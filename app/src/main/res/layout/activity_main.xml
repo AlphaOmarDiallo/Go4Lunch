@@ -7,9 +7,11 @@
     tools:context=".ui.MainActivity">
 
     <ImageView
-        android:id="@+id/imageView"
+        android:id="@+id/iv_background_login"
         android:layout_width="0dp"
         android:layout_height="0dp"
+        android:backgroundTintMode="add"
+        android:contentDescription="@string/co_workers_having_lunch"
         android:scaleType="centerCrop"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -20,9 +22,118 @@
         tools:srcCompat="@tools:sample/backgrounds/scenic" />
 
     <androidx.cardview.widget.CardView
-        android:layout_width="407dp"
-        android:layout_height="wrap_content"
+        android:id="@+id/cv_filter_login"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:cardBackgroundColor="#A6000000"
+        app:layout_constraintBottom_toBottomOf="@+id/iv_background_login"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <ImageView
+                android:id="@+id/iv_logo_login"
+                android:layout_width="248dp"
+                android:layout_height="255dp"
+                android:layout_marginTop="70dp"
+                android:layout_marginBottom="8dp"
+                android:contentDescription="@string/app_logo"
+                app:layout_constraintBottom_toTopOf="@+id/tv_appName_login"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.496"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:srcCompat="@drawable/ic_baseline_fastfood_24" />
+
+            <TextView
+                android:id="@+id/tv_appName_login"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:fontFamily="@font/roboto_black"
+                android:text="@string/app_name"
+                android:textAlignment="center"
+                android:textColor="@color/white"
+                android:textSize="60sp"
+                android:textStyle="bold"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/iv_logo_login" />
+
+            <TextView
+                android:id="@+id/tv_slogan_login"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="@string/slogan"
+                android:textAlignment="center"
+                android:textColor="@color/white"
+                android:textSize="11sp"
+                android:textStyle="italic"
+                app:layout_constraintEnd_toEndOf="@+id/tv_appName_login"
+                app:layout_constraintStart_toStartOf="@+id/tv_appName_login"
+                app:layout_constraintTop_toBottomOf="@+id/tv_appName_login" />
+
+            <Button
+                android:id="@+id/b_facebook_sign_in"
+                style="@style/Widget.MaterialComponents.Button.Icon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="32dp"
+                android:backgroundTint="@color/facebookBlue"
+                android:text="@string/facebook_sign_in"
+                android:textAlignment="center"
+                android:textAllCaps="false"
+                android:textColor="#000000"
+                app:icon="@drawable/ic_facebook_f"
+                app:iconSize="15dp"
+                app:layout_constraintBottom_toTopOf="@+id/b_google_sign_in"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.498"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tv_slogan_login"
+                app:layout_constraintVertical_chainStyle="packed"
+                tools:ignore="TextContrastCheck" />
+
+            <Button
+                android:id="@+id/b_google_sign_in"
+                style="@style/Widget.MaterialComponents.Button.Icon"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:backgroundTint="@color/googleRed"
+                android:text="@string/Google_sign_in"
+                android:textAlignment="center"
+                android:textAllCaps="false"
+                app:icon="@drawable/ic_google_icon"
+                app:iconSize="15dp"
+                app:layout_constraintBottom_toTopOf="@+id/b_twitter_sign_in"
+                app:layout_constraintEnd_toEndOf="@+id/b_facebook_sign_in"
+                app:layout_constraintStart_toStartOf="@+id/b_facebook_sign_in"
+                app:layout_constraintTop_toBottomOf="@+id/b_facebook_sign_in"
+                tools:ignore="TextContrastCheck" />
+
+            <Button
+                android:id="@+id/b_twitter_sign_in"
+                style="@style/Widget.MaterialComponents.Button.Icon"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:backgroundTint="@color/twitterBlue"
+                android:text="@string/Twitter_sign_in"
+                android:textAlignment="center"
+                android:textAllCaps="false"
+                app:icon="@drawable/ic_cib_twitter"
+                app:iconSize="15dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="@+id/b_google_sign_in"
+                app:layout_constraintStart_toStartOf="@+id/b_google_sign_in"
+                app:layout_constraintTop_toBottomOf="@+id/b_google_sign_in"
+                tools:ignore="TextContrastCheck" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.cardview.widget.CardView>
 </androidx.constraintlayout.widget.ConstraintLayout>
