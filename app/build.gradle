@@ -1,5 +1,7 @@
 apply plugin: 'com.android.application'
 apply plugin: 'dagger.hilt.android.plugin'
+apply plugin: 'com.android.application'
+apply plugin: 'com.google.gms.google-services'
 
 android {
     compileSdk 31
@@ -84,12 +86,14 @@ dependencies {
     //Hilt
     implementation 'com.google.dagger:hilt-android:2.41'
     annotationProcessor 'com.google.dagger:hilt-compiler:2.41'
-
-    // For instrumentation tests
+        // For instrumentation tests
     androidTestImplementation  'com.google.dagger:hilt-android-testing:2.41'
     androidTestAnnotationProcessor 'com.google.dagger:hilt-compiler:2.41'
-
-    // For local unit tests
+        // For local unit tests
     testImplementation 'com.google.dagger:hilt-android-testing:2.41'
     testAnnotationProcessor 'com.google.dagger:hilt-compiler:2.41'
+
+    //Firebase
+    implementation platform('com.google.firebase:firebase-bom:29.2.1')
+    implementation 'com.google.firebase:firebase-analytics'
 }
