@@ -7,4 +7,7 @@
     <string name="Google_sign_in">Sign in with Google</string>
     <string name="Twitter_sign_in">Sign in with Twitter</string>
 
+    //links
+    <string name="login_and_menu_background">https://images.pexels.com/photos/3184188/pexels-photo-3184188.jpeg?cs=srgb&amp;dl=pexels-fauxels-3184188.jpg&amp;fm=jpg</string>
+
 </resources>
