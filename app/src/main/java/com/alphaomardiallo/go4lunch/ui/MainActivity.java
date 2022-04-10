@@ -26,6 +26,7 @@ import com.google.firebase.auth.FirebaseUser;
 public class MainActivity extends AppCompatActivity {
     private static final int REQ_ONE_TAP = 9001;  // Can be any integer unique to the Activity.
     private static final int REC_SIGN_IN = 120;
+    private static final String BACKGROUND_URL = "https://images.pexels.com/photos/3184188/pexels-photo-3184188.jpeg?cs=srgb&dl=pexels-fauxels-3184188.jpg&fm=jpg";
     private boolean showOneTapUI = true;
     private ActivityMainBinding binding;
     private FirebaseAuth mAuth;
@@ -88,7 +89,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void setupBackgroundImage() {
         Glide.with(this)
-                .load("https://images.pexels.com/photos/3184188/pexels-photo-3184188.jpeg?cs=srgb&dl=pexels-fauxels-3184188.jpg&fm=jpg")
+                .load(BACKGROUND_URL)
                 .into(binding.ivBackgroundLogin);
     }
 }
