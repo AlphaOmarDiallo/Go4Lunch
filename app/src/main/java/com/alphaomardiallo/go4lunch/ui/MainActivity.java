@@ -30,6 +30,7 @@ public class MainActivity extends AppCompatActivity {
 
     private ActivityMainBinding binding;
 
+    /**setup to get back data from FirebaseUI activity if sign in needed*/
     private final ActivityResultLauncher<Intent> signInLauncher = registerForActivityResult(
             new FirebaseAuthUIActivityResultContract(),
             this::onSignInResult
@@ -45,6 +46,22 @@ public class MainActivity extends AppCompatActivity {
         checkIfSignedIn();
     }
 
+    /** UI update methods*/
+
+    private void showSnackBar(String message) {
+        Snackbar.make(binding.mainLayout, message, Snackbar.LENGTH_SHORT).show();
+    }
+
+    private void checkIfSignedIn() {
+        if (FirebaseAuth.getInstance().getCurrentUser() == null) {
+            createSignInIntent();
+        } else {
+            String userName = getString(R.string.welcome_back, FirebaseAuth.getInstance().getCurrentUser().getDisplayName());
+            showSnackBar(userName);
+        }
+    }
+
+    /**FirebaseUI related methods*/
     public void createSignInIntent() {
 
         List<AuthUI.IdpConfig> providers = Arrays.asList(
@@ -85,19 +102,6 @@ public class MainActivity extends AppCompatActivity {
             final Handler handler = new Handler(Looper.getMainLooper());
             handler.postDelayed(this::checkIfSignedIn, 1000);
         }
-    }
-
-    private void checkIfSignedIn() {
-        if (FirebaseAuth.getInstance().getCurrentUser() == null) {
-            createSignInIntent();
-        } else {
-            String userName = getString(R.string.welcome_back, FirebaseAuth.getInstance().getCurrentUser().getDisplayName());
-            showSnackBar(userName);
-        }
-    }
-
-    private void showSnackBar(String message) {
-        Snackbar.make(binding.mainLayout, message, Snackbar.LENGTH_SHORT).show();
     }
 
 }
