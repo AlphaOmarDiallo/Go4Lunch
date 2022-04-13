@@ -6,6 +6,15 @@
     <string name="facebook_sign_in">Sign in with Facebook</string>
     <string name="Google_sign_in">Sign in with Google</string>
     <string name="Twitter_sign_in">Sign in with Twitter</string>
+    <string name="You_are_connected">You are connected</string>
+    <string name="Disconnect">Disconnect</string>
+    <string name="error_not_connected">Please log in first</string>
+    <string name="error_authentication_canceled">Login aborted</string>
+    <string name="error_no_internet">Network unavailable</string>
+    <string name="error_unknown_error">An unknown error occurred</string>
+    <string name="connection_succeed">Login successful!</string>
+    <string name="button_login_text_logged">View your profile</string>
+    <string name="button_login_text_not_logged">Log In</string>
 
     //links
     <string name="login_and_menu_background">https://images.pexels.com/photos/3184188/pexels-photo-3184188.jpeg?cs=srgb&amp;dl=pexels-fauxels-3184188.jpg&amp;fm=jpg</string>
