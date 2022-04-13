@@ -15,6 +15,7 @@
     <string name="connection_succeed">Login successful!</string>
     <string name="button_login_text_logged">View your profile</string>
     <string name="button_login_text_not_logged">Log In</string>
+    <string name="welcome_back">Welcome back %1$s</string>
 
     //links
     <string name="login_and_menu_background">https://images.pexels.com/photos/3184188/pexels-photo-3184188.jpeg?cs=srgb&amp;dl=pexels-fauxels-3184188.jpg&amp;fm=jpg</string>
