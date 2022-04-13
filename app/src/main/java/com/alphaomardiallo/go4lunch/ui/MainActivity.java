@@ -37,23 +37,14 @@ public class MainActivity extends AppCompatActivity {
     private void checkIfSignedIn() {
         if (true) {
             startSignInActivity();
-        } /*else {
-                  Snackbar snackbar = Snackbar.make(binding.mainLayout, getString(R.string.You_are_connected), Snackbar.LENGTH_LONG)
-                    .setAction(getString(R.string.Disconnect), new View.OnClickListener() {
-                        @Override
-                        public void onClick(View view) {
-                            Snackbar snackbarBis = Snackbar.make(binding.mainLayout, "Message successfully disconnected.", Snackbar.LENGTH_SHORT);
-                            snackbarBis.show();
-                        }
-                    });
-            snackbar.show();
-        } */
+        }
     }
 
     private void startSignInActivity() {
         List<AuthUI.IdpConfig> providers = Arrays.asList(
                 new AuthUI.IdpConfig.GoogleBuilder().build(),
                 new AuthUI.IdpConfig.TwitterBuilder().build(),
+                new AuthUI.IdpConfig.FacebookBuilder().build(),
                 new AuthUI.IdpConfig.EmailBuilder().build()
         );
 
