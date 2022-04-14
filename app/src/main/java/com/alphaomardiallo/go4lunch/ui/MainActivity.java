@@ -11,8 +11,10 @@ import android.view.View;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.ViewModelProvider;
 
 import com.alphaomardiallo.go4lunch.R;
+import com.alphaomardiallo.go4lunch.data.viewModels.MainActivityVM;
 import com.alphaomardiallo.go4lunch.databinding.ActivityMainBinding;
 import com.firebase.ui.auth.AuthUI;
 import com.firebase.ui.auth.ErrorCodes;
@@ -26,9 +28,13 @@ import com.google.firebase.auth.FirebaseUser;
 import java.util.Arrays;
 import java.util.List;
 
+import dagger.hilt.android.AndroidEntryPoint;
+
+@AndroidEntryPoint
 public class MainActivity extends AppCompatActivity {
 
     private ActivityMainBinding binding;
+    public MainActivityVM viewModel;
 
     /**
      * setup to get back data from FirebaseUI activity if sign in needed
@@ -43,6 +49,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         View view = binding.getRoot();
+        viewModel = new ViewModelProvider(this).get(MainActivityVM.class);
         setContentView(view);
 
         checkIfSignedIn();
