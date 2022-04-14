@@ -26,4 +26,9 @@
     <string name="facebook_application_id">fb275016551500747</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="map_view">Map View</string>
+    <string name="list_view">List View</string>
+    <string name="workmates">Workmates</string>
+    <string name="i_m_hungry">I\'m Hungry</string>
+    <string name="available_workmates">Available workmates</string>
 </resources>
