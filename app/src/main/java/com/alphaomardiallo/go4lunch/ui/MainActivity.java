@@ -30,7 +30,9 @@ public class MainActivity extends AppCompatActivity {
 
     private ActivityMainBinding binding;
 
-    /**setup to get back data from FirebaseUI activity if sign in needed*/
+    /**
+     * setup to get back data from FirebaseUI activity if sign in needed
+     */
     private final ActivityResultLauncher<Intent> signInLauncher = registerForActivityResult(
             new FirebaseAuthUIActivityResultContract(),
             this::onSignInResult
@@ -46,7 +48,9 @@ public class MainActivity extends AppCompatActivity {
         checkIfSignedIn();
     }
 
-    /** UI update methods*/
+    /**
+     * UI update methods
+     */
 
     private void showSnackBar(String message) {
         Snackbar.make(binding.mainLayout, message, Snackbar.LENGTH_SHORT).show();
@@ -61,7 +65,9 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    /**FirebaseUI related methods*/
+    /**
+     * FirebaseUI related methods
+     */
     public void createSignInIntent() {
 
         List<AuthUI.IdpConfig> providers = Arrays.asList(
@@ -83,13 +89,10 @@ public class MainActivity extends AppCompatActivity {
     private void onSignInResult(FirebaseAuthUIAuthenticationResult result) {
         IdpResponse response = result.getIdpResponse();
         if (result.getResultCode() == RESULT_OK) {
-            // Successfully signed in
             FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
             Log.e(TAG, "onSignInResult: user " + user, null);
             showSnackBar(getString(R.string.connection_succeed));
-            // ...
         } else {
-            // ERRORS
             if (response == null) {
                 showSnackBar(getString(R.string.error_authentication_canceled));
             } else if (response.getError() != null) {
@@ -103,5 +106,4 @@ public class MainActivity extends AppCompatActivity {
             handler.postDelayed(this::checkIfSignedIn, 1000);
         }
     }
-
 }
