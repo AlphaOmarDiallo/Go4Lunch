@@ -1,5 +1,10 @@
 package com.alphaomardiallo.go4lunch.data.repositories;
 
+import androidx.annotation.Nullable;
+
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+
 import javax.inject.Inject;
 
 public class UserRepositoryImp implements UserRepository {
@@ -18,14 +23,17 @@ public class UserRepositoryImp implements UserRepository {
         }
         synchronized (UserRepository.class) {
             if (instance == null) {
-                instance = new UserRepository() {
-                    @Override
-                    public UserRepository getInstance() {
-                        return instance = this;
-                    }
-                };
+                instance = new UserRepositoryImp();
+                }
             }
             return instance;
-        }
     }
+
+    @Nullable
+    @Override
+    public FirebaseUser getCurrentUser() {
+        return FirebaseAuth.getInstance().getCurrentUser();
+    }
+
+
 }

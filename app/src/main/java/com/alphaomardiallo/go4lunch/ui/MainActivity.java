@@ -1,12 +1,9 @@
 package com.alphaomardiallo.go4lunch.ui;
 
-import static android.content.ContentValues.TAG;
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
-import android.util.Log;
 import android.view.View;
 
 import androidx.activity.result.ActivityResultLauncher;
@@ -22,8 +19,6 @@ import com.firebase.ui.auth.FirebaseAuthUIActivityResultContract;
 import com.firebase.ui.auth.IdpResponse;
 import com.firebase.ui.auth.data.model.FirebaseAuthUIAuthenticationResult;
 import com.google.android.material.snackbar.Snackbar;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 
 import java.util.Arrays;
 import java.util.List;
@@ -64,10 +59,10 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void checkIfSignedIn() {
-        if (FirebaseAuth.getInstance().getCurrentUser() == null) {
+        if (viewModel.isCurrentUserNotLoggedIn()) {
             createSignInIntent();
         } else {
-            String userName = getString(R.string.welcome_back, FirebaseAuth.getInstance().getCurrentUser().getDisplayName());
+            String userName = getString(R.string.welcome_back, viewModel.getCurrentUser().getDisplayName());
             showSnackBar(userName);
         }
     }
@@ -96,8 +91,6 @@ public class MainActivity extends AppCompatActivity {
     private void onSignInResult(FirebaseAuthUIAuthenticationResult result) {
         IdpResponse response = result.getIdpResponse();
         if (result.getResultCode() == RESULT_OK) {
-            FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-            Log.e(TAG, "onSignInResult: user " + user, null);
             showSnackBar(getString(R.string.connection_succeed));
         } else {
             if (response == null) {

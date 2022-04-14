@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel;
 
 import com.alphaomardiallo.go4lunch.data.repositories.UserRepository;
 import com.alphaomardiallo.go4lunch.data.repositories.UserRepositoryImp;
+import com.google.firebase.auth.FirebaseUser;
 
 import javax.inject.Inject;
 
@@ -21,5 +22,13 @@ public class MainActivityVM extends ViewModel {
 
     public UserRepository getInstance() {
         return userRepositoryImp.getInstance();
+    }
+
+    public FirebaseUser getCurrentUser() {
+        return userRepositoryImp.getCurrentUser();
+    }
+
+    public Boolean isCurrentUserNotLoggedIn(){
+        return (this.getCurrentUser() == null);
     }
 }
