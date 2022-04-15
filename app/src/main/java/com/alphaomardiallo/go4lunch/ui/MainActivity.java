@@ -1,21 +1,29 @@
 package com.alphaomardiallo.go4lunch.ui;
 
+import static android.content.ContentValues.TAG;
+
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageView;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.alphaomardiallo.go4lunch.R;
 import com.alphaomardiallo.go4lunch.data.viewModels.MainViewModel;
 import com.alphaomardiallo.go4lunch.databinding.ActivityMainBinding;
+import com.bumptech.glide.Glide;
 import com.firebase.ui.auth.AuthUI;
 import com.firebase.ui.auth.ErrorCodes;
 import com.firebase.ui.auth.FirebaseAuthUIActivityResultContract;
@@ -26,6 +34,7 @@ import com.google.android.material.snackbar.Snackbar;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 import dagger.hilt.android.AndroidEntryPoint;
 
@@ -34,6 +43,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     private ActivityMainBinding binding;
     public MainViewModel viewModel;
+    private ActionBarDrawerToggle toggle;
 
     /**
      * setup to get back data from FirebaseUI activity if sign in needed
@@ -51,8 +61,16 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         viewModel = new ViewModelProvider(this).get(MainViewModel.class);
         setContentView(view);
 
+        setSupportActionBar(binding.toolbar);
+        Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
+
         binding.bottomNavigationView.setOnItemSelectedListener(this::onNavigationItemSelected);
         binding.bottomNavigationView.setSelectedItemId(R.id.menuItemMapView);
+
+        toggle = new ActionBarDrawerToggle(this, binding.mainLayout, R.string.Open_drawer_menu, R.string.Close_drawer_menu);
+        binding.mainLayout.addDrawerListener(toggle);
+        toggle.syncState();
 
         checkIfSignedIn();
     }
@@ -69,9 +87,27 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         if (viewModel.isCurrentUserNotLoggedIn()) {
             createSignInIntent();
         } else {
-            String userName = getString(R.string.welcome_back, viewModel.getCurrentUser().getDisplayName());
-            showSnackBar(userName);
+            setupNavigationHeader();
         }
+    }
+
+    private void setupNavigationHeader(){
+        NavigationView navigationView = findViewById(R.id.drawerLayout);
+        View headerView = navigationView.getHeaderView(0);
+        ImageView background = headerView.findViewById(R.id.iVBackgroundHeaderMenu);
+        ImageView userAvatar = headerView.findViewById(R.id.iVUserAvatarDrawerMenu);
+        TextView userName = headerView.findViewById(R.id.tVUserNameDrawerMenu);
+        TextView userEmail = headerView.findViewById(R.id.tVUserEmailDrawerMenu);
+
+        Glide.with(this)
+                .load(getString(R.string.nav_drawer_background))
+                .into(background);
+        Glide.with(this)
+                .load(viewModel.getCurrentUser().getPhotoUrl())
+                .circleCrop()
+                .into(userAvatar);
+        userName.setText(viewModel.getCurrentUser().getDisplayName());
+        userEmail.setText(viewModel.getCurrentUser().getEmail());
     }
 
     /**
@@ -107,6 +143,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        if (toggle.onOptionsItemSelected(item)) {
+            return true;
+        }
         return super.onOptionsItemSelected(item);
     }
 

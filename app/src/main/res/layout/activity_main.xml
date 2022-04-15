@@ -48,10 +48,13 @@
     <com.google.android.material.navigation.NavigationView
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
-        app:headerLayout="@layout/navigation_drawer_menu"
+        android:id="@+id/drawerLayout"
+        app:headerLayout="@layout/navigation_drawer_header"
         app:menu="@menu/drawer_navigation_menu"
         android:layout_gravity="start"
+        app:itemIconTint="@color/white"
         android:fitsSystemWindows="true"
-        android:background="@color/coral" />
+        android:background="@color/coral"
+        app:itemTextColor="@color/white" />
 
 </androidx.drawerlayout.widget.DrawerLayout>

@@ -19,13 +19,13 @@
 
     //links
     <string name="login_and_menu_background">https://images.pexels.com/photos/3184188/pexels-photo-3184188.jpeg?cs=srgb&amp;dl=pexels-fauxels-3184188.jpg&amp;fm=jpg</string>
+    <string name="nav_drawer_background">https://images.pexels.com/photos/3184183/pexels-photo-3184183.jpeg?cs=srgb&amp;dl=pexels-fauxels-3184183.jpg&amp;fm=jpg</string>
 
     //Keys
     <string name="default_web_client_id_google">407532419271-qimb705lnldgpbks9mb0bhoveskv8po6.apps.googleusercontent.com</string>
     <string name="facebook_app_id">275016551500747</string>
     <string name="facebook_application_id">fb275016551500747</string>
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+
     <string name="map_view">Map View</string>
     <string name="list_view">List View</string>
     <string name="workmates">Workmates</string>
@@ -34,4 +34,6 @@
     <string name="your_lunch">Your Lunch</string>
     <string name="settings">Settings</string>
     <string name="logout">Logout</string>
+    <string name="Open_drawer_menu">Open drawer menu</string>
+    <string name="Close_drawer_menu">Close drawer menu</string>
 </resources>

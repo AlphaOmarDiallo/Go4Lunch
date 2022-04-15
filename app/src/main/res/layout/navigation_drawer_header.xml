@@ -7,7 +7,7 @@
     android:layout_height="250dp">
 
     <ImageView
-        android:id="@+id/iVbackgroundHeaderMenu"
+        android:id="@+id/iVBackgroundHeaderMenu"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:scaleType="center"
@@ -16,7 +16,8 @@
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        tools:srcCompat="@tools:sample/backgrounds/scenic" />
+        tools:srcCompat="@tools:sample/backgrounds/scenic"
+        android:contentDescription="TODO" />
 
     <androidx.cardview.widget.CardView
         android:layout_width="0dp"
@@ -33,44 +34,44 @@
             android:layout_height="match_parent">
 
             <TextView
-                android:id="@+id/textView3"
+                android:id="@+id/tVUserEmailDrawerMenu"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
                 android:layout_marginEnd="16dp"
-                android:text="TextView"
                 android:textColor="@color/white"
-                app:layout_constraintBottom_toBottomOf="@+id/imageView3"
+                app:layout_constraintBottom_toBottomOf="@+id/iVUserAvatarDrawerMenu"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="@+id/imageView3"
-                app:layout_constraintTop_toBottomOf="@+id/textView2"
+                app:layout_constraintStart_toEndOf="@+id/iVUserAvatarDrawerMenu"
+                app:layout_constraintTop_toBottomOf="@+id/tVUserNameDrawerMenu"
                 tools:text="john.doe@gmail.com" />
 
             <TextView
-                android:id="@+id/textView2"
+                android:id="@+id/tVUserNameDrawerMenu"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
                 android:layout_marginEnd="16dp"
                 android:textColor="@color/white"
                 android:textStyle="bold"
-                app:layout_constraintBottom_toTopOf="@+id/textView3"
+                app:layout_constraintBottom_toTopOf="@+id/tVUserEmailDrawerMenu"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="@+id/imageView3"
-                app:layout_constraintTop_toTopOf="@+id/imageView3"
+                app:layout_constraintStart_toEndOf="@+id/iVUserAvatarDrawerMenu"
+                app:layout_constraintTop_toTopOf="@+id/iVUserAvatarDrawerMenu"
                 app:layout_constraintVertical_chainStyle="packed"
                 tools:text="John Doe" />
 
             <ImageView
-                android:id="@+id/imageView3"
+                android:id="@+id/iVUserAvatarDrawerMenu"
                 android:layout_width="100dp"
                 android:layout_height="100dp"
                 android:layout_marginStart="24dp"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@+id/textView3"
+                app:layout_constraintEnd_toStartOf="@+id/tVUserEmailDrawerMenu"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="@+id/guideline2"
-                tools:srcCompat="@tools:sample/avatars" />
+                tools:srcCompat="@tools:sample/avatars"
+                android:contentDescription="TODO" />
 
             <androidx.constraintlayout.widget.Guideline
                 android:id="@+id/guideline2"
@@ -80,7 +81,7 @@
                 app:layout_constraintGuide_percent="0.4" />
 
             <TextView
-                android:id="@+id/textView"
+                android:id="@+id/tVAppNameDrawerMenu"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/roboto_black"
