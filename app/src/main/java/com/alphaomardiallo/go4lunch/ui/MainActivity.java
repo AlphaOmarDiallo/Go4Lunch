@@ -60,37 +60,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         viewModel = new ViewModelProvider(this).get(MainViewModel.class);
         setContentView(view);
 
-        setSupportActionBar(binding.toolbar);
-        Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setDisplayShowTitleEnabled(false);
-
-        binding.bottomNavigationView.setOnItemSelectedListener(this::onNavigationItemSelected);
-        binding.bottomNavigationView.setSelectedItemId(R.id.menuItemMapView);
-
-        toggle = new ActionBarDrawerToggle(this, binding.mainLayout, R.string.Open_drawer_menu, R.string.Close_drawer_menu);
-        binding.mainLayout.addDrawerListener(toggle);
-        toggle.syncState();
-
-        binding.navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
-
-            @SuppressLint("NonConstantResourceId")
-            @Override
-            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                switch (item.getItemId()) {
-                    case R.id.yourLunchNavDrawer:
-                        showSnackBar("your lunch");
-                    case R.id.settingsNavDrawer:
-                        showSnackBar("settings");
-                    case R.id.logoutNavDrawer:
-                        viewModel.signOut(MainActivity.this).addOnSuccessListener(aVoid -> {
-                            Log.e(TAG, "onNavigationItemSelected: after logout " + viewModel.getCurrentUser(), null);
-                            createSignInIntent();
-                        });
-                }
-                return true;
-            }
-        });
-
+        setupToolBar();
+        setupBottomNavBar();
+        setupNavDrawer();
 
         checkIfSignedIn();
     }
@@ -98,6 +70,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     /**
      * UI update methods
      */
+    private void setupToolBar() {
+        setSupportActionBar(binding.toolbar);
+        Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
+    }
 
     private void showSnackBar(String message) {
         Snackbar.make(binding.mainLayout, message, Snackbar.LENGTH_SHORT).show();
@@ -111,25 +88,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
     }
 
-    private void setupNavigationHeader() {
-        NavigationView navigationView = findViewById(R.id.navigationView);
-        View headerView = navigationView.getHeaderView(0);
-        ImageView background = headerView.findViewById(R.id.iVBackgroundHeaderMenu);
-        ImageView userAvatar = headerView.findViewById(R.id.iVUserAvatarDrawerMenu);
-        TextView userName = headerView.findViewById(R.id.tVUserNameDrawerMenu);
-        TextView userEmail = headerView.findViewById(R.id.tVUserEmailDrawerMenu);
-
-        Glide.with(this)
-                .load(getString(R.string.nav_drawer_background))
-                .into(background);
-        Glide.with(this)
-                .load(viewModel.getCurrentUser().getPhotoUrl())
-                .circleCrop()
-                .into(userAvatar);
-        userName.setText(viewModel.getCurrentUser().getDisplayName());
-        userEmail.setText(viewModel.getCurrentUser().getEmail());
-    }
-
     /**
      * Bottom navigation bar setup
      */
@@ -137,6 +95,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     MapViewFragment mapViewFragment = new MapViewFragment();
     ListViewFragment listViewFragment = new ListViewFragment();
     WorkmatesFragment workmatesFragment = new WorkmatesFragment();
+
+    private void setupBottomNavBar() {
+        binding.bottomNavigationView.setOnItemSelectedListener(this::onNavigationItemSelected);
+        binding.bottomNavigationView.setSelectedItemId(R.id.menuItemMapView);
+    }
 
     @SuppressLint("NonConstantResourceId")
     @Override
@@ -160,6 +123,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     /**
      * Navigation drawer setup
      */
+    private void setupNavDrawer() {
+        toggle = new ActionBarDrawerToggle(this, binding.mainLayout, R.string.Open_drawer_menu, R.string.Close_drawer_menu);
+        binding.mainLayout.addDrawerListener(toggle);
+        toggle.syncState();
+        handleClickNavDrawer();
+    }
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
@@ -167,6 +136,46 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @SuppressLint("NonConstantResourceId")
+    private void handleClickNavDrawer() {
+        binding.navigationView.setNavigationItemSelectedListener(item -> {
+            switch (item.getItemId()) {
+                case R.id.yourLunchNavDrawer:
+                    showSnackBar("your lunch");
+                    break;
+                case R.id.settingsNavDrawer:
+                    showSnackBar("settings");
+                    break;
+                case R.id.logoutNavDrawer:
+                    viewModel.signOut(MainActivity.this).addOnSuccessListener(aVoid -> {
+                        Log.e(TAG, "onNavigationItemSelected: after logout " + viewModel.getCurrentUser(), null);
+                        createSignInIntent();
+                    });
+                    break;
+            }
+            return true;
+        });
+    }
+
+    private void setupNavigationHeader() {
+        NavigationView navigationView = findViewById(R.id.navigationView);
+        View headerView = navigationView.getHeaderView(0);
+        ImageView background = headerView.findViewById(R.id.iVBackgroundHeaderMenu);
+        ImageView userAvatar = headerView.findViewById(R.id.iVUserAvatarDrawerMenu);
+        TextView userName = headerView.findViewById(R.id.tVUserNameDrawerMenu);
+        TextView userEmail = headerView.findViewById(R.id.tVUserEmailDrawerMenu);
+
+        Glide.with(this)
+                .load(getString(R.string.nav_drawer_background))
+                .into(background);
+        Glide.with(this)
+                .load(viewModel.getCurrentUser().getPhotoUrl())
+                .circleCrop()
+                .into(userAvatar);
+        userName.setText(viewModel.getCurrentUser().getDisplayName());
+        userEmail.setText(viewModel.getCurrentUser().getEmail());
     }
 
     /**
