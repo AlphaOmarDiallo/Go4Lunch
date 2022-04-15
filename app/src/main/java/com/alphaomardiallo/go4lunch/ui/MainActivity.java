@@ -1,18 +1,14 @@
 package com.alphaomardiallo.go4lunch.ui;
 
-import static android.content.ContentValues.TAG;
-
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.annotation.NonNull;
@@ -72,6 +68,23 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         binding.mainLayout.addDrawerListener(toggle);
         toggle.syncState();
 
+        binding.navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener(){
+
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                switch (item.getItemId()) {
+                    case R.id.yourLunchNavDrawer:
+                        showSnackBar("your lunch");
+                    case R.id.settingsNavDrawer:
+                        showSnackBar("settings");
+                    case R.id.logoutNavDrawer:
+
+                }
+                return true;
+            }
+        });
+
+
         checkIfSignedIn();
     }
 
@@ -92,7 +105,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     private void setupNavigationHeader(){
-        NavigationView navigationView = findViewById(R.id.drawerLayout);
+        NavigationView navigationView = findViewById(R.id.navigationView);
         View headerView = navigationView.getHeaderView(0);
         ImageView background = headerView.findViewById(R.id.iVBackgroundHeaderMenu);
         ImageView userAvatar = headerView.findViewById(R.id.iVUserAvatarDrawerMenu);
@@ -174,6 +187,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         IdpResponse response = result.getIdpResponse();
         if (result.getResultCode() == RESULT_OK) {
             showSnackBar(getString(R.string.connection_succeed));
+            setupNavigationHeader();
         } else {
             if (response == null) {
                 showSnackBar(getString(R.string.error_authentication_canceled));
