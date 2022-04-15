@@ -1,12 +1,15 @@
 package com.alphaomardiallo.go4lunch.ui;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.view.MenuItem;
 import android.view.View;
 
 import androidx.activity.result.ActivityResultLauncher;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 
@@ -18,6 +21,7 @@ import com.firebase.ui.auth.ErrorCodes;
 import com.firebase.ui.auth.FirebaseAuthUIActivityResultContract;
 import com.firebase.ui.auth.IdpResponse;
 import com.firebase.ui.auth.data.model.FirebaseAuthUIAuthenticationResult;
+import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.snackbar.Snackbar;
 
 import java.util.Arrays;
@@ -26,7 +30,7 @@ import java.util.List;
 import dagger.hilt.android.AndroidEntryPoint;
 
 @AndroidEntryPoint
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
     private ActivityMainBinding binding;
     public MainActivityVM viewModel;
@@ -47,6 +51,9 @@ public class MainActivity extends AppCompatActivity {
         viewModel = new ViewModelProvider(this).get(MainActivityVM.class);
         setContentView(view);
 
+        binding.bottomNavigationView.setOnItemSelectedListener(this::onNavigationItemSelected);
+        binding.bottomNavigationView.setSelectedItemId(R.id.menuItemMapView);
+
         checkIfSignedIn();
     }
 
@@ -65,6 +72,33 @@ public class MainActivity extends AppCompatActivity {
             String userName = getString(R.string.welcome_back, viewModel.getCurrentUser().getDisplayName());
             showSnackBar(userName);
         }
+    }
+
+    /**
+     * Bottom navigation bar setup
+     */
+
+    MapViewFragment mapViewFragment = new MapViewFragment();
+    ListViewFragment listViewFragment = new ListViewFragment();
+    WorkmatesFragment workmatesFragment = new WorkmatesFragment();
+
+    @SuppressLint("NonConstantResourceId")
+    @Override
+    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.menuItemMapView:
+                getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainerView, mapViewFragment).commit();
+                return true;
+
+            case R.id.menuItemListView:
+                getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainerView, listViewFragment).commit();
+                return true;
+
+            case R.id.menuItemWorkmates:
+                getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainerView, workmatesFragment).commit();
+                return true;
+        }
+        return false;
     }
 
     /**
