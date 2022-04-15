@@ -14,7 +14,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.alphaomardiallo.go4lunch.R;
-import com.alphaomardiallo.go4lunch.data.viewModels.MainActivityVM;
+import com.alphaomardiallo.go4lunch.data.viewModels.MainViewModel;
 import com.alphaomardiallo.go4lunch.databinding.ActivityMainBinding;
 import com.firebase.ui.auth.AuthUI;
 import com.firebase.ui.auth.ErrorCodes;
@@ -33,7 +33,7 @@ import dagger.hilt.android.AndroidEntryPoint;
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
     private ActivityMainBinding binding;
-    public MainActivityVM viewModel;
+    public MainViewModel viewModel;
 
     /**
      * setup to get back data from FirebaseUI activity if sign in needed
@@ -48,7 +48,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         super.onCreate(savedInstanceState);
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         View view = binding.getRoot();
-        viewModel = new ViewModelProvider(this).get(MainActivityVM.class);
+        viewModel = new ViewModelProvider(this).get(MainViewModel.class);
         setContentView(view);
 
         binding.bottomNavigationView.setOnItemSelectedListener(this::onNavigationItemSelected);
@@ -99,6 +99,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 return true;
         }
         return false;
+    }
+
+    /**
+     * Navigation drawer setup
+     */
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        return super.onOptionsItemSelected(item);
     }
 
     /**

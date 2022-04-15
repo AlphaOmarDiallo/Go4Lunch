@@ -11,12 +11,12 @@ import javax.inject.Inject;
 import dagger.hilt.android.lifecycle.HiltViewModel;
 
 @HiltViewModel
-public class MainActivityVM extends ViewModel {
+public class MainViewModel extends ViewModel {
 
     private final UserRepositoryImp userRepositoryImp;
 
     @Inject
-    public MainActivityVM(UserRepositoryImp userRepositoryImp) {
+    public MainViewModel(UserRepositoryImp userRepositoryImp) {
         this.userRepositoryImp = userRepositoryImp;
     }
 
