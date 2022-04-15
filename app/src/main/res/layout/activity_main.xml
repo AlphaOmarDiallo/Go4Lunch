@@ -15,7 +15,7 @@
             android:id="@+id/toolbar"
             android:layout_width="409dp"
             android:layout_height="wrap_content"
-            android:background="?attr/colorPrimary"
+            android:background="@color/coral"
             android:minHeight="?attr/actionBarSize"
             android:theme="?attr/actionBarTheme"
             app:layout_constraintEnd_toEndOf="parent"
@@ -51,6 +51,7 @@
         app:headerLayout="@layout/navigation_drawer_menu"
         app:menu="@menu/drawer_navigation_menu"
         android:layout_gravity="start"
-        android:fitsSystemWindows="true"/>
+        android:fitsSystemWindows="true"
+        android:background="@color/coral" />
 
 </androidx.drawerlayout.widget.DrawerLayout>

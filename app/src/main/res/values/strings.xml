@@ -31,4 +31,7 @@
     <string name="workmates">Workmates</string>
     <string name="i_m_hungry">I\'m Hungry</string>
     <string name="available_workmates">Available workmates</string>
+    <string name="your_lunch">Your Lunch</string>
+    <string name="settings">Settings</string>
+    <string name="logout">Logout</string>
 </resources>
