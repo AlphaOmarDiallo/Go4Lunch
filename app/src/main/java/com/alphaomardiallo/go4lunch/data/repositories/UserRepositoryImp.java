@@ -1,7 +1,11 @@
 package com.alphaomardiallo.go4lunch.data.repositories;
 
+import android.content.Context;
+
 import androidx.annotation.Nullable;
 
+import com.firebase.ui.auth.AuthUI;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
@@ -35,5 +39,14 @@ public class UserRepositoryImp implements UserRepository {
         return FirebaseAuth.getInstance().getCurrentUser();
     }
 
+    @Override
+    public Task<Void> signOut(Context context) {
+        return AuthUI.getInstance().signOut(context);
+    }
+
+    @Override
+    public Task<Void> deleteUser(Context context) {
+        return AuthUI.getInstance().delete(context);
+    }
 
 }

@@ -1,10 +1,13 @@
 package com.alphaomardiallo.go4lunch.ui;
 
+import static android.content.ContentValues.TAG;
+
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
@@ -68,8 +71,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         binding.mainLayout.addDrawerListener(toggle);
         toggle.syncState();
 
-        binding.navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener(){
+        binding.navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
 
+            @SuppressLint("NonConstantResourceId")
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                 switch (item.getItemId()) {
@@ -78,7 +82,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     case R.id.settingsNavDrawer:
                         showSnackBar("settings");
                     case R.id.logoutNavDrawer:
-
+                        viewModel.signOut(MainActivity.this).addOnSuccessListener(aVoid -> {
+                            Log.e(TAG, "onNavigationItemSelected: after logout " + viewModel.getCurrentUser(), null);
+                            createSignInIntent();
+                        });
                 }
                 return true;
             }
@@ -104,7 +111,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
     }
 
-    private void setupNavigationHeader(){
+    private void setupNavigationHeader() {
         NavigationView navigationView = findViewById(R.id.navigationView);
         View headerView = navigationView.getHeaderView(0);
         ImageView background = headerView.findViewById(R.id.iVBackgroundHeaderMenu);

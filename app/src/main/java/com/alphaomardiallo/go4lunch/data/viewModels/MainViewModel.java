@@ -1,9 +1,12 @@
 package com.alphaomardiallo.go4lunch.data.viewModels;
 
+import android.content.Context;
+
 import androidx.lifecycle.ViewModel;
 
 import com.alphaomardiallo.go4lunch.data.repositories.UserRepository;
 import com.alphaomardiallo.go4lunch.data.repositories.UserRepositoryImp;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseUser;
 
 import javax.inject.Inject;
@@ -28,7 +31,15 @@ public class MainViewModel extends ViewModel {
         return userRepositoryImp.getCurrentUser();
     }
 
-    public Boolean isCurrentUserNotLoggedIn(){
+    public Boolean isCurrentUserNotLoggedIn() {
         return (this.getCurrentUser() == null);
+    }
+
+    public Task<Void> signOut(Context context) {
+        return userRepositoryImp.signOut(context);
+    }
+
+    public Task<Void> deleteUser(Context context) {
+        return userRepositoryImp.deleteUser(context);
     }
 }
