@@ -73,24 +73,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.options_menu, menu);
-
-        // Associate searchable configuration with the SearchView
-        SearchManager searchManager =
-                (SearchManager) getSystemService(Context.SEARCH_SERVICE);
-        SearchView searchView =
-                (SearchView) menu.findItem(R.id.search).getActionView();
-        searchView.setSearchableInfo(
-                searchManager.getSearchableInfo(getComponentName()));
-        searchView.setBackgroundColor(getResources().getColor(R.color.white));
-        searchView.setQueryHint(getString(R.string.search_hint));
-        searchView.setIconifiedByDefault(false);
-
-        return true;
+    protected void onResume() {
+        super.onResume();
+        checkIfSignedIn();
     }
-
 
     /**
      * UI update methods
@@ -146,6 +132,29 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     /**
+     * SearchBar setup
+     */
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.options_menu, menu);
+
+        // Associate searchable configuration with the SearchView
+        SearchManager searchManager =
+                (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+        SearchView searchView =
+                (SearchView) menu.findItem(R.id.search).getActionView();
+        searchView.setSearchableInfo(
+                searchManager.getSearchableInfo(getComponentName()));
+        searchView.setBackgroundColor(getResources().getColor(R.color.white));
+        searchView.setQueryHint(getString(R.string.search_hint));
+        searchView.setIconifiedByDefault(false);
+
+        return true;
+    }
+
+    /**
      * Navigation drawer setup
      */
     private void setupNavDrawer() {
@@ -171,7 +180,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     showSnackBar("your lunch");
                     break;
                 case R.id.settingsNavDrawer:
-                    showSnackBar("settings");
+                    Intent settingIntent = new Intent(this, SettingsActivity.class);
+                    startActivity(settingIntent);
                     break;
                 case R.id.logoutNavDrawer:
                     viewModel.signOut(MainActivity.this).addOnSuccessListener(aVoid -> {

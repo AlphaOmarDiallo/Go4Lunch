@@ -41,4 +41,9 @@
     <style name="CustomBurger" parent="Base.Widget.AppCompat.DrawerArrowToggle">>
         <item name="color">@android:color/white</item>
     </style>
+
+    <style name="ThemeOverlay.Go4Lunch.FullscreenContainer" parent="">
+        <item name="fullscreenBackgroundColor">@color/light_blue_600</item>
+        <item name="fullscreenTextColor">@color/light_blue_A200</item>
+    </style>
 </resources>
