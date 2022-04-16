@@ -228,6 +228,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         List<AuthUI.IdpConfig> providers = Arrays.asList(
                 new AuthUI.IdpConfig.GoogleBuilder().build(),
+                //Unstable twitter login, follow matter here: https://github.com/firebase/firebase-js-sdk/issues/4256
                 new AuthUI.IdpConfig.TwitterBuilder().build(),
                 new AuthUI.IdpConfig.FacebookBuilder().build(),
                 new AuthUI.IdpConfig.EmailBuilder().build());
