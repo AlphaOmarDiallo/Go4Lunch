@@ -88,7 +88,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private void setupToolBar() {
         setSupportActionBar(binding.toolbar);
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setDisplayShowTitleEnabled(false);
+        getSupportActionBar().setDisplayShowTitleEnabled(true);
     }
 
     private void showSnackBar(String message) {
@@ -122,14 +122,17 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         switch (item.getItemId()) {
             case R.id.menuItemMapView:
                 getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainerView, mapViewFragment).commit();
+                Objects.requireNonNull(getSupportActionBar()).setTitle(getString(R.string.i_m_hungry));
                 return true;
 
             case R.id.menuItemListView:
                 getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainerView, listViewFragment).commit();
+                Objects.requireNonNull(getSupportActionBar()).setTitle(getString(R.string.i_m_hungry));
                 return true;
 
             case R.id.menuItemWorkmates:
                 getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainerView, workmatesFragment).commit();
+                Objects.requireNonNull(getSupportActionBar()).setTitle(getString(R.string.available_workmates));
                 return true;
         }
         return false;
@@ -154,6 +157,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         searchView.setBackgroundColor(getResources().getColor(R.color.white));
         searchView.setQueryHint(getString(R.string.search_hint));
         searchView.setIconifiedByDefault(false);
+        searchView.getOverlay();
 
         return true;
     }
