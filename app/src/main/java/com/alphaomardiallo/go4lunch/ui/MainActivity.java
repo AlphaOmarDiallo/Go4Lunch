@@ -86,6 +86,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 searchManager.getSearchableInfo(getComponentName()));
         searchView.setBackgroundColor(getResources().getColor(R.color.white));
         searchView.setQueryHint(getString(R.string.search_hint));
+        searchView.setIconifiedByDefault(false);
 
         return true;
     }
