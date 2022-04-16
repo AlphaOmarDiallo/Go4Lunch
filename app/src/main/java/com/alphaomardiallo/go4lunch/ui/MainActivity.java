@@ -22,6 +22,7 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.view.GravityCompat;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.alphaomardiallo.go4lunch.R;
@@ -75,7 +76,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Override
     protected void onResume() {
         super.onResume();
-        checkIfSignedIn();
+        binding.mainLayout.closeDrawer(GravityCompat.START);
+        if (viewModel.isCurrentUserNotLoggedIn()) {
+            checkIfSignedIn();
+        }
     }
 
     /**

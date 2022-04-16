@@ -57,4 +57,9 @@
     <string name="title_activity_settings">SettingsActivity</string>
     <string name="user_avatar">User avatar</string>
     <string name="delete_account">Delete account</string>
+    <string name="cancel">Cancel</string>
+    <string name="dialog_account_delete">Are you sure you want to delete your account? All data will be lost forever.</string>
+    <string name="dialog_account_title">Delete my account</string>
+    <string name="OK">OK</string>
+
 </resources>

@@ -1,5 +1,6 @@
 package com.alphaomardiallo.go4lunch.ui;
 
+import android.app.AlertDialog;
 import android.os.Bundle;
 import android.view.View;
 
@@ -66,14 +67,25 @@ public class SettingsActivity extends AppCompatActivity {
         binding.tVUserNameSettings.setText(viewModel.getCurrentUser().getDisplayName());
         binding.tVUserPEmailSettings.setText(viewModel.getCurrentUser().getEmail());
 
-        binding.buttonDeleteAccount.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                viewModel.signOut(SettingsActivity.this);
-                viewModel.deleteUser(SettingsActivity.this);
-                finish();
-            }
-        });
+        binding.buttonDeleteAccount.setOnClickListener(view -> accountDeletionAlertDialog());
     }
 
+    private void accountDeletionAlertDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(SettingsActivity.this);
+// Add the buttons
+        builder.setPositiveButton(R.string.OK, (dialog, id) -> {
+            viewModel.signOut(SettingsActivity.this);
+            viewModel.deleteUser(SettingsActivity.this);
+            finish();
+        });
+        builder.setNegativeButton(R.string.cancel, (dialog, id) -> dialog.cancel());
+// Set other dialog properties
+        builder.setCancelable(true);
+        builder.setMessage(R.string.dialog_account_delete)
+                .setTitle(R.string.dialog_account_title);
+
+// Create the AlertDialog
+        AlertDialog dialog = builder.create();
+        dialog.show();
+    }
 }
