@@ -36,4 +36,6 @@
     <string name="logout">LOGOUT</string>
     <string name="Open_drawer_menu">Open drawer menu</string>
     <string name="Close_drawer_menu">Close drawer menu</string>
+    <string name="search_title">Search title</string>
+    <string name="search_hint">Type here</string>
 </resources>
