@@ -3,13 +3,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/bottom_nav_implementation"
-    app:startDestination="@id/mapViewFragment">
+    app:startDestination="@id/mapsFragment">
 
-    <fragment
-        android:id="@+id/mapViewFragment"
-        android:name="com.alphaomardiallo.go4lunch.ui.MapViewFragment"
-        android:label="fragment_map_view"
-        tools:layout="@layout/fragment_map_view" />
     <fragment
         android:id="@+id/listViewFragment2"
         android:name="com.alphaomardiallo.go4lunch.ui.ListViewFragment"
@@ -20,4 +15,9 @@
         android:name="com.alphaomardiallo.go4lunch.ui.WorkmatesFragment"
         android:label="fragment_workmates"
         tools:layout="@layout/fragment_workmates" />
+    <fragment
+        android:id="@+id/mapsFragment"
+        android:name="com.alphaomardiallo.go4lunch.ui.MapsFragment"
+        android:label="fragment_maps"
+        tools:layout="@layout/fragment_maps" />
 </navigation>

@@ -107,7 +107,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
      * Bottom navigation bar setup
      */
 
-    MapViewFragment mapViewFragment = new MapViewFragment();
+    //MapViewFragment mapViewFragment = new MapViewFragment();
+    MapsFragment mapsFragment = new MapsFragment();
     ListViewFragment listViewFragment = new ListViewFragment();
     WorkmatesFragment workmatesFragment = new WorkmatesFragment();
 
@@ -121,7 +122,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menuItemMapView:
-                getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainerView, mapViewFragment).commit();
+                getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainerView, mapsFragment).commit();
                 Objects.requireNonNull(getSupportActionBar()).setTitle(getString(R.string.i_m_hungry));
                 return true;
 
