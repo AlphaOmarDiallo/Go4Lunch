@@ -10,6 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.alphaomardiallo.go4lunch.R;
+import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -32,9 +33,13 @@ public class MapsFragment extends Fragment {
          */
         @Override
         public void onMapReady(GoogleMap googleMap) {
-            LatLng office = new LatLng(48.86911, 2.35134);
-            googleMap.addMarker(new MarkerOptions().position(office).title("Marker in Sydney"));
-            googleMap.moveCamera(CameraUpdateFactory.newLatLng(office));
+            long zoom = 19;
+            LatLng office = new LatLng(48.86501071160738, 2.3467211059168793);
+            googleMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
+            googleMap.addMarker(new MarkerOptions()
+                    .position(office)
+                    .title("Office"));
+            googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(office, zoom));
         }
     };
 
