@@ -61,5 +61,9 @@
     <string name="dialog_account_delete">Are you sure you want to delete your account? All data will be lost forever.</string>
     <string name="dialog_account_title">Delete my account</string>
     <string name="OK">OK</string>
+    <string name="location_permission_denied">Location permission denied</string>
+    <string name="permission_required_toast">Permission required</string>
+    <string name="permission_rationale_location">Rationale permission location required</string>
+    <string name="activate">Activate</string>
 
 </resources>

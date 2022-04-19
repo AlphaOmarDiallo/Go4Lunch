@@ -1,13 +1,20 @@
 package com.alphaomardiallo.go4lunch.ui;
 
+import static android.content.ContentValues.TAG;
+
+import android.Manifest;
 import android.annotation.SuppressLint;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
 import com.alphaomardiallo.go4lunch.R;
@@ -18,10 +25,12 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.material.snackbar.Snackbar;
 
-public class MapsFragment extends Fragment {
+public class MapsFragment extends Fragment implements ActivityCompat.OnRequestPermissionsResultCallback{
 
     private FragmentMapsBinding binding;
+    private GoogleMap map;
     private final OnMapReadyCallback callback = new OnMapReadyCallback() {
 
         /**
@@ -36,19 +45,21 @@ public class MapsFragment extends Fragment {
 
         @SuppressLint("MissingPermission")
         @Override
-        public void onMapReady(GoogleMap googleMap) {
+        public void onMapReady(@NonNull GoogleMap googleMap) {
+            map = googleMap;
             long zoom = 19;
-            googleMap.setPadding(0, 1700, 0, 0);
-            googleMap.setMyLocationEnabled(true);
-            googleMap.getUiSettings().setMyLocationButtonEnabled(true);
             LatLng office = new LatLng(48.86501071160738, 2.3467211059168793);
-            googleMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
-            googleMap.addMarker(new MarkerOptions()
+
+            map.setPadding(0, 1700, 0, 0);
+            //map.setMyLocationEnabled(enableMyLocation());
+            map.setMapType(GoogleMap.MAP_TYPE_NORMAL);
+            map.addMarker(new MarkerOptions()
                     .position(office)
                     .title("Office"));
-            googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(office, 10));
-            googleMap.animateCamera(CameraUpdateFactory.zoomTo(zoom), 2000, null);
+            map.moveCamera(CameraUpdateFactory.newLatLngZoom(office, zoom));
+            enableMyLocation();
         }
+
     };
 
     @Nullable
@@ -68,6 +79,21 @@ public class MapsFragment extends Fragment {
         if (mapFragment != null) {
             mapFragment.getMapAsync(callback);
         }
+    }
+
+    @SuppressLint("MissingPermission")
+    private void enableMyLocation() {
+        if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION)
+                == PackageManager.PERMISSION_GRANTED
+                && ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_COARSE_LOCATION)
+                == PackageManager.PERMISSION_GRANTED) {
+            map.setMyLocationEnabled(true);
+            map.getUiSettings().setMyLocationButtonEnabled(true);
+            return;
+        }
+        Snackbar.make(binding.map, "Location permission is not granted", Snackbar.LENGTH_LONG)
+                .setAction(R.string.activate, view -> Log.e(TAG, "onClick: Activate localization", null))
+                .show();
     }
 
 }
