@@ -25,6 +25,8 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.libraries.places.api.Places;
+import com.google.android.libraries.places.api.net.PlacesClient;
 import com.google.android.material.snackbar.Snackbar;
 
 public class MapsFragment extends Fragment implements ActivityCompat.OnRequestPermissionsResultCallback{
@@ -58,8 +60,14 @@ public class MapsFragment extends Fragment implements ActivityCompat.OnRequestPe
                     .title("Office"));
             map.moveCamera(CameraUpdateFactory.newLatLngZoom(office, zoom));
             enableMyLocation();
-        }
 
+            // Initialize the SDK
+            Places.initialize(requireContext(), "${MAPS_API_KEY}");
+
+            // Create a new PlacesClient instance
+            PlacesClient placesClient = Places.createClient(requireContext());
+            Log.e(TAG, "onMapReady: " + placesClient, null);
+        }
     };
 
     @Nullable
