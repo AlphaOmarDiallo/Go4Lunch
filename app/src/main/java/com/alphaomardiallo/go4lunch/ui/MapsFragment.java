@@ -1,16 +1,17 @@
 package com.alphaomardiallo.go4lunch.ui;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-
+import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+
 import com.alphaomardiallo.go4lunch.R;
-import com.google.android.gms.maps.CameraUpdate;
+import com.alphaomardiallo.go4lunch.databinding.FragmentMapsBinding;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -20,6 +21,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 
 public class MapsFragment extends Fragment {
 
+    private FragmentMapsBinding binding;
     private final OnMapReadyCallback callback = new OnMapReadyCallback() {
 
         /**
@@ -31,15 +33,21 @@ public class MapsFragment extends Fragment {
          * install it inside the SupportMapFragment. This method will only be triggered once the
          * user has installed Google Play services and returned to the app.
          */
+
+        @SuppressLint("MissingPermission")
         @Override
         public void onMapReady(GoogleMap googleMap) {
             long zoom = 19;
+            googleMap.setPadding(0, 1700, 0, 0);
+            googleMap.setMyLocationEnabled(true);
+            googleMap.getUiSettings().setMyLocationButtonEnabled(true);
             LatLng office = new LatLng(48.86501071160738, 2.3467211059168793);
             googleMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
             googleMap.addMarker(new MarkerOptions()
                     .position(office)
                     .title("Office"));
-            googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(office, zoom));
+            googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(office, 10));
+            googleMap.animateCamera(CameraUpdateFactory.zoomTo(zoom), 2000, null);
         }
     };
 
@@ -48,7 +56,8 @@ public class MapsFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater,
                              @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_maps, container, false);
+        binding = FragmentMapsBinding.inflate(inflater, container, false);
+        return binding.getRoot();
     }
 
     @Override
@@ -60,4 +69,5 @@ public class MapsFragment extends Fragment {
             mapFragment.getMapAsync(callback);
         }
     }
+
 }
