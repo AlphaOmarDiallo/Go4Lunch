@@ -65,5 +65,6 @@
     <string name="permission_required_toast">Permission required</string>
     <string name="permission_rationale_location">Rationale permission location required</string>
     <string name="activate">Activate</string>
+    <string name="background_image">Background image</string>
 
 </resources>
