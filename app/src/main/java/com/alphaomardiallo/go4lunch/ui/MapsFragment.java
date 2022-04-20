@@ -52,7 +52,7 @@ public class MapsFragment extends Fragment implements ActivityCompat.OnRequestPe
             long zoom = 19;
             LatLng office = new LatLng(48.86501071160738, 2.3467211059168793);
 
-            map.setPadding(0, 1700, 0, 0);
+            //map.setPadding(0, 1700, 0, 0);
             //map.setMyLocationEnabled(enableMyLocation());
             map.setMapType(GoogleMap.MAP_TYPE_NORMAL);
             map.addMarker(new MarkerOptions()
@@ -96,11 +96,12 @@ public class MapsFragment extends Fragment implements ActivityCompat.OnRequestPe
                 && ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_COARSE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED) {
             map.setMyLocationEnabled(true);
-            map.getUiSettings().setMyLocationButtonEnabled(true);
+            //map.getUiSettings().setMyLocationButtonEnabled(true);
             return;
         }
         Snackbar.make(binding.map, "Location permission is not granted", Snackbar.LENGTH_LONG)
                 .setAction(R.string.activate, view -> Log.e(TAG, "onClick: Activate localization", null))
+                .setAnchorView(binding.fabMyLocation)
                 .show();
     }
 

@@ -66,5 +66,7 @@
     <string name="permission_rationale_location">Rationale permission location required</string>
     <string name="activate">Activate</string>
     <string name="background_image">Background image</string>
+    <string name="less_than_1km">Less than 1km</string>
+    <string name="high_rating">High rating</string>
 
 </resources>
