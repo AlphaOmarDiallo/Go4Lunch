@@ -68,5 +68,6 @@
     <string name="background_image">Background image</string>
     <string name="less_than_1km">Less than 1km</string>
     <string name="high_rating">High rating</string>
+    <string name="my_location_button">My location button</string>
 
 </resources>

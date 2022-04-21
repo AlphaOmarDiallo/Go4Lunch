@@ -19,20 +19,27 @@ import androidx.fragment.app.Fragment;
 
 import com.alphaomardiallo.go4lunch.R;
 import com.alphaomardiallo.go4lunch.databinding.FragmentMapsBinding;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.tasks.CancellationToken;
+import com.google.android.gms.tasks.OnTokenCanceledListener;
 import com.google.android.libraries.places.api.Places;
 import com.google.android.libraries.places.api.net.PlacesClient;
 import com.google.android.material.snackbar.Snackbar;
 
-public class MapsFragment extends Fragment implements ActivityCompat.OnRequestPermissionsResultCallback{
+public class MapsFragment extends Fragment implements ActivityCompat.OnRequestPermissionsResultCallback {
 
     private FragmentMapsBinding binding;
     private GoogleMap map;
+    private FusedLocationProviderClient fusedLocationClient;
+    private final long defaultCameraZoomOverMap = 19;
     private final OnMapReadyCallback callback = new OnMapReadyCallback() {
 
         /**
@@ -49,16 +56,15 @@ public class MapsFragment extends Fragment implements ActivityCompat.OnRequestPe
         @Override
         public void onMapReady(@NonNull GoogleMap googleMap) {
             map = googleMap;
-            long zoom = 19;
             LatLng office = new LatLng(48.86501071160738, 2.3467211059168793);
 
-            //map.setPadding(0, 1700, 0, 0);
             //map.setMyLocationEnabled(enableMyLocation());
+            map.getUiSettings().setMyLocationButtonEnabled(false);
             map.setMapType(GoogleMap.MAP_TYPE_NORMAL);
             map.addMarker(new MarkerOptions()
                     .position(office)
                     .title("Office"));
-            map.moveCamera(CameraUpdateFactory.newLatLngZoom(office, zoom));
+            map.moveCamera(CameraUpdateFactory.newLatLngZoom(office, defaultCameraZoomOverMap));
             enableMyLocation();
 
             // Initialize the SDK
@@ -87,6 +93,10 @@ public class MapsFragment extends Fragment implements ActivityCompat.OnRequestPe
         if (mapFragment != null) {
             mapFragment.getMapAsync(callback);
         }
+
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireContext());
+
+        binding.fabMyLocation.setOnClickListener(view1 -> getCurrentLocation());
     }
 
     @SuppressLint("MissingPermission")
@@ -96,13 +106,34 @@ public class MapsFragment extends Fragment implements ActivityCompat.OnRequestPe
                 && ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_COARSE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED) {
             map.setMyLocationEnabled(true);
-            //map.getUiSettings().setMyLocationButtonEnabled(true);
             return;
         }
         Snackbar.make(binding.map, "Location permission is not granted", Snackbar.LENGTH_LONG)
                 .setAction(R.string.activate, view -> Log.e(TAG, "onClick: Activate localization", null))
                 .setAnchorView(binding.fabMyLocation)
                 .show();
+    }
+
+    @SuppressLint("MissingPermission")
+    private void getCurrentLocation() {
+        fusedLocationClient.getCurrentLocation(LocationRequest.PRIORITY_HIGH_ACCURACY, new CancellationToken() {
+            @NonNull
+            @Override
+            public CancellationToken onCanceledRequested(@NonNull OnTokenCanceledListener onTokenCanceledListener) {
+                Log.e(TAG, "onCanceledRequested: no no",null );
+                return null;
+            }
+
+            @Override
+            public boolean isCancellationRequested() {
+                Log.e(TAG, "isCancellationRequested: no", null);
+                return false;
+            }
+        }) .addOnSuccessListener(location -> {
+            Log.e(TAG, "onSuccess: yes " + location, null);
+            LatLng current = new LatLng(location.getLatitude(), location.getLongitude());
+            map.moveCamera(CameraUpdateFactory.newLatLngZoom(current, defaultCameraZoomOverMap));
+        });
     }
 
 }

@@ -106,8 +106,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     /**
      * Bottom navigation bar setup
      */
-
-    //MapViewFragment mapViewFragment = new MapViewFragment();
     MapsFragment mapsFragment = new MapsFragment();
     ListViewFragment listViewFragment = new ListViewFragment();
     WorkmatesFragment workmatesFragment = new WorkmatesFragment();
@@ -142,7 +140,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     /**
      * SearchBar setup
      */
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
