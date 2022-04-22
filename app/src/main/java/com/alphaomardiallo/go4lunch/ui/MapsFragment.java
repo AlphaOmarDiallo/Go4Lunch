@@ -88,6 +88,7 @@ public class MapsFragment extends Fragment implements ActivityCompat.OnRequestPe
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        binding.chipGroup.setVisibility(View.GONE);
         SupportMapFragment mapFragment =
                 (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
         if (mapFragment != null) {

@@ -116,6 +116,7 @@ dependencies {
 
     // FirebaseUI
     implementation 'com.firebaseui:firebase-ui-auth:7.2.0'
+    implementation 'com.google.android.gms:play-services-auth:20.1.0'
 
     //Meta login
     implementation 'com.facebook.android:facebook-android-sdk:[8,9)'
