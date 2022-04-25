@@ -17,8 +17,8 @@
 
     <ImageView
         android:id="@+id/iVUserPictureSettings"
-        android:layout_width="200dp"
-        android:layout_height="200dp"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
         android:layout_gravity="center"
         android:layout_margin="8dp"
         android:contentDescription="@string/user_avatar"
