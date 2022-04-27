@@ -133,4 +133,7 @@ dependencies {
 
     // work runtime
     implementation 'androidx.work:work-runtime:2.7.1'
+
+    //Easy-permissions
+    implementation 'pub.devrel:easypermissions:3.0.0'
 }

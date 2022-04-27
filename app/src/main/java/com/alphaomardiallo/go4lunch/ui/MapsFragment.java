@@ -3,7 +3,6 @@ package com.alphaomardiallo.go4lunch.ui;
 import static android.Manifest.permission.ACCESS_FINE_LOCATION;
 import static android.content.ContentValues.TAG;
 
-import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
@@ -14,12 +13,12 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
 import com.alphaomardiallo.go4lunch.R;
 import com.alphaomardiallo.go4lunch.databinding.FragmentMapsBinding;
+import com.alphaomardiallo.go4lunch.domain.PermissionUtils;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationRequest;
@@ -44,12 +43,16 @@ import com.google.android.material.snackbar.Snackbar;
 import java.util.Collections;
 import java.util.List;
 
-public class MapsFragment extends Fragment implements ActivityCompat.OnRequestPermissionsResultCallback {
+import pub.devrel.easypermissions.AfterPermissionGranted;
+
+public class MapsFragment extends Fragment {
 
     private FragmentMapsBinding binding;
     private GoogleMap map;
     private FusedLocationProviderClient fusedLocationClient;
     private final long defaultCameraZoomOverMap = 19;
+    private static final int requestPermissionsLocation = 567;
+    private static final PermissionUtils permission = new PermissionUtils();
     private final OnMapReadyCallback callback = new OnMapReadyCallback() {
 
         /**
@@ -95,7 +98,7 @@ public class MapsFragment extends Fragment implements ActivityCompat.OnRequestPe
             if (ContextCompat.checkSelfPermission(requireContext(), ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
                 @SuppressLint("MissingPermission") Task<FindCurrentPlaceResponse> placeResponse = placesClient.findCurrentPlace(request);
                 placeResponse.addOnCompleteListener(task -> {
-                    if (task.isSuccessful()){
+                    if (task.isSuccessful()) {
                         FindCurrentPlaceResponse response = task.getResult();
                         for (PlaceLikelihood placeLikelihood : response.getPlaceLikelihoods()) {
                             Log.i(TAG, String.format("Place '%s' has likelihood: %f",
@@ -139,31 +142,46 @@ public class MapsFragment extends Fragment implements ActivityCompat.OnRequestPe
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireContext());
 
-        binding.fabMyLocation.setOnClickListener(view1 -> getCurrentLocation());
+        binding.fabMyLocation.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (permission.hasLocationPermissions(requireContext())) {
+                    getCurrentLocation();
+                } else {
+                    Log.e(TAG, "onClick: permission not granted", null);
+                }
+            }
+        });
     }
 
     @SuppressLint("MissingPermission")
-    private void enableMyLocation() {
-        if (ContextCompat.checkSelfPermission(requireContext(), ACCESS_FINE_LOCATION)
+    @AfterPermissionGranted(requestPermissionsLocation)
+    public void enableMyLocation() {
+/*        if (ContextCompat.checkSelfPermission(requireContext(), ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED
                 && ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_COARSE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED) {
             map.setMyLocationEnabled(true);
             return;
+        }*/
+        if (permission.hasLocationPermissions(requireContext())) {
+            map.setMyLocationEnabled(true);
+        } else {
+            Snackbar.make(binding.map, "Location permission is not granted", Snackbar.LENGTH_LONG)
+                    .setAction(R.string.activate, view -> Log.e(TAG, "onClick: Activate localization", null))
+                    .setAnchorView(binding.fabMyLocation)
+                    .show();
         }
-        Snackbar.make(binding.map, "Location permission is not granted", Snackbar.LENGTH_LONG)
-                .setAction(R.string.activate, view -> Log.e(TAG, "onClick: Activate localization", null))
-                .setAnchorView(binding.fabMyLocation)
-                .show();
+
     }
 
     @SuppressLint("MissingPermission")
-    private void getCurrentLocation() {
+    public void getCurrentLocation() {
         fusedLocationClient.getCurrentLocation(LocationRequest.PRIORITY_HIGH_ACCURACY, new CancellationToken() {
             @NonNull
             @Override
             public CancellationToken onCanceledRequested(@NonNull OnTokenCanceledListener onTokenCanceledListener) {
-                Log.e(TAG, "onCanceledRequested: no no",null );
+                Log.e(TAG, "onCanceledRequested: no no", null);
                 return null;
             }
 
@@ -172,7 +190,7 @@ public class MapsFragment extends Fragment implements ActivityCompat.OnRequestPe
                 Log.e(TAG, "isCancellationRequested: no", null);
                 return false;
             }
-        }) .addOnSuccessListener(location -> {
+        }).addOnSuccessListener(location -> {
             Log.e(TAG, "onSuccess: yes " + location, null);
             LatLng current = new LatLng(location.getLatitude(), location.getLongitude());
             map.moveCamera(CameraUpdateFactory.newLatLngZoom(current, defaultCameraZoomOverMap));

@@ -70,7 +70,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         setupBottomNavBar();
         setupNavDrawer();
 
-        checkIfSignedIn();
+        final Handler handler = new Handler(Looper.getMainLooper());
+        handler.postDelayed(this::checkIfSignedIn, 1000);
     }
 
     @Override
