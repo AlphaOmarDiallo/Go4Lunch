@@ -18,6 +18,7 @@ import androidx.fragment.app.Fragment;
 import com.alphaomardiallo.go4lunch.R;
 import com.alphaomardiallo.go4lunch.databinding.FragmentMapsBinding;
 import com.alphaomardiallo.go4lunch.domain.PermissionUtils;
+import com.alphaomardiallo.go4lunch.domain.PositionUtils;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationRequest;
@@ -52,6 +53,7 @@ public class MapsFragment extends Fragment implements EasyPermissions.Permission
     private FragmentMapsBinding binding;
     private GoogleMap map;
     private FusedLocationProviderClient fusedLocationClient;
+    private PositionUtils positionUtils = new PositionUtils();
 
     private final OnMapReadyCallback callback = new OnMapReadyCallback() {
 
@@ -69,19 +71,16 @@ public class MapsFragment extends Fragment implements EasyPermissions.Permission
         @Override
         public void onMapReady(@NonNull GoogleMap googleMap) {
             map = googleMap;
-            LatLng office = new LatLng(48.86501071160738, 2.3467211059168793);
-
-            //map.setMyLocationEnabled(enableMyLocation());
             map.getUiSettings().setMyLocationButtonEnabled(false);
             map.setMapType(GoogleMap.MAP_TYPE_NORMAL);
             map.addMarker(new MarkerOptions()
-                    .position(office)
+                    .position(positionUtils.getOfficeLocation())
                     .title("Office"));
             if(permission.hasLocationPermissions(requireContext())) {
                 enableMyLocation();
                 getCurrentLocation();
             } else {
-                map.moveCamera(CameraUpdateFactory.newLatLngZoom(office, defaultCameraZoomOverMap));
+                map.moveCamera(CameraUpdateFactory.newLatLngZoom(positionUtils.getOfficeLocation(), defaultCameraZoomOverMap));
             }
 
             // Initialize the SDK
