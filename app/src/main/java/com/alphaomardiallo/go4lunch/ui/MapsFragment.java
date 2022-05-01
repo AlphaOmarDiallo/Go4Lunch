@@ -5,7 +5,6 @@ import static android.content.ContentValues.TAG;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
-import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -14,7 +13,6 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
 import com.alphaomardiallo.go4lunch.R;
@@ -85,7 +83,7 @@ public class MapsFragment extends Fragment implements EasyPermissions.Permission
             }
 
             // Initialize the SDK
-            Places.initialize(requireContext(), "${MAPS_API_KEY}");
+            Places.initialize(requireContext(), "com.google.android.geo.API_KEY");
 
             // Create a new PlacesClient instance
             PlacesClient placesClient = Places.createClient(requireContext());
@@ -98,7 +96,7 @@ public class MapsFragment extends Fragment implements EasyPermissions.Permission
             FindCurrentPlaceRequest request = FindCurrentPlaceRequest.newInstance(placeFields);
 
 // Call findCurrentPlace and handle the response (first check that the user has granted permission).
-            if (ContextCompat.checkSelfPermission(requireContext(), ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            if (permission.hasLocationPermissions(requireContext())) {
                 @SuppressLint("MissingPermission") Task<FindCurrentPlaceResponse> placeResponse = placesClient.findCurrentPlace(request);
                 placeResponse.addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {

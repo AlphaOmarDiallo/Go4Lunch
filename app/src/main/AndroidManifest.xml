@@ -16,19 +16,6 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Go4Lunch">
 
-        <meta-data
-            android:name="com.google.android.geo.API_KEY"
-            android:value="${MAPS_API_KEY}" />
-        <meta-data
-            android:name="preloaded_fonts"
-            android:resource="@array/preloaded_fonts" />
-        <meta-data
-            android:name="android.app.searchable"
-            android:resource="@xml/searchable" />
-        <meta-data
-            android:name="com.google.android.gms.version"
-            android:value="@integer/google_play_services_version" />
-
         <activity
             android:name=".ui.SettingsActivity"
             android:exported="false"
@@ -42,6 +29,29 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="${MAPS_API_KEY}" />
+        <meta-data
+            android:name="default_web_client_id_google"
+            android:value="${DEFAULT_WEB_CLIENT_ID_GOOGLE}" />
+        <meta-data
+            android:name="facebook_app_id"
+            android:value="${FACEBOOK_APP_ID}" />
+        <meta-data
+            android:name="facebook_application_id"
+            android:value="${FACEBOOK_APPLICATION_ID}" />
+        <meta-data
+            android:name="preloaded_fonts"
+            android:resource="@array/preloaded_fonts" />
+        <meta-data
+            android:name="android.app.searchable"
+            android:resource="@xml/searchable" />
+        <meta-data
+            android:name="com.google.android.gms.version"
+            android:value="@integer/google_play_services_version" />
+
     </application>
 
 </manifest>
