@@ -77,9 +77,11 @@ public class MapsFragment extends Fragment implements EasyPermissions.Permission
             map.addMarker(new MarkerOptions()
                     .position(office)
                     .title("Office"));
-            map.moveCamera(CameraUpdateFactory.newLatLngZoom(office, defaultCameraZoomOverMap));
-            if (permission.hasLocationPermissions(requireContext())) {
+            if(permission.hasLocationPermissions(requireContext())) {
                 enableMyLocation();
+                getCurrentLocation();
+            } else {
+                map.moveCamera(CameraUpdateFactory.newLatLngZoom(office, defaultCameraZoomOverMap));
             }
 
             // Initialize the SDK
@@ -166,20 +168,18 @@ public class MapsFragment extends Fragment implements EasyPermissions.Permission
     @SuppressLint("MissingPermission")
     public void getCurrentLocation() {
         fusedLocationClient.getCurrentLocation(LocationRequest.PRIORITY_HIGH_ACCURACY, new CancellationToken() {
+            @SuppressWarnings("ConstantConditions")
             @NonNull
             @Override
             public CancellationToken onCanceledRequested(@NonNull OnTokenCanceledListener onTokenCanceledListener) {
-                Log.e(TAG, "onCanceledRequested: no no", null);
                 return null;
             }
 
             @Override
             public boolean isCancellationRequested() {
-                Log.e(TAG, "isCancellationRequested: no", null);
                 return false;
             }
         }).addOnSuccessListener(location -> {
-            Log.e(TAG, "onSuccess: yes " + location, null);
             LatLng current = new LatLng(location.getLatitude(), location.getLongitude());
             map.moveCamera(CameraUpdateFactory.newLatLngZoom(current, defaultCameraZoomOverMap));
         });
