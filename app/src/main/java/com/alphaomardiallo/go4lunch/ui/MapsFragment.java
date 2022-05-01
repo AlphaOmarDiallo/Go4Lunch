@@ -3,6 +3,7 @@ package com.alphaomardiallo.go4lunch.ui;
 import static android.Manifest.permission.ACCESS_FINE_LOCATION;
 import static android.content.ContentValues.TAG;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
@@ -38,21 +39,22 @@ import com.google.android.libraries.places.api.model.PlaceLikelihood;
 import com.google.android.libraries.places.api.net.FindCurrentPlaceRequest;
 import com.google.android.libraries.places.api.net.FindCurrentPlaceResponse;
 import com.google.android.libraries.places.api.net.PlacesClient;
-import com.google.android.material.snackbar.Snackbar;
 
 import java.util.Collections;
 import java.util.List;
 
-import pub.devrel.easypermissions.AfterPermissionGranted;
+import pub.devrel.easypermissions.AppSettingsDialog;
+import pub.devrel.easypermissions.EasyPermissions;
 
-public class MapsFragment extends Fragment {
+public class MapsFragment extends Fragment implements EasyPermissions.PermissionCallbacks {
 
+    private static final int REQUEST_PERMISSIONS_LOCATION = 567;
+    private static final PermissionUtils permission = new PermissionUtils();
+    private final long defaultCameraZoomOverMap = 19;
     private FragmentMapsBinding binding;
     private GoogleMap map;
     private FusedLocationProviderClient fusedLocationClient;
-    private final long defaultCameraZoomOverMap = 19;
-    private static final int requestPermissionsLocation = 567;
-    private static final PermissionUtils permission = new PermissionUtils();
+
     private final OnMapReadyCallback callback = new OnMapReadyCallback() {
 
         /**
@@ -78,8 +80,9 @@ public class MapsFragment extends Fragment {
                     .position(office)
                     .title("Office"));
             map.moveCamera(CameraUpdateFactory.newLatLngZoom(office, defaultCameraZoomOverMap));
-            enableMyLocation();
-
+            if (permission.hasLocationPermissions(requireContext())) {
+                enableMyLocation();
+            }
 
             // Initialize the SDK
             Places.initialize(requireContext(), "${MAPS_API_KEY}");
@@ -114,8 +117,7 @@ public class MapsFragment extends Fragment {
                     }
                 });
             } else {
-                // A local method to request required permissions;
-                // See https://developer.android.com/training/permissions/requesting
+                requestPermission();
                 Log.e(TAG, "onViewCreated: permission not granted", null);
             }
         }
@@ -140,39 +142,27 @@ public class MapsFragment extends Fragment {
             mapFragment.getMapAsync(callback);
         }
 
+        requestPermission();
+
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireContext());
 
-        binding.fabMyLocation.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (permission.hasLocationPermissions(requireContext())) {
-                    getCurrentLocation();
-                } else {
-                    Log.e(TAG, "onClick: permission not granted", null);
-                }
+        binding.fabMyLocation.setOnClickListener(view1 -> {
+            if (permission.hasLocationPermissions(requireContext())) {
+                getCurrentLocation();
+            } else {
+                Log.e(TAG, "onClick: permission not granted", null);
+                requestPermission();
             }
         });
     }
 
-    @SuppressLint("MissingPermission")
-    @AfterPermissionGranted(requestPermissionsLocation)
-    public void enableMyLocation() {
-/*        if (ContextCompat.checkSelfPermission(requireContext(), ACCESS_FINE_LOCATION)
-                == PackageManager.PERMISSION_GRANTED
-                && ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_COARSE_LOCATION)
-                == PackageManager.PERMISSION_GRANTED) {
-            map.setMyLocationEnabled(true);
-            return;
-        }*/
-        if (permission.hasLocationPermissions(requireContext())) {
-            map.setMyLocationEnabled(true);
-        } else {
-            Snackbar.make(binding.map, "Location permission is not granted", Snackbar.LENGTH_LONG)
-                    .setAction(R.string.activate, view -> Log.e(TAG, "onClick: Activate localization", null))
-                    .setAnchorView(binding.fabMyLocation)
-                    .show();
-        }
+    /**
+     * Location handling
+     */
 
+    @SuppressLint("MissingPermission")
+    public void enableMyLocation() {
+        map.setMyLocationEnabled(true);
     }
 
     @SuppressLint("MissingPermission")
@@ -197,4 +187,41 @@ public class MapsFragment extends Fragment {
         });
     }
 
+    /**
+     * Permission handling
+     */
+
+    public void requestPermission() {
+        if (permission.hasLocationPermissions(requireContext())) {
+            return;
+        }
+
+        EasyPermissions.requestPermissions(
+                this,
+                "This app needs location permission to function properly",
+                REQUEST_PERMISSIONS_LOCATION,
+                ACCESS_FINE_LOCATION,
+                Manifest.permission.ACCESS_COARSE_LOCATION);
+    }
+
+    @Override
+    public void onPermissionsGranted(int requestCode, @NonNull List<String> perms) {
+        enableMyLocation();
+    }
+
+    @Override
+    public void onPermissionsDenied(int requestCode, @NonNull List<String> perms) {
+        if (EasyPermissions.somePermissionPermanentlyDenied(this, perms)) {
+            new AppSettingsDialog.Builder(this).build().show();
+        } else {
+            requestPermission();
+        }
+    }
+
+    @SuppressWarnings("deprecation")
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        EasyPermissions.onRequestPermissionsResult(requestCode, permissions, grantResults, this);
+    }
 }

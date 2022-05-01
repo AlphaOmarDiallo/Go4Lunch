@@ -22,7 +22,6 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.view.GravityCompat;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.alphaomardiallo.go4lunch.R;
@@ -46,6 +45,7 @@ import dagger.hilt.android.AndroidEntryPoint;
 @AndroidEntryPoint
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
+    private final Handler handler = new Handler(Looper.getMainLooper());
     private ActivityMainBinding binding;
     public MainViewModel viewModel;
     private ActionBarDrawerToggle toggle;
@@ -70,17 +70,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         setupBottomNavBar();
         setupNavDrawer();
 
-        final Handler handler = new Handler(Looper.getMainLooper());
         handler.postDelayed(this::checkIfSignedIn, 1000);
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        binding.mainLayout.closeDrawer(GravityCompat.START);
-        if (viewModel.isCurrentUserNotLoggedIn()) {
-            checkIfSignedIn();
-        }
     }
 
     /**
@@ -257,7 +247,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     showSnackBar(getString(R.string.error_unknown_error));
                 }
             }
-            final Handler handler = new Handler(Looper.getMainLooper());
             handler.postDelayed(this::checkIfSignedIn, 1000);
         }
     }
