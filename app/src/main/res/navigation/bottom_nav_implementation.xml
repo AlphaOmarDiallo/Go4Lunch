@@ -7,17 +7,17 @@
 
     <fragment
         android:id="@+id/listViewFragment2"
-        android:name="com.alphaomardiallo.go4lunch.ui.ListViewFragment"
+        android:name="com.alphaomardiallo.go4lunch.ui.fragments.ListViewFragment"
         android:label="fragment_list_view"
         tools:layout="@layout/fragment_list_view" />
     <fragment
         android:id="@+id/workmatesFragment2"
-        android:name="com.alphaomardiallo.go4lunch.ui.WorkmatesFragment"
+        android:name="com.alphaomardiallo.go4lunch.ui.fragments.WorkmatesFragment"
         android:label="fragment_workmates"
         tools:layout="@layout/fragment_workmates" />
     <fragment
         android:id="@+id/mapsFragment"
-        android:name="com.alphaomardiallo.go4lunch.ui.MapsFragment"
+        android:name="com.alphaomardiallo.go4lunch.ui.fragments.MapsFragment"
         android:label="fragment_maps"
         tools:layout="@layout/fragment_maps" />
 </navigation>

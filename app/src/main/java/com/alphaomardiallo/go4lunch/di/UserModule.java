@@ -1,4 +1,4 @@
-package com.alphaomardiallo.go4lunch.DI;
+package com.alphaomardiallo.go4lunch.di;
 
 import com.alphaomardiallo.go4lunch.data.repositories.UserRepository;
 import com.alphaomardiallo.go4lunch.data.repositories.UserRepositoryImp;

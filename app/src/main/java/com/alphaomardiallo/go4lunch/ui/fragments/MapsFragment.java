@@ -1,4 +1,4 @@
-package com.alphaomardiallo.go4lunch.ui;
+package com.alphaomardiallo.go4lunch.ui.fragments;
 
 import static android.Manifest.permission.ACCESS_FINE_LOCATION;
 import static android.content.ContentValues.TAG;
@@ -89,7 +89,7 @@ public class MapsFragment extends Fragment implements EasyPermissions.Permission
 
             // Create a new PlacesClient instance
             PlacesClient placesClient = Places.createClient(requireContext());
-            Log.e(TAG, "onMapReady: " + placesClient, null);
+            Log.e(TAG, "MAPS FRAGMENT onMapReady: " + placesClient, null);
 
             // Use fields to define the data types to return.
             List<Place.Field> placeFields = Collections.singletonList(Place.Field.NAME);
@@ -112,13 +112,13 @@ public class MapsFragment extends Fragment implements EasyPermissions.Permission
                         Exception exception = task.getException();
                         if (exception instanceof ApiException) {
                             ApiException apiException = (ApiException) exception;
-                            Log.e(TAG, "Place not found: " + apiException.getStatusCode());
+                            Log.e(TAG, "MAPS FRAGMENT Place not found: " + apiException.getStatusCode());
                         }
                     }
                 });
             } else {
                 requestPermission();
-                Log.e(TAG, "onViewCreated: permission not granted", null);
+                Log.e(TAG, "MAPS FRAGMENT onViewCreated: permission not granted", null);
             }
         }
     };
@@ -150,7 +150,7 @@ public class MapsFragment extends Fragment implements EasyPermissions.Permission
             if (permission.hasLocationPermissions(requireContext())) {
                 getCurrentLocation();
             } else {
-                Log.e(TAG, "onClick: permission not granted", null);
+                Log.e(TAG, "MAPS FRAGMENT onClick: permission not granted", null);
                 requestPermission();
             }
         });
