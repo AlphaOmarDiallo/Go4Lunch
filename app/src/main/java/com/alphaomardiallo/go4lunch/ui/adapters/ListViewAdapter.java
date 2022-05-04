@@ -12,7 +12,7 @@ import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.alphaomardiallo.go4lunch.R;
-import com.alphaomardiallo.go4lunch.data.Restaurant;
+import com.alphaomardiallo.go4lunch.data.dataSources.Model.Restaurant;
 import com.alphaomardiallo.go4lunch.databinding.ItemRestaurantBinding;
 
 public class ListViewAdapter extends ListAdapter <Restaurant, ListViewAdapter.ListViewHolder> {
