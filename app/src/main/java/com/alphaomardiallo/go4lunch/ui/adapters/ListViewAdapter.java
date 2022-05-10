@@ -12,14 +12,14 @@ import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.alphaomardiallo.go4lunch.R;
-import com.alphaomardiallo.go4lunch.data.dataSources.Model.Restaurant;
+import com.alphaomardiallo.go4lunch.data.dataSources.Model.nearBySearchPojo.ResultsItem;
 import com.alphaomardiallo.go4lunch.databinding.ItemRestaurantBinding;
 
-public class ListViewAdapter extends ListAdapter <Restaurant, ListViewAdapter.ListViewHolder> {
+public class ListViewAdapter extends ListAdapter <ResultsItem, ListViewAdapter.ListViewHolder> {
 
     ItemRestaurantBinding binding;
 
-    protected ListViewAdapter(@NonNull DiffUtil.ItemCallback<Restaurant> diffCallback) {
+    protected ListViewAdapter(@NonNull DiffUtil.ItemCallback<ResultsItem> diffCallback) {
         super(diffCallback);
     }
 
@@ -35,15 +35,15 @@ public class ListViewAdapter extends ListAdapter <Restaurant, ListViewAdapter.Li
         holder.bind(getItem(position));
     }
 
-    static class ListDiff extends DiffUtil.ItemCallback<Restaurant> {
+    static class ListDiff extends DiffUtil.ItemCallback<ResultsItem> {
 
         @Override
-        public boolean areItemsTheSame(@NonNull Restaurant oldItem, @NonNull Restaurant newItem) {
+        public boolean areItemsTheSame(@NonNull ResultsItem oldItem, @NonNull ResultsItem newItem) {
             return false;
         }
 
         @Override
-        public boolean areContentsTheSame(@NonNull Restaurant oldItem, @NonNull Restaurant newItem) {
+        public boolean areContentsTheSame(@NonNull ResultsItem oldItem, @NonNull ResultsItem newItem) {
             return false;
         }
     }
@@ -57,8 +57,12 @@ public class ListViewAdapter extends ListAdapter <Restaurant, ListViewAdapter.Li
             restaurantName = itemView.findViewById(R.id.tvRestaurantName);
         }
 
-        public void bind(Restaurant restaurant) {
-            restaurantName.setText("Mon restaurant");
+        public void bind(ResultsItem restaurant) {
+            if (restaurant != null) {
+                restaurantName.setText(restaurant.getName().toUpperCase());
+            } else {
+                restaurantName.setText("Objet null");
+            }
         }
 
         static ListViewHolder create(ViewGroup parent) {
