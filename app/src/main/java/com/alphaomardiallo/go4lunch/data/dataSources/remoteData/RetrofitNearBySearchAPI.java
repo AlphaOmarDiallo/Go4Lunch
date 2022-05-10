@@ -9,8 +9,10 @@ import retrofit2.http.Query;
 public interface RetrofitNearBySearchAPI {
 
     @GET("https://maps.googleapis.com/maps/api/place/nearbysearch/json?")
-    Call<PlaceNearBy> getNearByPlaces(@Query("key") String key,
-                                      @Query("location") String location,
-                                      @Query("type") String type,
-                                      @Query("radius") int radius);
+    Call<PlaceNearBy> getNearByPlaces(
+            @Query("key") String key,
+            @Query("location") String location,
+            @Query("type") String type,
+            @Query("radius") int radius
+    );
 }
