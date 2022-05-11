@@ -8,7 +8,7 @@ import retrofit2.http.Query;
 
 public interface RetrofitAutocompleteAPI {
 
-    @GET("https://maps.googleapis.com/maps/api/place/autocomplete/json?")
+    @GET("autocomplete/json?")
     Call<PlaceAutoComplete> getPlaceAutocomplete(
             @Query("key") String key,
             @Query("input") String input,

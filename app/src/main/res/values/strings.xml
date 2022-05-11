@@ -17,15 +17,6 @@
     <string name="button_login_text_not_logged">Log In</string>
     <string name="welcome_back">Welcome back %1$s</string>
 
-    //links
-    <string name="login_and_menu_background">https://images.pexels.com/photos/3184188/pexels-photo-3184188.jpeg?cs=srgb&amp;dl=pexels-fauxels-3184188.jpg&amp;fm=jpg</string>
-    <string name="nav_drawer_background">https://images.pexels.com/photos/3184183/pexels-photo-3184183.jpeg?cs=srgb&amp;dl=pexels-fauxels-3184183.jpg&amp;fm=jpg</string>
-
-    //Keys
-    <string name="default_web_client_id_google">407532419271-qimb705lnldgpbks9mb0bhoveskv8po6.apps.googleusercontent.com</string>
-    <string name="facebook_app_id">275016551500747</string>
-    <string name="facebook_application_id">fb275016551500747</string>
-
     <string name="map_view">Map View</string>
     <string name="list_view">List View</string>
     <string name="workmates">Workmates</string>
@@ -38,6 +29,7 @@
     <string name="Close_drawer_menu">Close drawer menu</string>
     <string name="search_title">Search title</string>
     <string name="search_hint">Type here</string>
+
     <!-- Preference Titles -->
     <string name="messages_header">Messages</string>
     <string name="sync_header">Sync</string>
@@ -49,8 +41,7 @@
     <!-- Sync Preferences -->
     <string name="sync_title">Sync email periodically</string>
     <string name="attachment_title">Download incoming attachments</string>
-    <string name="attachment_summary_on">Automatically download attachments for incoming emails
-    </string>
+    <string name="attachment_summary_on">Automatically download attachments for incoming emails</string>
     <string name="attachment_summary_off">Only download attachments when manually requested</string>
     <string name="dummy_button">Dummy Button</string>
     <string name="dummy_content">DUMMY\nCONTENT</string>
@@ -69,5 +60,17 @@
     <string name="less_than_1km">Less than 1km</string>
     <string name="high_rating">High rating</string>
     <string name="my_location_button">My location button</string>
+
+    //links
+    <string name="login_and_menu_background">https://images.pexels.com/photos/3184188/pexels-photo-3184188.jpeg?cs=srgb&amp;dl=pexels-fauxels-3184188.jpg&amp;fm=jpg</string>
+    <string name="nav_drawer_background">https://images.pexels.com/photos/3184183/pexels-photo-3184183.jpeg?cs=srgb&amp;dl=pexels-fauxels-3184183.jpg&amp;fm=jpg</string>
+
+    //Keys
+    <string name="default_web_client_id_google">407532419271-qimb705lnldgpbks9mb0bhoveskv8po6.apps.googleusercontent.com</string>
+    <string name="facebook_app_id">275016551500747</string>
+    <string name="facebook_application_id">fb275016551500747</string>
+
+    //API
+    <string name="places_base_url">https://maps.googleapis.com/maps/api/place/</string>
 
 </resources>

@@ -28,9 +28,9 @@ public class UserRepositoryImp implements UserRepository {
         synchronized (UserRepository.class) {
             if (instance == null) {
                 instance = new UserRepositoryImp();
-                }
             }
-            return instance;
+        }
+        return instance;
     }
 
     @Nullable
