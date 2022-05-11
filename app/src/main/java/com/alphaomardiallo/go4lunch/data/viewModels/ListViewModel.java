@@ -1,5 +1,6 @@
 package com.alphaomardiallo.go4lunch.data.viewModels;
 
+import androidx.lifecycle.LiveData;
 import androidx.lifecycle.ViewModel;
 
 import com.alphaomardiallo.go4lunch.data.repositories.APIRepository;
@@ -17,5 +18,9 @@ public class ListViewModel extends ViewModel {
     @Inject
     public ListViewModel(APIRepository apiRepository) {
         this.apiRepository = apiRepository;
+    }
+
+    public LiveData getNearBySearchListAsLiveData(String location) {
+        return apiRepository.getNearBySearchListAsLiveData(location);
     }
 }
