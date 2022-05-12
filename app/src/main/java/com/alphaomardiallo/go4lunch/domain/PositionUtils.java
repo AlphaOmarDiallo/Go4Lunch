@@ -9,6 +9,6 @@ public class PositionUtils {
     }
 
     public int getRadius() {
-        return 800;
+        return 500;
     }
 }

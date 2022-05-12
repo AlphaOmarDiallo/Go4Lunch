@@ -4,7 +4,9 @@ import androidx.lifecycle.LiveData;
 
 public interface APIRepository {
 
-    LiveData getNearBySearchListAsLiveData(String location);
+    LiveData getNearBySearchListRankByMethod(String location);
+
+    LiveData getNearBySearchListRadiusMethod(String location);
 
     LiveData getDetailsListAsLiveData();
 

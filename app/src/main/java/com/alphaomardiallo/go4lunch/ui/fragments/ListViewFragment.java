@@ -2,6 +2,8 @@ package com.alphaomardiallo.go4lunch.ui.fragments;
 
 import android.annotation.SuppressLint;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,6 +24,7 @@ import dagger.hilt.android.AndroidEntryPoint;
 public class ListViewFragment extends Fragment {
 
     private static final String TAG = "ListViewFragment";
+    private final Handler handler = new Handler(Looper.getMainLooper());
     private FragmentListViewBinding binding;
     public MapsAndListSharedViewModel viewModel;
     private PermissionUtils permissionUtils = new PermissionUtils();
@@ -42,9 +45,13 @@ public class ListViewFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         viewModel = new ViewModelProvider(requireActivity()).get(MapsAndListSharedViewModel.class);
+        String pageToken = null;
+        getNearByRestaurants();
 
-        viewModel.getNearBySearchListAsLiveData("48.86501071160738,2.3467211059168793");
+    }
 
+    public void getNearByRestaurants() {
+        viewModel.getNearBySearchListRadius("48.86501071160738,2.3467211059168793");
     }
 
 }
