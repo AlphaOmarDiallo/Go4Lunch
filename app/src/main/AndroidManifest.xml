@@ -34,6 +34,9 @@
             android:name="com.google.android.geo.API_KEY"
             android:value="${MAPS_API_KEY}" />
         <meta-data
+            android:name="com.google.places.API"
+            android:value="${PLACES_API_KEY}" />
+        <meta-data
             android:name="default_web_client_id_google"
             android:value="${DEFAULT_WEB_CLIENT_ID_GOOGLE}" />
         <meta-data

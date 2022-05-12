@@ -40,7 +40,7 @@ public class APIRepositoryImp implements APIRepository {
     public LiveData getNearBySearchListAsLiveData(String location) {
         RetrofitNearBySearchAPI retrofitNearBySearchAPI = retrofit.create(RetrofitNearBySearchAPI.class);
 
-        Call<PlaceNearBy> call = retrofitNearBySearchAPI.getNearByPlaces(BuildConfig.MAPS_API_KEY, location, typeRestaurant, radius);
+        Call<PlaceNearBy> call = retrofitNearBySearchAPI.getNearByPlaces(BuildConfig.PLACES_API_KEY, location, typeRestaurant, radius);
 
         call.enqueue(new Callback<PlaceNearBy>() {
             @Override
@@ -50,7 +50,7 @@ public class APIRepositoryImp implements APIRepository {
                     return;
                 }
 
-                Log.i(TAG, "onResponse: check "+ response.raw().request().url().toString());
+                Log.i(TAG, "onResponse: check " + response.raw().request().url());
             }
 
             @Override

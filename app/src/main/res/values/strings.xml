@@ -70,7 +70,7 @@
     <string name="facebook_app_id">275016551500747</string>
     <string name="facebook_application_id">fb275016551500747</string>
 
-    //API
-    <string name="places_base_url">https://maps.googleapis.com/maps/api/place/</string>
+    //location
+    <string name="office_location">48.86501071160738,2.3467211059168793</string>
 
 </resources>

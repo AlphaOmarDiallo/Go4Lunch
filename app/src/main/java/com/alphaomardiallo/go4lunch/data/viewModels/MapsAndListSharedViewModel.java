@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.ViewModel;
 
 import com.alphaomardiallo.go4lunch.data.repositories.APIRepository;
+import com.alphaomardiallo.go4lunch.data.repositories.LocationRepository;
 
 import javax.inject.Inject;
 
@@ -11,13 +12,15 @@ import dagger.hilt.android.lifecycle.HiltViewModel;
 
 @HiltViewModel
 
-public class ListViewModel extends ViewModel {
+public class MapsAndListSharedViewModel extends ViewModel {
 
     private final APIRepository apiRepository;
+    private final LocationRepository locationRepository;
 
     @Inject
-    public ListViewModel(APIRepository apiRepository) {
+    public MapsAndListSharedViewModel(APIRepository apiRepository, LocationRepository locationRepository) {
         this.apiRepository = apiRepository;
+        this.locationRepository = locationRepository;
     }
 
     public LiveData getNearBySearchListAsLiveData(String location) {
