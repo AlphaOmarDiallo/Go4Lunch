@@ -20,4 +20,14 @@ public interface RetrofitNearBySearchAPI {
             @Nullable @Query("pagetoken") String pageToken
     );
 
+    @GET("nearbysearch/json?")
+    Call<PlaceNearBy> getNearByPlacesRankByMethod(
+            @Query("location") String location,
+            @Query("rankby") String rankBy,
+            @Query("maxprice") int maxPrice,
+            @Query("type") String type,
+            @Query("key") String key,
+            @Nullable @Query("pagetoken") String pageToken
+    );
+
 }

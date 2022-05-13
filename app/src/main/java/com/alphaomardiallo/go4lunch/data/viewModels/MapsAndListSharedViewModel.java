@@ -3,8 +3,11 @@ package com.alphaomardiallo.go4lunch.data.viewModels;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.ViewModel;
 
+import com.alphaomardiallo.go4lunch.data.dataSources.Model.nearBySearchPojo.ResultsItem;
 import com.alphaomardiallo.go4lunch.data.repositories.APIRepository;
 import com.alphaomardiallo.go4lunch.data.repositories.LocationRepository;
+
+import java.util.List;
 
 import javax.inject.Inject;
 
@@ -23,8 +26,7 @@ public class MapsAndListSharedViewModel extends ViewModel {
         this.locationRepository = locationRepository;
     }
 
-    public LiveData getNearBySearchListRadius(String location) {
+    public LiveData<List<ResultsItem>> getAllRestaurantList(String location) {
         return apiRepository.getNearBySearchListRadiusMethod(location);
     }
-
 }

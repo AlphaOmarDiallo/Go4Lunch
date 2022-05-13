@@ -1,6 +1,7 @@
 package com.alphaomardiallo.go4lunch.ui.adapters;
 
 
+import android.annotation.SuppressLint;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,12 +16,16 @@ import com.alphaomardiallo.go4lunch.R;
 import com.alphaomardiallo.go4lunch.data.dataSources.Model.nearBySearchPojo.ResultsItem;
 import com.alphaomardiallo.go4lunch.databinding.ItemRestaurantBinding;
 
+import java.util.List;
+
 public class ListViewAdapter extends ListAdapter <ResultsItem, ListViewAdapter.ListViewHolder> {
 
     ItemRestaurantBinding binding;
+    private List<ResultsItem> resultsItemList;
 
-    protected ListViewAdapter(@NonNull DiffUtil.ItemCallback<ResultsItem> diffCallback) {
+    public ListViewAdapter(@NonNull DiffUtil.ItemCallback<ResultsItem> diffCallback, List<ResultsItem> resultsItemList) {
         super(diffCallback);
+        this.resultsItemList = resultsItemList;
     }
 
     @NonNull
@@ -35,21 +40,24 @@ public class ListViewAdapter extends ListAdapter <ResultsItem, ListViewAdapter.L
         holder.bind(getItem(position));
     }
 
-    static class ListDiff extends DiffUtil.ItemCallback<ResultsItem> {
+    public static class ListDiff extends DiffUtil.ItemCallback<ResultsItem> {
 
         @Override
         public boolean areItemsTheSame(@NonNull ResultsItem oldItem, @NonNull ResultsItem newItem) {
-            return false;
+            return oldItem.getPlaceId() == newItem.getPlaceId();
         }
 
+        @SuppressLint("DiffUtilEquals")
         @Override
         public boolean areContentsTheSame(@NonNull ResultsItem oldItem, @NonNull ResultsItem newItem) {
-            return false;
+            return oldItem.getPlaceId() == newItem.getPlaceId() &&
+                    oldItem.getName() == newItem.getName() &&
+                    oldItem.getGeometry().getLocation() == newItem.getGeometry().getLocation();
+
         }
     }
 
     public static class ListViewHolder extends RecyclerView.ViewHolder {
-
         TextView restaurantName;
 
         public ListViewHolder(@NonNull View itemView) {
@@ -58,11 +66,7 @@ public class ListViewAdapter extends ListAdapter <ResultsItem, ListViewAdapter.L
         }
 
         public void bind(ResultsItem restaurant) {
-            if (restaurant != null) {
-                restaurantName.setText(restaurant.getName().toUpperCase());
-            } else {
-                restaurantName.setText("Objet null");
-            }
+            restaurantName.setText(restaurant.getName());
         }
 
         static ListViewHolder create(ViewGroup parent) {

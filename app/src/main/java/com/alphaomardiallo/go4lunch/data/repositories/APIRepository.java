@@ -2,12 +2,18 @@ package com.alphaomardiallo.go4lunch.data.repositories;
 
 import androidx.lifecycle.LiveData;
 
+import com.alphaomardiallo.go4lunch.data.dataSources.Model.nearBySearchPojo.ResultsItem;
+
+import java.util.List;
+
 public interface APIRepository {
 
-    LiveData getNearBySearchListRadiusMethod(String location);
+    LiveData<List<ResultsItem>> getNearBySearchListRadiusMethod(String location);
 
-    LiveData getDetailsListAsLiveData();
+    //List<ResultsItem> getNearBySearchListRankByMethod(String location);
 
-    LiveData getAutocompleteListAsLiveData();
+    //void getDetailsListAsLiveData();
+
+    //void getAutocompleteListAsLiveData();
 
 }
