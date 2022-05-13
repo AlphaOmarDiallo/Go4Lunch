@@ -23,10 +23,6 @@ public class MapsAndListSharedViewModel extends ViewModel {
         this.locationRepository = locationRepository;
     }
 
-    public LiveData getNearBySearchListRankBy(String location) {
-        return apiRepository.getNearBySearchListRankByMethod(location);
-    }
-
     public LiveData getNearBySearchListRadius(String location) {
         return apiRepository.getNearBySearchListRadiusMethod(location);
     }

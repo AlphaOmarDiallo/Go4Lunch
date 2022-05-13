@@ -56,34 +56,10 @@ public class APIRepositoryImp implements APIRepository {
     RetrofitNearBySearchAPI retrofitNearBySearchAPI = retrofit.create(RetrofitNearBySearchAPI.class);
 
     @Override
-    public LiveData getNearBySearchListRankByMethod(String location) {
-
-        Call<PlaceNearBy> call = retrofitNearBySearchAPI.getNearByPlacesRankByMethod(location, rankBy, RESTAURANT, BuildConfig.PLACES_API_KEY, pageToken);
-
-        call.enqueue(new Callback<PlaceNearBy>() {
-            @Override
-            public void onResponse(Call<PlaceNearBy> call, Response<PlaceNearBy> response) {
-                if (!response.isSuccessful()) {
-                    Log.e(TAG, "onResponse: failed " + response.message(), null);
-                    return;
-                }
-
-                Log.i(TAG, "onResponse: check " + response.raw().request().url());
-            }
-
-            @Override
-            public void onFailure(Call<PlaceNearBy> call, Throwable t) {
-                Log.e(TAG, "onFailure: " + t.getMessage(), t);
-            }
-        });
-        return null;
-    }
-
-    @Override
     public MutableLiveData<List<ResultsItem>> getNearBySearchListRadiusMethod(String location) {
 
         RetrofitNearBySearchAPI retrofitNearBySearchAPI = retrofit.create(RetrofitNearBySearchAPI.class);
-        Call<PlaceNearBy> call = retrofitNearBySearchAPI.getNearByPlacesRadiusMethod(location, MAXPRICE, radius, RESTAURANT, BuildConfig.PLACES_API_KEY, pageToken);
+        Call<PlaceNearBy> call = retrofitNearBySearchAPI.getNearByPlacesRadiusMethod(location, radius, MAXPRICE, RESTAURANT, BuildConfig.PLACES_API_KEY, pageToken);
 
         call.enqueue(new Callback<PlaceNearBy>() {
             @Override
@@ -135,7 +111,7 @@ public class APIRepositoryImp implements APIRepository {
     }
 
     public void getNextResults(String location, String pageToken) {
-        Call<PlaceNearBy> call = retrofitNearBySearchAPI.getNearByPlacesRadiusMethod(location, MAXPRICE, radius, RESTAURANT, BuildConfig.PLACES_API_KEY, pageToken);
+        Call<PlaceNearBy> call = retrofitNearBySearchAPI.getNearByPlacesRadiusMethod(location, radius, MAXPRICE, RESTAURANT, BuildConfig.PLACES_API_KEY, pageToken);
         call.enqueue(new Callback<PlaceNearBy>() {
             @Override
             public void onResponse(Call<PlaceNearBy> call, Response<PlaceNearBy> response) {
@@ -150,7 +126,7 @@ public class APIRepositoryImp implements APIRepository {
                 System.out.println(nearByRestaurantList.toArray().length);
                 nearByRestaurantListObserved.setValue(nearByRestaurantList);
 
-                if(nearByRestaurantList.size() == 40) {
+                if (nearByRestaurantList.size() == 40) {
                     String newPageToken = response.body().getNextPageToken();
                     getNextResults(location, newPageToken);
                     nearByRestaurantList.addAll(response.body().getResults());
