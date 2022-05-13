@@ -13,7 +13,9 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.LinearLayoutManager;
 
+import com.alphaomardiallo.go4lunch.R;
 import com.alphaomardiallo.go4lunch.data.dataSources.Model.nearBySearchPojo.ResultsItem;
 import com.alphaomardiallo.go4lunch.data.viewModels.MapsAndListSharedViewModel;
 import com.alphaomardiallo.go4lunch.databinding.FragmentListViewBinding;
@@ -44,6 +46,13 @@ public class ListViewFragment extends Fragment {
                              @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
         binding = FragmentListViewBinding.inflate(inflater, container, false);
+        viewModel = new ViewModelProvider(requireActivity()).get(MapsAndListSharedViewModel.class);
+
+        View view = inflater.inflate(R.layout.fragment_list_view, container, false);
+
+        binding.recyclerView.setHasFixedSize(true);
+        binding.recyclerView.setLayoutManager(new LinearLayoutManager(view.getContext(), LinearLayoutManager.VERTICAL, false));
+        binding.recyclerView.setAdapter(adapter);
         return binding.getRoot();
     }
 
@@ -51,8 +60,6 @@ public class ListViewFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        binding.recyclerView.setAdapter(adapter);
-        viewModel = new ViewModelProvider(requireActivity()).get(MapsAndListSharedViewModel.class);
         getNearByRestaurants();
 
     }
@@ -66,11 +73,11 @@ public class ListViewFragment extends Fragment {
                     public void run() {
                         if(resultsItems != null) {
                             System.out.println("List change " + resultsItems.size());
-                            binding.recyclerView.setAdapter(new ListViewAdapter(new ListViewAdapter.ListDiff(), resultsItems));
+                            viewModel.getAllRestaurantList("48.86501071160738, 2.3467211059168793").observe(requireActivity(), adapter::submitList);
                         }
                         System.out.println(resultsItems.toString());
                     }
-                }, 5000);
+                }, 1000);
 
             }
         });
