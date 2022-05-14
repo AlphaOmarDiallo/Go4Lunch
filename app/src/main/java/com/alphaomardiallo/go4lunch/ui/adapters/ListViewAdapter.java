@@ -32,7 +32,7 @@ public class ListViewAdapter extends ListAdapter<ResultsItem, ListViewAdapter.Li
 
     //TODO Gives location to adapter
     ItemRestaurantBinding binding;
-    private List<ResultsItem> resultsItemList;
+    private final List<ResultsItem> resultsItemList;
 
     public ListViewAdapter(@NonNull DiffUtil.ItemCallback<ResultsItem> diffCallback, List<ResultsItem> resultsItemList) {
         super(diffCallback);
@@ -105,12 +105,7 @@ public class ListViewAdapter extends ListAdapter<ResultsItem, ListViewAdapter.Li
             Glide.with(restaurantPhoto)
                     .load("https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference=" + restaurant.getPhotos().get(0).getPhotoReference() + "&key=" + BuildConfig.PLACES_API_KEY)
                     .into(restaurantPhoto);
-            card.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    Log.e(TAG, "onClick: Nice try, but I am not setup", null);
-                }
-            });
+            card.setOnClickListener(view -> Log.e(TAG, "onClick: Nice try, but I am not setup", null));
         }
 
         static ListViewHolder create(ViewGroup parent) {

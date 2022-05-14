@@ -40,7 +40,6 @@ public class APIRepositoryImp implements APIRepository {
     private String pageToken = null;
 
     private MutableLiveData<List<ResultsItem>> nearByRestaurantList = new MutableLiveData<>();
-    private MutableLiveData<List<ResultsItem>> rankByList = new MutableLiveData<>();
 
 
     @Inject
@@ -102,6 +101,28 @@ public class APIRepositoryImp implements APIRepository {
                 Log.e(TAG, "onFailure: " + t.getMessage(), t);
             }
         });
+
+        Call<PlaceNearBy> call2 = retrofitNearBySearchAPI.getNearByPlacesRankByMethod(location, rankBy, MAXPRICE, RESTAURANT, BuildConfig.PLACES_API_KEY, pageToken);
+
+        call2.enqueue(new Callback<PlaceNearBy>() {
+            @Override
+            public void onResponse(Call<PlaceNearBy> call, Response<PlaceNearBy> response) {
+                if (!response.isSuccessful()) {
+                    Log.e(TAG, "onResponse: failed " + response.message(), null);
+                    return;
+                }
+
+                Log.d(" Retrofit Rank by ", response.raw().request().url().toString());
+                nearByRestaurantList.getValue().addAll(response.body().getResults());
+
+            }
+
+            @Override
+            public void onFailure(Call<PlaceNearBy> call, Throwable t) {
+                Log.e(TAG, "onFailure: " + t.getMessage(), null);
+            }
+        });
+
         return nearByRestaurantList;
     }
 
