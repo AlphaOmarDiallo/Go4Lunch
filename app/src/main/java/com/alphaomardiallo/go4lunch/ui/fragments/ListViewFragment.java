@@ -71,8 +71,9 @@ public class ListViewFragment extends Fragment {
                 handler.postDelayed(new Runnable() {
                     @Override
                     public void run() {
-                        if(resultsItems != null) {
+                        if(resultsItems != null /*&& (restaurantList == null || !restaurantList.equals(resultsItems))*/) {
                             System.out.println("List change " + resultsItems.size());
+                            restaurantList = resultsItems;
                             viewModel.getAllRestaurantList("48.86501071160738, 2.3467211059168793").observe(requireActivity(), adapter::submitList);
                         }
                         System.out.println(resultsItems.toString());

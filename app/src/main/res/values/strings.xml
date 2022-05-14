@@ -73,4 +73,8 @@
     //location
     <string name="office_location">48.86501071160738,2.3467211059168793</string>
 
+    //ItemRestaurant
+    <string name="person_icon">Person Icon</string>
+    <string name="picture_of_the_restaurant">Picture of the restaurant</string>
+
 </resources>
