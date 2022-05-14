@@ -76,5 +76,7 @@
     //ItemRestaurant
     <string name="person_icon">Person Icon</string>
     <string name="picture_of_the_restaurant">Picture of the restaurant</string>
+    <string name="number_of_guests">(%i)</string>
+    <string name="distance_in_meters">%i m</string>
 
 </resources>

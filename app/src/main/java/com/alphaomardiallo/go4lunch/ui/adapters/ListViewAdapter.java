@@ -1,7 +1,11 @@
 package com.alphaomardiallo.go4lunch.ui.adapters;
 
 
+import static android.content.ContentValues.TAG;
+
 import android.annotation.SuppressLint;
+import android.graphics.Color;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,6 +14,7 @@ import android.widget.RatingBar;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
@@ -18,12 +23,14 @@ import com.alphaomardiallo.go4lunch.BuildConfig;
 import com.alphaomardiallo.go4lunch.R;
 import com.alphaomardiallo.go4lunch.data.dataSources.Model.nearBySearchPojo.ResultsItem;
 import com.alphaomardiallo.go4lunch.databinding.ItemRestaurantBinding;
+import com.alphaomardiallo.go4lunch.domain.DistanceCalculatorUtils;
 import com.bumptech.glide.Glide;
 
 import java.util.List;
 
 public class ListViewAdapter extends ListAdapter<ResultsItem, ListViewAdapter.ListViewHolder> {
 
+    //TODO Gives location to adapter
     ItemRestaurantBinding binding;
     private List<ResultsItem> resultsItemList;
 
@@ -70,6 +77,7 @@ public class ListViewAdapter extends ListAdapter<ResultsItem, ListViewAdapter.Li
         TextView restaurantNumberOfWorkmates;
         RatingBar restaurantRating;
         ImageView restaurantPhoto;
+        ConstraintLayout card;
 
         public ListViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -81,19 +89,28 @@ public class ListViewAdapter extends ListAdapter<ResultsItem, ListViewAdapter.Li
             restaurantNumberOfWorkmates = itemView.findViewById(R.id.tvNumberOfGuests);
             restaurantRating = itemView.findViewById(R.id.ratingBar);
             restaurantPhoto = itemView.findViewById(R.id.ivPhotoRestaurant);
+            card = itemView.findViewById(R.id.restaurant_item);
+
+            setupRatingBar();
         }
 
         public void bind(ResultsItem restaurant) {
             restaurantName.setText(restaurant.getName());
             restaurantStyleAndAddress.setText(restaurant.getVicinity());
-            restaurantOpeningTime.setText(getOpeningTime(restaurant.getOpeningHours().isOpenNow() ));
+            restaurantOpeningTime.setText(getOpeningTime(restaurant.getOpeningHours().isOpenNow()));
             restaurantDistance.setText(restaurant.getGeometry().getLocation().toString());
-            restaurantNumberOfWorkmates.setText("2");
-            setupRatingBar();
+            restaurantNumberOfWorkmates.setText(getNumberOfWorkmates());
             restaurantRating.setRating(getRating(restaurant.getRating()));
+            restaurantDistance.setText(getDistance("48.86501071160738, 2.3467211059168793", restaurant.getGeometry().getLocation().getLat(), restaurant.getGeometry().getLocation().getLng()));
             Glide.with(restaurantPhoto)
-                    .load("https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference="+ restaurant.getPhotos().get(0).getPhotoReference() +"&key="+ BuildConfig.PLACES_API_KEY)
+                    .load("https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference=" + restaurant.getPhotos().get(0).getPhotoReference() + "&key=" + BuildConfig.PLACES_API_KEY)
                     .into(restaurantPhoto);
+            card.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Log.e(TAG, "onClick: Nice try, but I am not setup", null);
+                }
+            });
         }
 
         static ListViewHolder create(ViewGroup parent) {
@@ -103,8 +120,10 @@ public class ListViewAdapter extends ListAdapter<ResultsItem, ListViewAdapter.Li
 
         private String getOpeningTime(Boolean isOpenNow) {
             if (!isOpenNow) {
+                restaurantOpeningTime.setTextColor(Color.RED);
                 return "Closed";
             } else {
+                restaurantOpeningTime.setTextColor(Color.BLUE);
                 return "Open now";
             }
         }
@@ -114,11 +133,24 @@ public class ListViewAdapter extends ListAdapter<ResultsItem, ListViewAdapter.Li
             restaurantRating.setMax(3);
             restaurantRating.setNumStars(3);
             restaurantRating.setStepSize(0.1f);
+            restaurantRating.setScaleX(-1f);
 
         }
 
         private float getRating(Double rating) {
             return (float) ((rating / 5) * 3);
         }
+
+        private String getDistance(String currentLocation, double destinationLat, double destinationLng) {
+            DistanceCalculatorUtils calculatorUtils = new DistanceCalculatorUtils();
+            int distance = Math.round(calculatorUtils.getDistance(currentLocation, destinationLat, destinationLng));
+            return String.format("%sm", distance);
+        }
+
+        private String getNumberOfWorkmates() {
+            //TODO set method
+            return String.format("(%d)", 2);
+        }
+
     }
 }
