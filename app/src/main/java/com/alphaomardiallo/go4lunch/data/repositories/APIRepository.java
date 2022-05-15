@@ -8,9 +8,7 @@ import java.util.List;
 
 public interface APIRepository {
 
-    LiveData<List<ResultsItem>> getNearBySearchListRadiusMethod(String location);
-
-    //List<ResultsItem> getNearBySearchListRankByMethod(String location);
+    LiveData<List<ResultsItem>> getNearBySearchList(String location, int radius);
 
     //void getDetailsListAsLiveData();
 

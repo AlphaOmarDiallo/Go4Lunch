@@ -39,7 +39,7 @@ public class ListViewFragment extends Fragment {
     private PositionUtils positionUtils = new PositionUtils();
     private List<ResultsItem> restaurantList;
     private final ListViewAdapter adapter = new ListViewAdapter(new ListViewAdapter.ListDiff(), restaurantList);
-
+    private final String location = "48.86501071160738, 2.3467211059168793";
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -65,7 +65,7 @@ public class ListViewFragment extends Fragment {
     }
 
     public void getNearByRestaurants() {
-        viewModel.getAllRestaurantList("48.86501071160738, 2.3467211059168793").observe(requireActivity(), new Observer<List<ResultsItem>>() {
+        viewModel.getAllRestaurantList(viewModel.getOfficeLocationAsString(), viewModel.getRadius()).observe(requireActivity(), new Observer<List<ResultsItem>>() {
             @Override
             public void onChanged(List<ResultsItem> resultsItems) {
                 handler.postDelayed(new Runnable() {
@@ -74,7 +74,7 @@ public class ListViewFragment extends Fragment {
                         if(resultsItems != null /*&& (restaurantList == null || !restaurantList.equals(resultsItems))*/) {
                             System.out.println("List change " + resultsItems.size());
                             restaurantList = resultsItems;
-                            viewModel.getAllRestaurantList("48.86501071160738, 2.3467211059168793").observe(requireActivity(), adapter::submitList);
+                            viewModel.getAllRestaurantList(viewModel.getOfficeLocationAsString(), viewModel.getRadius()).observe(requireActivity(), adapter::submitList);
                         }
                         System.out.println(resultsItems.toString());
                     }

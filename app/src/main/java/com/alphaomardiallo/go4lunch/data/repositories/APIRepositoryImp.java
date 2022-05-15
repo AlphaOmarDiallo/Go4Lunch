@@ -6,6 +6,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
 
+import androidx.annotation.NonNull;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
@@ -13,9 +14,10 @@ import com.alphaomardiallo.go4lunch.BuildConfig;
 import com.alphaomardiallo.go4lunch.data.dataSources.Model.nearBySearchPojo.PlaceNearBy;
 import com.alphaomardiallo.go4lunch.data.dataSources.Model.nearBySearchPojo.ResultsItem;
 import com.alphaomardiallo.go4lunch.data.dataSources.remoteData.RetrofitNearBySearchAPI;
-import com.alphaomardiallo.go4lunch.domain.PositionUtils;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import javax.inject.Inject;
 
@@ -31,15 +33,9 @@ public class APIRepositoryImp implements APIRepository {
     private static final String rankBy = "distance";
     private static final int MAXPRICE = 2;
     private static final int HANDLING_TIME = 2000;
-
     private final Handler handler = new Handler(Looper.getMainLooper());
-
-    private PositionUtils positionUtils = new PositionUtils();
-    private int radius = positionUtils.getRadius();
-
-    private String pageToken = null;
-
-    private MutableLiveData<List<ResultsItem>> nearByRestaurantList = new MutableLiveData<>();
+    private final MutableLiveData<List<ResultsItem>> nearByRestaurantList = new MutableLiveData<>();
+    private final List<ResultsItem> nearByRestaurantListRankBy = new ArrayList<>();
 
 
     @Inject
@@ -60,85 +56,82 @@ public class APIRepositoryImp implements APIRepository {
     /**
      * Getting NearBySearch results as a list using the radius parameter and managing the recall if there is a page token
      *
-     * @param location
      * @return nearByRestaurantList
      */
 
     @Override
-    public LiveData<List<ResultsItem>> getNearBySearchListRadiusMethod(String location) {
+    public LiveData<List<ResultsItem>> getNearBySearchList(String location, int radius) {
 
-        Call<PlaceNearBy> call = retrofitNearBySearchAPI.getNearByPlacesRadiusMethod(location, radius, MAXPRICE, RESTAURANT, BuildConfig.PLACES_API_KEY, pageToken);
+        Call<PlaceNearBy> call = retrofitNearBySearchAPI.getNearByPlacesRadiusMethod(location, radius, MAXPRICE, RESTAURANT, BuildConfig.PLACES_API_KEY, null);
 
         call.enqueue(new Callback<PlaceNearBy>() {
             @Override
-            public void onResponse(Call<PlaceNearBy> call, Response<PlaceNearBy> response) {
+            public void onResponse(@NonNull Call<PlaceNearBy> call, @NonNull Response<PlaceNearBy> response) {
                 if (!response.isSuccessful()) {
                     Log.e(TAG, "onResponse: failed " + response.message(), null);
                     return;
                 }
 
-                nearByRestaurantList.setValue(response.body().getResults());
+                assert response.body() != null;
+                nearByRestaurantListRankBy.addAll(response.body().getResults());
 
                 //TODO delete these once API works correctly
-                System.out.println(nearByRestaurantList.getValue().size());
                 Log.d("onResponse: Retrofit ", response.raw().request().url().toString());
 
                 if (response.body().getNextPageToken() != null) {
 
-                    handler.postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-                            getNextResultsRadiusMethod(location, response.body().getNextPageToken());
+                    handler.postDelayed(() -> getNextResultsRadiusMethod(location, radius, response.body().getNextPageToken()), HANDLING_TIME);
+
+                }
+
+                Call<PlaceNearBy> call2 = retrofitNearBySearchAPI.getNearByPlacesRankByMethod(location, rankBy, MAXPRICE, RESTAURANT, BuildConfig.PLACES_API_KEY, null);
+
+                call2.enqueue(new Callback<PlaceNearBy>() {
+                    @Override
+                    public void onResponse(@NonNull Call<PlaceNearBy> call, @NonNull Response<PlaceNearBy> response) {
+                        if (!response.isSuccessful()) {
+                            Log.e(TAG, "onResponse: failed " + response.message(), null);
+                            return;
                         }
-                    }, HANDLING_TIME);
 
-                }
+                        Log.d(" Retrofit Rank by ", response.raw().request().url().toString());
+                        assert response.body() != null;
+
+                        nearByRestaurantListRankBy.addAll(response.body().getResults());
+                    }
+
+                    @Override
+                    public void onFailure(@NonNull Call<PlaceNearBy> call, @NonNull Throwable t) {
+                        Log.e(TAG, "onFailure: " + t.getMessage(), null);
+                    }
+                });
+
+                nearByRestaurantList.setValue(nearByRestaurantListRankBy);
 
             }
 
             @Override
-            public void onFailure(Call<PlaceNearBy> call, Throwable t) {
+            public void onFailure(@NonNull Call<PlaceNearBy> call, @NonNull Throwable t) {
                 Log.e(TAG, "onFailure: " + t.getMessage(), t);
-            }
-        });
-
-        Call<PlaceNearBy> call2 = retrofitNearBySearchAPI.getNearByPlacesRankByMethod(location, rankBy, MAXPRICE, RESTAURANT, BuildConfig.PLACES_API_KEY, pageToken);
-
-        call2.enqueue(new Callback<PlaceNearBy>() {
-            @Override
-            public void onResponse(Call<PlaceNearBy> call, Response<PlaceNearBy> response) {
-                if (!response.isSuccessful()) {
-                    Log.e(TAG, "onResponse: failed " + response.message(), null);
-                    return;
-                }
-
-                Log.d(" Retrofit Rank by ", response.raw().request().url().toString());
-                nearByRestaurantList.getValue().addAll(response.body().getResults());
-
-            }
-
-            @Override
-            public void onFailure(Call<PlaceNearBy> call, Throwable t) {
-                Log.e(TAG, "onFailure: " + t.getMessage(), null);
             }
         });
 
         return nearByRestaurantList;
     }
 
-    public void getNextResultsRadiusMethod(String location, String pageToken) {
+    public void getNextResultsRadiusMethod(String location, int radius, String pageToken) {
         Call<PlaceNearBy> call = retrofitNearBySearchAPI.getNearByPlacesRadiusMethod(location, radius, MAXPRICE, RESTAURANT, BuildConfig.PLACES_API_KEY, pageToken);
         call.enqueue(new Callback<PlaceNearBy>() {
             @Override
-            public void onResponse(Call<PlaceNearBy> call, Response<PlaceNearBy> response) {
+            public void onResponse(@NonNull Call<PlaceNearBy> call, @NonNull Response<PlaceNearBy> response) {
                 if (!response.isSuccessful()) {
                     Log.e(TAG, "onResponse: failed " + response.message(), null);
                     return;
                 }
                 Log.i(TAG, "onResponse: check " + response.raw().request().url());
-                List<ResultsItem> thisList = response.body().getResults();
+                List<ResultsItem> thisList = Objects.requireNonNull(response.body()).getResults();
                 System.out.println(thisList.toArray().length);
-                nearByRestaurantList.getValue().addAll(response.body().getResults());
+                Objects.requireNonNull(nearByRestaurantList.getValue()).addAll(response.body().getResults());
                 System.out.println(nearByRestaurantList.getValue().size());
 
                 if (response.body().getNextPageToken() != null) {
@@ -146,119 +139,32 @@ public class APIRepositoryImp implements APIRepository {
 
                     call2.enqueue(new Callback<PlaceNearBy>() {
                         @Override
-                        public void onResponse(Call<PlaceNearBy> call, Response<PlaceNearBy> response) {
+                        public void onResponse(@NonNull Call<PlaceNearBy> call, @NonNull Response<PlaceNearBy> response) {
                             if (!response.isSuccessful()) {
                                 Log.e(TAG, "onResponse: failed " + response.message(), null);
                                 return;
                             }
 
                             Log.d("onResponse: Retrofit ", response.raw().request().url().toString());
-                            nearByRestaurantList.getValue().addAll(response.body().getResults());
+                            nearByRestaurantList.getValue().addAll(Objects.requireNonNull(response.body()).getResults());
                             System.out.println(nearByRestaurantList.getValue().size());
                         }
 
                         @Override
-                        public void onFailure(Call<PlaceNearBy> call, Throwable t) {
+                        public void onFailure(@NonNull Call<PlaceNearBy> call, @NonNull Throwable t) {
                             Log.e(TAG, "onFailure: " + t.getMessage(), t);
                         }
                     });
-                    nearByRestaurantList.getValue().addAll(response.body().getResults());
+                    Objects.requireNonNull(nearByRestaurantList.getValue()).addAll(response.body().getResults());
                 }
             }
 
             @Override
-            public void onFailure(Call<PlaceNearBy> call, Throwable t) {
+            public void onFailure(@NonNull Call<PlaceNearBy> call, @NonNull Throwable t) {
                 Log.e(TAG, "onFailure: " + t.getMessage(), null);
             }
         });
     }
-
-    /**
-     * Getting NearBySearch results as a list using the rankBy parameter
-     *
-     * @return
-     */
-
-/*    public List<ResultsItem> getNearBySearchListRankByMethod(String location) {
-
-        Call<PlaceNearBy> call = retrofitNearBySearchAPI.getNearByPlacesRankByMethod(location, rankBy, MAXPRICE, RESTAURANT, BuildConfig.PLACES_API_KEY, pageToken);
-
-        call.enqueue(new Callback<PlaceNearBy>() {
-            @Override
-            public void onResponse(Call<PlaceNearBy> call, Response<PlaceNearBy> response) {
-                if (!response.isSuccessful()) {
-                    Log.e(TAG, "onResponse: failed " + response.message(), null);
-                    return;
-                }
-                Log.d(" Retrofit Rank by ", response.raw().request().url().toString());
-                rankByList.addAll(response.body().getResults());
-
-                if (response.body().getNextPageToken() != null) {
-                    handler.postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-                            getNextResultsRankByMethod(location, response.body().getNextPageToken());
-                        }
-                    }, HANDLING_TIME);
-                }
-
-            }
-
-            @Override
-            public void onFailure(Call<PlaceNearBy> call, Throwable t) {
-                Log.e(TAG, "onFailure: " + t.getMessage(), null);
-            }
-        });
-        return rankByList.getValue();
-    }
-
-    private void getNextResultsRankByMethod(String location, String pageToken) {
-
-        Call<PlaceNearBy> call = retrofitNearBySearchAPI.getNearByPlacesRankByMethod(location, rankBy, MAXPRICE, RESTAURANT, BuildConfig.PLACES_API_KEY, pageToken);
-
-        call.enqueue(new Callback<PlaceNearBy>() {
-            @Override
-            public void onResponse(Call<PlaceNearBy> call, Response<PlaceNearBy> response) {
-                if (!response.isSuccessful()) {
-                    Log.e(TAG, "onResponse: failed " + response.message(), null);
-                    return;
-                }
-
-                Log.d("onResponse: Retrofit ", response.raw().request().url().toString());
-                rankByList.addAll(response.body().getResults());
-                System.out.println(rankByList.size());
-
-                if (response.body().getNextPageToken() != null) {
-                    Call<PlaceNearBy> call2 = retrofitNearBySearchAPI.getNearByPlacesRankByMethod(location, rankBy, MAXPRICE, RESTAURANT, BuildConfig.PLACES_API_KEY, response.body().getNextPageToken());
-
-                    call2.enqueue(new Callback<PlaceNearBy>() {
-                        @Override
-                        public void onResponse(Call<PlaceNearBy> call, Response<PlaceNearBy> response) {
-                            if (!response.isSuccessful()) {
-                                Log.e(TAG, "onResponse: failed " + response.message(), null);
-                                return;
-                            }
-
-                            Log.d("onResponse: Retrofit ", response.raw().request().url().toString());
-                            rankByList.addAll(response.body().getResults());
-                            System.out.println(rankByList.size());
-                        }
-
-                        @Override
-                        public void onFailure(Call<PlaceNearBy> call, Throwable t) {
-                            Log.e(TAG, "onFailure: " + t.getMessage(), null);
-                        }
-                    });
-                }
-
-            }
-
-            @Override
-            public void onFailure(Call<PlaceNearBy> call, Throwable t) {
-                Log.e(TAG, "onFailure: " + t.getMessage(), null);
-            }
-        });
-    }*/
 
     /**
      * Getting Details results for one restaurant

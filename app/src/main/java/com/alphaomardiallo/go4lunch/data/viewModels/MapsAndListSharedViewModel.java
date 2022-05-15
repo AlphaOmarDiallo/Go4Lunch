@@ -27,13 +27,20 @@ public class MapsAndListSharedViewModel extends ViewModel {
         this.locationRepository = locationRepository;
     }
 
-    public LiveData<List<ResultsItem>> getAllRestaurantList(String location) {
+    public LiveData<List<ResultsItem>> getAllRestaurantList(String location, int radius) {
         if (checkList == null) {
-            checkList = apiRepository.getNearBySearchListRadiusMethod(location);
+            checkList = apiRepository.getNearBySearchList(location, radius);
             return checkList;
         } else {
             return checkList;
         }
+    }
 
+    public int getRadius(){
+        return locationRepository.getRadius();
+    }
+
+    public String getOfficeLocationAsString(){
+        return locationRepository.getOfficeAddressStringFormat();
     }
 }
