@@ -1,9 +1,10 @@
 package com.alphaomardiallo.go4lunch.data.dataSources.Model.nearBySearchPojo;
 
-import java.util.List;
 import com.google.gson.annotations.SerializedName;
 
-public class ResultsItem{
+import java.util.List;
+
+public class ResultsItem {
 
 	@SerializedName("types")
 	private List<String> types;

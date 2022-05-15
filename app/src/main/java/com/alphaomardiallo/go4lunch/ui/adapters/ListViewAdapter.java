@@ -1,11 +1,8 @@
 package com.alphaomardiallo.go4lunch.ui.adapters;
 
 
-import static android.content.ContentValues.TAG;
-
 import android.annotation.SuppressLint;
 import android.graphics.Color;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,6 +21,7 @@ import com.alphaomardiallo.go4lunch.R;
 import com.alphaomardiallo.go4lunch.data.dataSources.Model.nearBySearchPojo.ResultsItem;
 import com.alphaomardiallo.go4lunch.databinding.ItemRestaurantBinding;
 import com.alphaomardiallo.go4lunch.domain.DistanceCalculatorUtils;
+import com.alphaomardiallo.go4lunch.domain.OnClickItemListener;
 import com.bumptech.glide.Glide;
 
 import java.util.List;
@@ -31,12 +29,14 @@ import java.util.List;
 public class ListViewAdapter extends ListAdapter<ResultsItem, ListViewAdapter.ListViewHolder> {
 
     //TODO Gives location to adapter
-    ItemRestaurantBinding binding;
+    private ItemRestaurantBinding binding;
     private final List<ResultsItem> resultsItemList;
+    OnClickItemListener onClickItemListener;
 
-    public ListViewAdapter(@NonNull DiffUtil.ItemCallback<ResultsItem> diffCallback, List<ResultsItem> resultsItemList) {
+    public ListViewAdapter(@NonNull DiffUtil.ItemCallback<ResultsItem> diffCallback, List<ResultsItem> resultsItemList, OnClickItemListener onClickItemListener) {
         super(diffCallback);
         this.resultsItemList = resultsItemList;
+        this.onClickItemListener = onClickItemListener;
     }
 
     @NonNull
@@ -48,7 +48,7 @@ public class ListViewAdapter extends ListAdapter<ResultsItem, ListViewAdapter.Li
 
     @Override
     public void onBindViewHolder(@NonNull ListViewHolder holder, int position) {
-        holder.bind(getItem(position));
+        holder.bind(getItem(position), onClickItemListener);
     }
 
     public static class ListDiff extends DiffUtil.ItemCallback<ResultsItem> {
@@ -94,7 +94,7 @@ public class ListViewAdapter extends ListAdapter<ResultsItem, ListViewAdapter.Li
             setupRatingBar();
         }
 
-        public void bind(ResultsItem restaurant) {
+        public void bind(ResultsItem restaurant, OnClickItemListener onClickItemListener) {
             restaurantName.setText(restaurant.getName());
             restaurantStyleAndAddress.setText(restaurant.getVicinity());
             restaurantOpeningTime.setText(getOpeningTime(restaurant.getOpeningHours().isOpenNow()));
@@ -105,7 +105,12 @@ public class ListViewAdapter extends ListAdapter<ResultsItem, ListViewAdapter.Li
             Glide.with(restaurantPhoto)
                     .load("https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference=" + restaurant.getPhotos().get(0).getPhotoReference() + "&key=" + BuildConfig.PLACES_API_KEY)
                     .into(restaurantPhoto);
-            card.setOnClickListener(view -> Log.e(TAG, "onClick: Nice try, but I am not setup", null));
+            card.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    onClickItemListener.onClickItem(getAbsoluteAdapterPosition());
+                }
+            });
         }
 
         static ListViewHolder create(ViewGroup parent) {

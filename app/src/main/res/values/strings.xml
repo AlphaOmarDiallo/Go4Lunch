@@ -79,5 +79,13 @@
     <string name="number_of_guests">(%i)</string>
     <string name="distance_in_meters">%i m</string>
     <string name="hungry_bear">Hungry Bear</string>
+    <string name="button_to_select_a_restaurant">Button to select a restaurant</string>
+    <string name="button_to_call_the_restaurant">Button to call the restaurant</string>
+    <string name="button_to_add_the_restaurant_to_the_favourite">Button to add the restaurant to the favourite</string>
+    <string name="button_to_visit_the_website_of_the_restaurant">Button to visit the webSite of the restaurant</string>
+    <string name="call">CALL</string>
+    <string name="like">LIKE</string>
+    <string name="website">WEBSITE</string>
+    <string name="gif_showing_if_you_are_eating_alone">GIF showing if you are eating alone</string>
 
 </resources>

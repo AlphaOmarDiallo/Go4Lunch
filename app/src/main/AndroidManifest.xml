@@ -16,7 +16,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Go4Lunch">
         <activity
-            android:name=".restaurantDetails"
+            android:name=".RestaurantDetails"
             android:exported="false" />
         <activity
             android:name=".ui.SettingsActivity"

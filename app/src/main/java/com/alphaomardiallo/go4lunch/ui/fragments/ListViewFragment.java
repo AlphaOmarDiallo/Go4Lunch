@@ -1,6 +1,7 @@
 package com.alphaomardiallo.go4lunch.ui.fragments;
 
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -15,9 +16,11 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.alphaomardiallo.go4lunch.R;
+import com.alphaomardiallo.go4lunch.RestaurantDetails;
 import com.alphaomardiallo.go4lunch.data.dataSources.Model.nearBySearchPojo.ResultsItem;
 import com.alphaomardiallo.go4lunch.data.viewModels.MapsAndListSharedViewModel;
 import com.alphaomardiallo.go4lunch.databinding.FragmentListViewBinding;
+import com.alphaomardiallo.go4lunch.domain.OnClickItemListener;
 import com.alphaomardiallo.go4lunch.ui.adapters.ListViewAdapter;
 import com.bumptech.glide.Glide;
 
@@ -26,14 +29,14 @@ import java.util.List;
 import dagger.hilt.android.AndroidEntryPoint;
 
 @AndroidEntryPoint
-public class ListViewFragment extends Fragment {
+public class ListViewFragment extends Fragment implements OnClickItemListener {
 
     private final Handler handler = new Handler(Looper.getMainLooper());
 
     private FragmentListViewBinding binding;
     public MapsAndListSharedViewModel viewModel;
     private List<ResultsItem> restaurantList;
-    private final ListViewAdapter adapter = new ListViewAdapter(new ListViewAdapter.ListDiff(), restaurantList);
+    private final ListViewAdapter adapter = new ListViewAdapter(new ListViewAdapter.ListDiff(), restaurantList, this);
 
     @Nullable
     @Override
@@ -67,6 +70,7 @@ public class ListViewFragment extends Fragment {
                 System.out.println("List change " + resultsItems.size());
                 restaurantList = resultsItems;
                 viewModel.getAllRestaurantList(viewModel.getOfficeLocationAsString(), viewModel.getRadius()).observe(requireActivity(), adapter::submitList);
+                viewModel.getRestaurants().observe(getViewLifecycleOwner(), this::updateRestaurantList);
                 loadingGIFSetup();
             }
         }, 1000));
@@ -92,4 +96,16 @@ public class ListViewFragment extends Fragment {
         }
     }
 
+
+    @Override
+    public void onClickItem(int position) {
+        ResultsItem restaurant = viewModel.getRestaurants().getValue().get(position);
+        Intent intent = new Intent(requireContext(), RestaurantDetails.class);
+        intent.putExtra("id", restaurant.getPlaceId());
+        startActivity(intent);
+    }
+
+    public void updateRestaurantList(List<ResultsItem> list) {
+        restaurantList = list;
+    }
 }

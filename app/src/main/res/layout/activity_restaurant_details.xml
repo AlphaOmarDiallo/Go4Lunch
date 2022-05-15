@@ -4,6 +4,222 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".restaurantDetails">
+    tools:context=".RestaurantDetails">
 
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline5"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.65" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline7"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.55" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline8"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.40" />
+
+    <ImageView
+        android:id="@+id/ivRestaurantPhotoDetail"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:scaleType="fitXY"
+        app:layout_constraintBottom_toTopOf="@+id/guideline8"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:srcCompat="@tools:sample/backgrounds/scenic"
+        android:contentDescription="@string/picture_of_the_restaurant" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fabSelectRestaurant"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="16dp"
+        android:clickable="true"
+        app:backgroundTint="@color/white"
+        app:layout_constraintBottom_toTopOf="@+id/guideline8"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/guideline8"
+        app:srcCompat="@drawable/ic_baseline_check_circle_24"
+        android:contentDescription="@string/button_to_select_a_restaurant"
+        android:focusable="true" />
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/cvRestaurantInformation"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:cardBackgroundColor="@color/googleRed"
+        app:layout_constraintBottom_toTopOf="@+id/guideline7"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/guideline8">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <TextView
+                android:id="@+id/tvRestaurantNameDetail"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="8dp"
+                android:textColor="@color/white"
+                android:textSize="20sp"
+                app:layout_constraintBottom_toTopOf="@+id/tvAddressRestaurantDetails"
+                app:layout_constraintEnd_toStartOf="@+id/ratingBarRestaurantDetails"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_chainStyle="packed"
+                tools:text="Le restaurant de test" />
+
+            <RatingBar
+                android:id="@+id/ratingBarRestaurantDetails"
+                style="@style/Widget.AppCompat.RatingBar.Small"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:theme="@style/RatingBar"
+                app:layout_constraintBottom_toBottomOf="@+id/tvRestaurantNameDetail"
+                app:layout_constraintStart_toEndOf="@+id/tvRestaurantNameDetail"
+                app:layout_constraintTop_toTopOf="@+id/tvRestaurantNameDetail" />
+
+            <TextView
+                android:id="@+id/tvAddressRestaurantDetails"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:layout_marginEnd="16dp"
+                android:layout_marginBottom="26dp"
+                android:textColor="@color/white"
+                app:layout_constraintBottom_toTopOf="@+id/tvIsOpenDetails"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="@+id/tvRestaurantNameDetail"
+                app:layout_constraintTop_toBottomOf="@+id/tvRestaurantNameDetail"
+                tools:text="46 rue de Montorgueil 75004 Paris" />
+
+            <TextView
+                android:id="@+id/tvIsOpenDetails"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/white"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/tvDistanceRestaurantDetails"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="@+id/tvAddressRestaurantDetails"
+                app:layout_constraintTop_toBottomOf="@+id/tvAddressRestaurantDetails"
+                tools:text="Open now" />
+
+            <TextView
+                android:id="@+id/tvDistanceRestaurantDetails"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="29dp"
+                app:layout_constraintBottom_toBottomOf="@+id/tvIsOpenDetails"
+                app:layout_constraintStart_toEndOf="@+id/tvIsOpenDetails"
+                app:layout_constraintTop_toTopOf="@+id/tvIsOpenDetails"
+                tools:text="300m"
+                android:textColor="@color/white" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.cardview.widget.CardView>
+
+    <ImageButton
+        android:id="@+id/ibCallDetail"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:backgroundTint="#00FFFFFF"
+        app:layout_constraintBottom_toTopOf="@+id/guideline5"
+        app:layout_constraintEnd_toStartOf="@+id/ibLikeDetail"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/guideline7"
+        app:srcCompat="@drawable/ic_baseline_phone_24"
+        android:contentDescription="@string/button_to_call_the_restaurant" />
+
+    <ImageButton
+        android:id="@+id/ibLikeDetail"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:backgroundTint="#00FFFFFF"
+        app:layout_constraintBottom_toTopOf="@+id/guideline5"
+        app:layout_constraintEnd_toStartOf="@+id/ibWebSiteDetails"
+        app:layout_constraintStart_toEndOf="@+id/ibCallDetail"
+        app:layout_constraintTop_toTopOf="@+id/guideline7"
+        app:srcCompat="@drawable/ic_baseline_star_rate_24"
+        android:contentDescription="@string/button_to_add_the_restaurant_to_the_favourite" />
+
+    <ImageButton
+        android:id="@+id/ibWebSiteDetails"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:backgroundTint="#00FFFFFF"
+        app:layout_constraintBottom_toTopOf="@+id/guideline5"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/ibLikeDetail"
+        app:layout_constraintTop_toTopOf="@+id/guideline7"
+        app:srcCompat="@drawable/ic_baseline_web_24"
+        android:contentDescription="@string/button_to_visit_the_website_of_the_restaurant" />
+
+    <TextView
+        android:id="@+id/tvCallDetails"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:text="@string/call"
+        android:textColor="@color/googleRed"
+        app:layout_constraintBottom_toTopOf="@+id/guideline5"
+        app:layout_constraintEnd_toEndOf="@+id/ibCallDetail"
+        app:layout_constraintStart_toStartOf="@+id/ibCallDetail" />
+
+    <TextView
+        android:id="@+id/tvLLikeDetails"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:text="@string/like"
+        android:textColor="@color/googleRed"
+        app:layout_constraintBottom_toTopOf="@+id/guideline5"
+        app:layout_constraintEnd_toEndOf="@+id/ibLikeDetail"
+        app:layout_constraintStart_toEndOf="@+id/ibCallDetail" />
+
+    <TextView
+        android:id="@+id/tvWebsiteDetails"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:text="@string/website"
+        android:textColor="@color/googleRed"
+        app:layout_constraintBottom_toTopOf="@+id/guideline5"
+        app:layout_constraintEnd_toEndOf="@+id/ibWebSiteDetails"
+        app:layout_constraintStart_toEndOf="@+id/ibLikeDetail" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/guideline5"
+        app:layout_constraintVertical_bias="1.0" />
+
+    <ImageView
+        android:id="@+id/ivEatingAloneDetail"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/guideline5"
+        tools:srcCompat="@tools:sample/backgrounds/scenic"
+        android:contentDescription="@string/gif_showing_if_you_are_eating_alone" />
 </androidx.constraintlayout.widget.ConstraintLayout>
