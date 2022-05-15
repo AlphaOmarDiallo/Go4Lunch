@@ -19,6 +19,7 @@ import com.alphaomardiallo.go4lunch.data.dataSources.Model.nearBySearchPojo.Resu
 import com.alphaomardiallo.go4lunch.data.viewModels.MapsAndListSharedViewModel;
 import com.alphaomardiallo.go4lunch.databinding.FragmentListViewBinding;
 import com.alphaomardiallo.go4lunch.ui.adapters.ListViewAdapter;
+import com.bumptech.glide.Glide;
 
 import java.util.List;
 
@@ -47,6 +48,7 @@ public class ListViewFragment extends Fragment {
         binding.recyclerView.setHasFixedSize(true);
         binding.recyclerView.setLayoutManager(new LinearLayoutManager(view.getContext(), LinearLayoutManager.VERTICAL, false));
         binding.recyclerView.setAdapter(adapter);
+
         return binding.getRoot();
     }
 
@@ -54,6 +56,7 @@ public class ListViewFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        loadingGIFSetup();
         getNearByRestaurants();
 
     }
@@ -64,8 +67,29 @@ public class ListViewFragment extends Fragment {
                 System.out.println("List change " + resultsItems.size());
                 restaurantList = resultsItems;
                 viewModel.getAllRestaurantList(viewModel.getOfficeLocationAsString(), viewModel.getRadius()).observe(requireActivity(), adapter::submitList);
+                loadingGIFSetup();
             }
         }, 1000));
+    }
+
+    private void loadingGIFSetup(){
+        // https://tenor.com/view/ice-family-bear-food-hungry-gif-15132050648417346282
+        if (restaurantList == null) {
+            Glide.with(binding.ivLoadingGIF)
+                    .asGif()
+                    .load("https://media.giphy.com/media/0KiLnOipDAnfk5Jgsf/giphy.gif")
+                    .into(binding.ivLoadingGIF);
+        } else if (restaurantList != null && restaurantList.size() == 0){
+            binding.tvLoadingMessage.setText("No results in your area");
+            Glide.with(binding.ivLoadingGIF)
+                    .asGif()
+                    .override(100, 100)
+                    .load("https://tenor.com/view/shermans-night-in-midnight-snack-hungry-shopping-the-fridge-empty-fridge-gif-14466290")
+                    .into(binding.ivLoadingGIF);
+        } else {
+            binding.tvLoadingMessage.setVisibility(View.INVISIBLE);
+            binding.ivLoadingGIF.setVisibility(View.INVISIBLE);
+        }
     }
 
 }
