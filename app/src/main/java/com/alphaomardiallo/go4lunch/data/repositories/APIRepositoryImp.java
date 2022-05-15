@@ -17,7 +17,6 @@ import com.alphaomardiallo.go4lunch.data.dataSources.remoteData.RetrofitNearBySe
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 import javax.inject.Inject;
 
@@ -75,9 +74,6 @@ public class APIRepositoryImp implements APIRepository {
                 assert response.body() != null;
                 nearByRestaurantListRankBy.addAll(response.body().getResults());
 
-                //TODO delete these once API works correctly
-                Log.d("onResponse: Retrofit ", response.raw().request().url().toString());
-
                 if (response.body().getNextPageToken() != null) {
 
                     handler.postDelayed(() -> getNextResultsRadiusMethod(location, radius, response.body().getNextPageToken()), HANDLING_TIME);
@@ -94,7 +90,6 @@ public class APIRepositoryImp implements APIRepository {
                             return;
                         }
 
-                        Log.d(" Retrofit Rank by ", response.raw().request().url().toString());
                         assert response.body() != null;
 
                         nearByRestaurantListRankBy.addAll(response.body().getResults());
@@ -106,7 +101,12 @@ public class APIRepositoryImp implements APIRepository {
                     }
                 });
 
-                nearByRestaurantList.setValue(nearByRestaurantListRankBy);
+                handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        nearByRestaurantList.setValue(nearByRestaurantListRankBy);
+                    }
+                }, 5000);
 
             }
 
@@ -128,11 +128,8 @@ public class APIRepositoryImp implements APIRepository {
                     Log.e(TAG, "onResponse: failed " + response.message(), null);
                     return;
                 }
-                Log.i(TAG, "onResponse: check " + response.raw().request().url());
-                List<ResultsItem> thisList = Objects.requireNonNull(response.body()).getResults();
-                System.out.println(thisList.toArray().length);
-                Objects.requireNonNull(nearByRestaurantList.getValue()).addAll(response.body().getResults());
-                System.out.println(nearByRestaurantList.getValue().size());
+
+                nearByRestaurantListRankBy.addAll(response.body().getResults());
 
                 if (response.body().getNextPageToken() != null) {
                     Call<PlaceNearBy> call2 = retrofitNearBySearchAPI.getNearByPlacesRadiusMethod(location, radius, MAXPRICE, RESTAURANT, BuildConfig.PLACES_API_KEY, response.body().getNextPageToken());
@@ -145,9 +142,7 @@ public class APIRepositoryImp implements APIRepository {
                                 return;
                             }
 
-                            Log.d("onResponse: Retrofit ", response.raw().request().url().toString());
-                            nearByRestaurantList.getValue().addAll(Objects.requireNonNull(response.body()).getResults());
-                            System.out.println(nearByRestaurantList.getValue().size());
+                            nearByRestaurantListRankBy.addAll(response.body().getResults());
                         }
 
                         @Override
@@ -155,7 +150,7 @@ public class APIRepositoryImp implements APIRepository {
                             Log.e(TAG, "onFailure: " + t.getMessage(), t);
                         }
                     });
-                    Objects.requireNonNull(nearByRestaurantList.getValue()).addAll(response.body().getResults());
+                    nearByRestaurantListRankBy.addAll(response.body().getResults());
                 }
             }
 
