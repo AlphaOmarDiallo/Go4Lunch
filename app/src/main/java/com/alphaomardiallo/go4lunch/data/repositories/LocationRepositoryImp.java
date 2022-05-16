@@ -1,10 +1,13 @@
 package com.alphaomardiallo.go4lunch.data.repositories;
 
+import android.content.Context;
+
+import com.alphaomardiallo.go4lunch.domain.PermissionUtils;
 import com.google.android.gms.maps.model.LatLng;
 
 import javax.inject.Inject;
 
-public class LocationRepositoryImp implements LocationRepository{
+public class LocationRepositoryImp implements LocationRepository {
 
     @Inject
     public LocationRepositoryImp() {
@@ -21,7 +24,12 @@ public class LocationRepositoryImp implements LocationRepository{
     }
 
     @Override
-    public String getOfficeAddressStringFormat() {
-        return "48.86501071160738, 2.3467211059168793";
+    public String getLocationStringFormat(Context context) {
+        PermissionUtils permissionUtils = new PermissionUtils();
+        if (permissionUtils.hasLocationPermissions(context)) {
+            return "48.86501071160738, 2.3467211059168793";
+        } else {
+            return "48.86501071160738, 2.3467211059168793";
+        }
     }
 }

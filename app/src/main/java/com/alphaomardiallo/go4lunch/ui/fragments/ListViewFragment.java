@@ -67,11 +67,11 @@ public class ListViewFragment extends Fragment implements OnClickItemListener {
      * Methods getting API's to populate recyclerView
      */
     public void getNearByRestaurants() {
-        viewModel.getAllRestaurantList(viewModel.getOfficeLocationAsString(), viewModel.getRadius()).observe(requireActivity(), resultsItems -> handler.postDelayed(() -> {
+        viewModel.getAllRestaurantList(requireContext()).observe(requireActivity(), resultsItems -> handler.postDelayed(() -> {
             if (resultsItems != null /*&& (restaurantList == null || !restaurantList.equals(resultsItems))*/) {
                 System.out.println("List change " + resultsItems.size());
                 restaurantList = resultsItems;
-                viewModel.getAllRestaurantList(viewModel.getOfficeLocationAsString(), viewModel.getRadius()).observe(requireActivity(), adapter::submitList);
+                viewModel.getAllRestaurantList(requireContext()).observe(requireActivity(), adapter::submitList);
                 viewModel.getRestaurants().observe(getViewLifecycleOwner(), this::updateRestaurantList);
                 loadingGIFSetup();
             }
