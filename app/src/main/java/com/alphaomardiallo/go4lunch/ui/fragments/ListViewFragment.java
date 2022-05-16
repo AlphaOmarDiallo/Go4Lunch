@@ -61,7 +61,6 @@ public class ListViewFragment extends Fragment implements OnClickItemListener {
         super.onViewCreated(view, savedInstanceState);
         loadingGIFSetup();
         getNearByRestaurants();
-
     }
 
     public void getNearByRestaurants() {
@@ -101,7 +100,16 @@ public class ListViewFragment extends Fragment implements OnClickItemListener {
     public void onClickItem(int position) {
         ResultsItem restaurant = viewModel.getRestaurants().getValue().get(position);
         Intent intent = new Intent(requireContext(), RestaurantDetails.class);
-        intent.putExtra("id", restaurant.getPlaceId());
+        Bundle bundle = new Bundle();
+        bundle.putString("id", restaurant.getPlaceId());
+        bundle.putString("photo", restaurant.getPhotos().get(0).getPhotoReference());
+        bundle.putString("name", restaurant.getName());
+        bundle.putDouble("rating", restaurant.getRating());
+        bundle.putString("address", restaurant.getVicinity());
+        bundle.putBoolean("openNow", restaurant.getOpeningHours().isOpenNow());
+        bundle.putDouble("latitude", restaurant.getGeometry().getLocation().getLat());
+        bundle.putDouble("longitude", restaurant.getGeometry().getLocation().getLng());
+        intent.putExtra("bundle", bundle);
         startActivity(intent);
     }
 
