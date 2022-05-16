@@ -22,7 +22,6 @@ import com.alphaomardiallo.go4lunch.data.viewModels.MapsAndListSharedViewModel;
 import com.alphaomardiallo.go4lunch.databinding.FragmentListViewBinding;
 import com.alphaomardiallo.go4lunch.domain.OnClickItemListener;
 import com.alphaomardiallo.go4lunch.ui.adapters.ListViewAdapter;
-import com.bumptech.glide.Glide;
 
 import java.util.List;
 import java.util.Objects;
@@ -67,15 +66,19 @@ public class ListViewFragment extends Fragment implements OnClickItemListener {
      * Methods getting API's to populate recyclerView
      */
     public void getNearByRestaurants() {
-        viewModel.getAllRestaurantList(requireContext()).observe(requireActivity(), resultsItems -> handler.postDelayed(() -> {
-            if (resultsItems != null /*&& (restaurantList == null || !restaurantList.equals(resultsItems))*/) {
+        /*viewModel.getAllRestaurantList(requireContext()).observe(requireActivity(), resultsItems -> handler.postDelayed(() -> {
+            if (resultsItems != null *//*&& (restaurantList == null || !restaurantList.equals(resultsItems))*//*) {
                 System.out.println("List change " + resultsItems.size());
                 restaurantList = resultsItems;
                 viewModel.getAllRestaurantList(requireContext()).observe(requireActivity(), adapter::submitList);
                 viewModel.getRestaurants().observe(getViewLifecycleOwner(), this::updateRestaurantList);
                 loadingGIFSetup();
             }
-        }, 1000));
+        }, 1000));*/
+        viewModel.getAllRestaurantList(requireContext());
+        viewModel.getRestaurants().observe(requireActivity(), adapter::submitList);
+        viewModel.getRestaurants().observe(requireActivity(), this::updateRestaurantList);
+        loadingGIFSetup();
     }
 
     public void updateRestaurantList(List<ResultsItem> list) {
@@ -86,7 +89,7 @@ public class ListViewFragment extends Fragment implements OnClickItemListener {
      * Managing the idling time with a gif
      */
     private void loadingGIFSetup() {
-        if (restaurantList == null) {
+/*        if (restaurantList == null) {
             Glide.with(binding.ivLoadingGIF)
                     .asGif()
                     .load("https://media.giphy.com/media/0KiLnOipDAnfk5Jgsf/giphy.gif")
@@ -101,7 +104,9 @@ public class ListViewFragment extends Fragment implements OnClickItemListener {
         } else {
             binding.tvLoadingMessage.setVisibility(View.INVISIBLE);
             binding.ivLoadingGIF.setVisibility(View.INVISIBLE);
-        }
+        }*/
+        binding.tvLoadingMessage.setVisibility(View.INVISIBLE);
+        binding.ivLoadingGIF.setVisibility(View.INVISIBLE);
     }
 
     /**

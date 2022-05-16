@@ -10,6 +10,6 @@ public interface APIRepository {
 
     LiveData<List<ResultsItem>> getNearBySearchRestaurantList();
 
-    LiveData<List<ResultsItem>> fetchNearBySearchPlaces(String location, int radius);
+    void fetchNearBySearchPlaces(String location, int radius);
 
 }

@@ -38,13 +38,7 @@ public class MapsAndListSharedViewModel extends ViewModel {
         return restaurants;
     }
 
-    public LiveData<List<ResultsItem>> getAllRestaurantList(Context context) {
-        if (checkList == null) {
-            checkList = apiRepository.fetchNearBySearchPlaces(locationRepository.getLocationStringFormat(context), locationRepository.getRadius());
-            restaurants = checkList;
-            return checkList;
-        } else {
-            return checkList;
-        }
+    public void getAllRestaurantList(Context context) {
+        apiRepository.fetchNearBySearchPlaces(locationRepository.getLocationStringFormat(context), locationRepository.getRadius());
     }
 }

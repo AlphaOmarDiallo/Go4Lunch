@@ -67,7 +67,7 @@ public class APIRepositoryImp implements APIRepository {
 
 
     @Override
-    public LiveData<List<ResultsItem>> fetchNearBySearchPlaces(String location, int radius) {
+    public void fetchNearBySearchPlaces(String location, int radius) {
 
         Call<PlaceNearBy> call = retrofitNearBySearchAPI.getNearByPlacesRadiusMethod(location, radius, MAXPRICE, RESTAURANT, BuildConfig.PLACES_API_KEY, null);
 
@@ -114,7 +114,7 @@ public class APIRepositoryImp implements APIRepository {
                     public void run() {
                         nearByRestaurantList.setValue(nearByRestaurantListRankBy);
                     }
-                }, 5000);
+                }, 2000);
 
             }
 
@@ -123,8 +123,8 @@ public class APIRepositoryImp implements APIRepository {
                 Log.e(TAG, "onFailure: " + t.getMessage(), t);
             }
         });
-
-        return nearByRestaurantList;
+        Log.e(TAG, "fetchNearBySearchPlaces: API called", null);
+        //return nearByRestaurantList;
     }
 
     public void getNextResultsRadiusMethod(String location, int radius, String pageToken) {
