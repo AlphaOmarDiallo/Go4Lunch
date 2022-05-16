@@ -16,7 +16,6 @@ import com.bumptech.glide.Glide;
 public class RestaurantDetails extends AppCompatActivity {
 
     private ActivityRestaurantDetailsBinding binding;
-    private String location;
     private String restaurantID;
     private String restaurantPhoto;
     private String restaurantName;
@@ -28,6 +27,7 @@ public class RestaurantDetails extends AppCompatActivity {
     private String restaurantPhoneNumber;
     private Boolean restaurantIsInMyFavourite;
     private String restaurantWebsite;
+    private Intent intent;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,17 +37,22 @@ public class RestaurantDetails extends AppCompatActivity {
         //viewModel = new ViewModelProvider(this).get(MainViewModel.class);
         setContentView(view);
 
-        /**
-         * Setting information retrieved via Bundle if available or getting the information via and API call
-         */
+        //View setup
+        intent = getIntent();
+        retrieveInformation();
 
-        Intent intent = getIntent();
-        Bundle bundle = intent.getBundleExtra("bundle");
+    }
 
-        if (bundle.isEmpty()){
+    private String getLocation() {
+        return "48.86501071160738, 2.3467211059168793";
+    }
+
+    private void retrieveInformation() {
+        if (!intent.hasExtra("bundle")){
             //TODO API CALL
             Log.i(TAG, "onCreate: Empty bundle, API call needed");
         } else {
+            Bundle bundle = intent.getBundleExtra("bundle");
             restaurantID = bundle.getString("id");
             restaurantPhoto = "https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference=" + bundle.getString("photo", null) + "&key=" + BuildConfig.PLACES_API_KEY;
             restaurantName = bundle.getString("name");
@@ -58,14 +63,9 @@ public class RestaurantDetails extends AppCompatActivity {
             restaurantLongitude = bundle.getDouble("longitude");
 
             //TODO make API call for what is left
+
+            setupViews();
         }
-
-        setupViews();
-    }
-
-    private String getLocation() {
-        return location = "48.86501071160738, 2.3467211059168793";
-        //TODO setup correctLocation
     }
 
     private void setupViews() {
@@ -82,15 +82,15 @@ public class RestaurantDetails extends AppCompatActivity {
         binding.tvAddressRestaurantDetails.setText(restaurantAddress);
 
         if (restaurantIsOpenNow) {
-            binding.tvIsOpenDetails.setText("Open now");
+            binding.tvIsOpenDetails.setText(R.string.open_now);
         } else {
-            binding.tvIsOpenDetails.setText("Closed");
+            binding.tvIsOpenDetails.setText(R.string.closed);
         }
         getLocation();
-        int distance = Math.round(calculatorUtils.getDistance(location, restaurantLatitude, restaurantLongitude));
+        int distance = Math.round(calculatorUtils.getDistance(getLocation(), restaurantLatitude, restaurantLongitude));
         binding.tvDistanceRestaurantDetails.setText(String.format("%sm", distance));
 
-        //TODO setup Missing informations
+        //TODO setup Missing information
 
         Glide.with(binding.ivEatingAloneDetail)
                 .asGif()

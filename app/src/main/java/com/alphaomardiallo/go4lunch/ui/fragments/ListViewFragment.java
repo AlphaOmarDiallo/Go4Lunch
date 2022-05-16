@@ -25,6 +25,7 @@ import com.alphaomardiallo.go4lunch.ui.adapters.ListViewAdapter;
 import com.bumptech.glide.Glide;
 
 import java.util.List;
+import java.util.Objects;
 
 import dagger.hilt.android.AndroidEntryPoint;
 
@@ -45,7 +46,6 @@ public class ListViewFragment extends Fragment implements OnClickItemListener {
                              @Nullable Bundle savedInstanceState) {
         binding = FragmentListViewBinding.inflate(inflater, container, false);
         viewModel = new ViewModelProvider(requireActivity()).get(MapsAndListSharedViewModel.class);
-
         View view = inflater.inflate(R.layout.fragment_list_view, container, false);
 
         binding.recyclerView.setHasFixedSize(true);
@@ -63,9 +63,12 @@ public class ListViewFragment extends Fragment implements OnClickItemListener {
         getNearByRestaurants();
     }
 
+    /**
+     * Methods getting API's to populate recyclerView
+     */
     public void getNearByRestaurants() {
         viewModel.getAllRestaurantList(viewModel.getOfficeLocationAsString(), viewModel.getRadius()).observe(requireActivity(), resultsItems -> handler.postDelayed(() -> {
-            if(resultsItems != null /*&& (restaurantList == null || !restaurantList.equals(resultsItems))*/) {
+            if (resultsItems != null /*&& (restaurantList == null || !restaurantList.equals(resultsItems))*/) {
                 System.out.println("List change " + resultsItems.size());
                 restaurantList = resultsItems;
                 viewModel.getAllRestaurantList(viewModel.getOfficeLocationAsString(), viewModel.getRadius()).observe(requireActivity(), adapter::submitList);
@@ -75,19 +78,25 @@ public class ListViewFragment extends Fragment implements OnClickItemListener {
         }, 1000));
     }
 
-    private void loadingGIFSetup(){
-        // https://tenor.com/view/ice-family-bear-food-hungry-gif-15132050648417346282
+    public void updateRestaurantList(List<ResultsItem> list) {
+        restaurantList = list;
+    }
+
+    /**
+     * Managing the idling time with a gif
+     */
+    private void loadingGIFSetup() {
         if (restaurantList == null) {
             Glide.with(binding.ivLoadingGIF)
                     .asGif()
                     .load("https://media.giphy.com/media/0KiLnOipDAnfk5Jgsf/giphy.gif")
                     .into(binding.ivLoadingGIF);
-        } else if (restaurantList != null && restaurantList.size() == 0){
-            binding.tvLoadingMessage.setText("No results in your area");
+        } else if (restaurantList.isEmpty()) {
+            binding.tvLoadingMessage.setText(R.string.no_restaurant_in_your_area);
             Glide.with(binding.ivLoadingGIF)
                     .asGif()
                     .override(100, 100)
-                    .load("https://tenor.com/view/shermans-night-in-midnight-snack-hungry-shopping-the-fridge-empty-fridge-gif-14466290")
+                    .load("https://media.giphy.com/media/MdeHHwPzLpzbEkzl70/giphy.gif")
                     .into(binding.ivLoadingGIF);
         } else {
             binding.tvLoadingMessage.setVisibility(View.INVISIBLE);
@@ -95,10 +104,12 @@ public class ListViewFragment extends Fragment implements OnClickItemListener {
         }
     }
 
-
+    /**
+     * Method overriding onCLickItemListener interface to manage clicks on recyclerView
+     */
     @Override
     public void onClickItem(int position) {
-        ResultsItem restaurant = viewModel.getRestaurants().getValue().get(position);
+        ResultsItem restaurant = Objects.requireNonNull(viewModel.getRestaurants().getValue()).get(position);
         Intent intent = new Intent(requireContext(), RestaurantDetails.class);
         Bundle bundle = new Bundle();
         bundle.putString("id", restaurant.getPlaceId());
@@ -111,9 +122,5 @@ public class ListViewFragment extends Fragment implements OnClickItemListener {
         bundle.putDouble("longitude", restaurant.getGeometry().getLocation().getLng());
         intent.putExtra("bundle", bundle);
         startActivity(intent);
-    }
-
-    public void updateRestaurantList(List<ResultsItem> list) {
-        restaurantList = list;
     }
 }

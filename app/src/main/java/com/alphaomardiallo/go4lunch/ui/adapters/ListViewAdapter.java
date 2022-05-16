@@ -25,6 +25,7 @@ import com.alphaomardiallo.go4lunch.domain.OnClickItemListener;
 import com.bumptech.glide.Glide;
 
 import java.util.List;
+import java.util.Locale;
 
 public class ListViewAdapter extends ListAdapter<ResultsItem, ListViewAdapter.ListViewHolder> {
 
@@ -105,12 +106,7 @@ public class ListViewAdapter extends ListAdapter<ResultsItem, ListViewAdapter.Li
             Glide.with(restaurantPhoto)
                     .load("https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference=" + restaurant.getPhotos().get(0).getPhotoReference() + "&key=" + BuildConfig.PLACES_API_KEY)
                     .into(restaurantPhoto);
-            card.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    onClickItemListener.onClickItem(getAbsoluteAdapterPosition());
-                }
-            });
+            card.setOnClickListener(view -> onClickItemListener.onClickItem(getAbsoluteAdapterPosition()));
         }
 
         static ListViewHolder create(ViewGroup parent) {
@@ -149,7 +145,7 @@ public class ListViewAdapter extends ListAdapter<ResultsItem, ListViewAdapter.Li
 
         private String getNumberOfWorkmates() {
             //TODO set method
-            return String.format("(%d)", 2);
+            return String.format(Locale.getDefault(), "(%d)", 2);
         }
 
     }
