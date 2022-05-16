@@ -52,14 +52,22 @@ public class APIRepositoryImp implements APIRepository {
 
     RetrofitNearBySearchAPI retrofitNearBySearchAPI = retrofit.create(RetrofitNearBySearchAPI.class);
 
+    @Override
+    public LiveData<List<ResultsItem>> getNearBySearchRestaurantList() {
+        LiveData<List<ResultsItem>> restaurantList = nearByRestaurantList;
+        return restaurantList;
+    }
+
     /**
      * Getting NearBySearch results as a list using the radius parameter and managing the recall if there is a page token
      *
      * @return nearByRestaurantList
      */
 
+
+
     @Override
-    public LiveData<List<ResultsItem>> getNearBySearchList(String location, int radius) {
+    public LiveData<List<ResultsItem>> fetchNearBySearchPlaces(String location, int radius) {
 
         Call<PlaceNearBy> call = retrofitNearBySearchAPI.getNearByPlacesRadiusMethod(location, radius, MAXPRICE, RESTAURANT, BuildConfig.PLACES_API_KEY, null);
 
@@ -160,21 +168,5 @@ public class APIRepositoryImp implements APIRepository {
             }
         });
     }
-
-    /**
-     * Getting Details results for one restaurant
-     * @return
-     */
-
-/*    @Override
-    public void getDetailsListAsLiveData() {
-        RetrofitDetailsAPI retrofitDetailsAPI = retrofit.create(RetrofitDetailsAPI.class);
-    }
-
-    @Override
-    public void getAutocompleteListAsLiveData() {
-        RetrofitAutocompleteAPI retrofitAutocompleteAPI = retrofit.create(RetrofitAutocompleteAPI.class);
-    }*/
-
 
 }

@@ -19,13 +19,15 @@ public class MapsAndListSharedViewModel extends ViewModel {
 
     private final APIRepository apiRepository;
     private final LocationRepository locationRepository;
-    LiveData<List<ResultsItem>> restaurants = null;
-    LiveData<List<ResultsItem>> checkList = null;
+    LiveData<List<ResultsItem>> restaurants;
+    LiveData<List<ResultsItem>> checkList;
 
     @Inject
     public MapsAndListSharedViewModel(APIRepository apiRepository, LocationRepository locationRepository) {
         this.apiRepository = apiRepository;
         this.locationRepository = locationRepository;
+        restaurants = apiRepository.getNearBySearchRestaurantList();
+        checkList = null;
     }
     public LiveData<List<ResultsItem>> getRestaurants() {
         return restaurants;
@@ -33,7 +35,7 @@ public class MapsAndListSharedViewModel extends ViewModel {
 
     public LiveData<List<ResultsItem>> getAllRestaurantList(String location, int radius) {
         if (checkList == null) {
-            checkList = apiRepository.getNearBySearchList(location, radius);
+            checkList = apiRepository.fetchNearBySearchPlaces(location, radius);
             restaurants = checkList;
             return checkList;
         } else {

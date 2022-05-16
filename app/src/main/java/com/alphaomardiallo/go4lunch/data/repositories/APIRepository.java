@@ -8,10 +8,8 @@ import java.util.List;
 
 public interface APIRepository {
 
-    LiveData<List<ResultsItem>> getNearBySearchList(String location, int radius);
+    LiveData<List<ResultsItem>> getNearBySearchRestaurantList();
 
-    //void getDetailsListAsLiveData();
-
-    //void getAutocompleteListAsLiveData();
+    LiveData<List<ResultsItem>> fetchNearBySearchPlaces(String location, int radius);
 
 }
