@@ -107,11 +107,6 @@ public class ListViewAdapter extends ListAdapter<ResultsItem, ListViewAdapter.Li
             card.setOnClickListener(view -> onClickItemListener.onClickItem(getAbsoluteAdapterPosition()));
         }
 
-/*        static ListViewHolder create(ViewGroup parent) {
-            View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_restaurant, parent, false);
-            return new ListViewHolder(view);
-        }*/
-
         private String getOpeningTime(Boolean isOpenNow) {
             if (!isOpenNow) {
                 restaurantOpeningTime.setTextColor(Color.RED);

@@ -31,13 +31,13 @@
         android:id="@+id/ivRestaurantPhotoDetail"
         android:layout_width="0dp"
         android:layout_height="0dp"
+        android:contentDescription="@string/picture_of_the_restaurant"
         android:scaleType="fitXY"
         app:layout_constraintBottom_toTopOf="@+id/guideline8"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        tools:srcCompat="@tools:sample/backgrounds/scenic"
-        android:contentDescription="@string/picture_of_the_restaurant" />
+        tools:srcCompat="@tools:sample/backgrounds/scenic" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fabSelectRestaurant"
@@ -45,13 +45,13 @@
         android:layout_height="wrap_content"
         android:layout_marginEnd="16dp"
         android:clickable="true"
+        android:contentDescription="@string/button_to_select_a_restaurant"
+        android:focusable="true"
         app:backgroundTint="@color/white"
         app:layout_constraintBottom_toTopOf="@+id/guideline8"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@+id/guideline8"
-        app:srcCompat="@drawable/ic_baseline_check_circle_24"
-        android:contentDescription="@string/button_to_select_a_restaurant"
-        android:focusable="true" />
+        app:srcCompat="@drawable/ic_baseline_check_circle_24" />
 
     <androidx.cardview.widget.CardView
         android:id="@+id/cvRestaurantInformation"
@@ -146,36 +146,36 @@
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:backgroundTint="#00FFFFFF"
+        android:contentDescription="@string/button_to_call_the_restaurant"
         app:layout_constraintBottom_toTopOf="@+id/guideline5"
         app:layout_constraintEnd_toStartOf="@+id/ibLikeDetail"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/guideline7"
-        app:srcCompat="@drawable/ic_baseline_phone_24"
-        android:contentDescription="@string/button_to_call_the_restaurant" />
+        app:srcCompat="@drawable/ic_baseline_phone_24" />
 
     <ImageButton
         android:id="@+id/ibLikeDetail"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:backgroundTint="#00FFFFFF"
+        android:contentDescription="@string/button_to_add_the_restaurant_to_the_favourite"
         app:layout_constraintBottom_toTopOf="@+id/guideline5"
         app:layout_constraintEnd_toStartOf="@+id/ibWebSiteDetails"
         app:layout_constraintStart_toEndOf="@+id/ibCallDetail"
         app:layout_constraintTop_toTopOf="@+id/guideline7"
-        app:srcCompat="@drawable/ic_baseline_star_rate_24"
-        android:contentDescription="@string/button_to_add_the_restaurant_to_the_favourite" />
+        app:srcCompat="@drawable/ic_baseline_star_rate_24" />
 
     <ImageButton
         android:id="@+id/ibWebSiteDetails"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:backgroundTint="#00FFFFFF"
+        android:contentDescription="@string/button_to_visit_the_website_of_the_restaurant"
         app:layout_constraintBottom_toTopOf="@+id/guideline5"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/ibLikeDetail"
         app:layout_constraintTop_toTopOf="@+id/guideline7"
-        app:srcCompat="@drawable/ic_baseline_web_24"
-        android:contentDescription="@string/button_to_visit_the_website_of_the_restaurant" />
+        app:srcCompat="@drawable/ic_baseline_web_24" />
 
     <TextView
         android:id="@+id/tvCallDetails"
@@ -224,10 +224,10 @@
         android:id="@+id/ivEatingAloneDetail"
         android:layout_width="0dp"
         android:layout_height="0dp"
+        android:contentDescription="@string/gif_showing_if_you_are_eating_alone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/guideline5"
-        tools:srcCompat="@tools:sample/backgrounds/scenic"
-        android:contentDescription="@string/gif_showing_if_you_are_eating_alone" />
+        tools:srcCompat="@tools:sample/backgrounds/scenic" />
 </androidx.constraintlayout.widget.ConstraintLayout>

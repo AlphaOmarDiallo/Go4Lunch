@@ -88,5 +88,6 @@
     <string name="no_restaurant_in_your_area">No results in your area, where are you?</string>
     <string name="open_now">Open now</string>
     <string name="closed">Closed</string>
+    <string name="restaurant_icon">Restaurant Icon</string>
 
 </resources>

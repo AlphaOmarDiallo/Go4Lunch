@@ -1,6 +1,9 @@
 package com.alphaomardiallo.go4lunch.data.viewModels;
 
 import android.content.Context;
+import android.content.res.Resources;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.ViewModel;
@@ -41,5 +44,12 @@ public class MapsAndListSharedViewModel extends ViewModel {
             location = locationRepository.getLocationStringFormat(context);
             apiRepository.fetchNearBySearchPlaces(locationRepository.getLocationStringFormat(context), locationRepository.getRadius());
         }
+    }
+
+    public Bitmap resizeMarker(Resources resources, int drawable) {
+        int height = 120;
+        int width = 100;
+        Bitmap icon = BitmapFactory.decodeResource(resources, drawable);
+        return Bitmap.createScaledBitmap(icon, width, height, false);
     }
 }

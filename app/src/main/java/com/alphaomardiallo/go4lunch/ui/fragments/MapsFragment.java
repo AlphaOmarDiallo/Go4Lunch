@@ -14,12 +14,14 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 
 import com.alphaomardiallo.go4lunch.R;
+import com.alphaomardiallo.go4lunch.data.dataSources.Model.nearBySearchPojo.ResultsItem;
+import com.alphaomardiallo.go4lunch.data.viewModels.MapsAndListSharedViewModel;
 import com.alphaomardiallo.go4lunch.databinding.FragmentMapsBinding;
 import com.alphaomardiallo.go4lunch.domain.PermissionUtils;
 import com.alphaomardiallo.go4lunch.domain.PositionUtils;
-import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
@@ -27,30 +29,26 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.CancellationToken;
 import com.google.android.gms.tasks.OnTokenCanceledListener;
-import com.google.android.gms.tasks.Task;
-import com.google.android.libraries.places.api.Places;
-import com.google.android.libraries.places.api.model.Place;
-import com.google.android.libraries.places.api.model.PlaceLikelihood;
-import com.google.android.libraries.places.api.net.FindCurrentPlaceRequest;
-import com.google.android.libraries.places.api.net.FindCurrentPlaceResponse;
-import com.google.android.libraries.places.api.net.PlacesClient;
 
-import java.util.Collections;
 import java.util.List;
 
+import dagger.hilt.android.AndroidEntryPoint;
 import pub.devrel.easypermissions.AppSettingsDialog;
 import pub.devrel.easypermissions.EasyPermissions;
 
+@AndroidEntryPoint
 public class MapsFragment extends Fragment implements EasyPermissions.PermissionCallbacks {
 
     private static final int REQUEST_PERMISSIONS_LOCATION = 567;
     private static final PermissionUtils permission = new PermissionUtils();
     private final long defaultCameraZoomOverMap = 19;
     private FragmentMapsBinding binding;
+    private MapsAndListSharedViewModel viewModel;
     private GoogleMap map;
     private FusedLocationProviderClient fusedLocationClient;
     private PositionUtils positionUtils = new PositionUtils();
@@ -75,50 +73,16 @@ public class MapsFragment extends Fragment implements EasyPermissions.Permission
             map.setMapType(GoogleMap.MAP_TYPE_NORMAL);
             map.addMarker(new MarkerOptions()
                     .position(positionUtils.getOfficeLocation())
-                    .title("Office"));
-            if(permission.hasLocationPermissions(requireContext())) {
+                    .title("Office")
+                    .icon(BitmapDescriptorFactory.fromBitmap(viewModel.resizeMarker(requireContext().getResources(),R.drawable.office_marker)))
+            );
+            if (permission.hasLocationPermissions(requireContext())) {
                 enableMyLocation();
                 getCurrentLocation();
             } else {
                 map.moveCamera(CameraUpdateFactory.newLatLngZoom(positionUtils.getOfficeLocation(), defaultCameraZoomOverMap));
             }
 
-            // Initialize the SDK
-            Places.initialize(requireContext(), "com.google.android.geo.API_KEY");
-
-            // Create a new PlacesClient instance
-            PlacesClient placesClient = Places.createClient(requireContext());
-            Log.e(TAG, "MAPS FRAGMENT onMapReady: " + placesClient, null);
-
-            // Use fields to define the data types to return.
-            List<Place.Field> placeFields = Collections.singletonList(Place.Field.NAME);
-
-// Use the builder to create a FindCurrentPlaceRequest.
-            FindCurrentPlaceRequest request = FindCurrentPlaceRequest.newInstance(placeFields);
-
-// Call findCurrentPlace and handle the response (first check that the user has granted permission).
-            if (permission.hasLocationPermissions(requireContext())) {
-                @SuppressLint("MissingPermission") Task<FindCurrentPlaceResponse> placeResponse = placesClient.findCurrentPlace(request);
-                placeResponse.addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
-                        FindCurrentPlaceResponse response = task.getResult();
-                        for (PlaceLikelihood placeLikelihood : response.getPlaceLikelihoods()) {
-                            Log.i(TAG, String.format("Place '%s' has likelihood: %f",
-                                    placeLikelihood.getPlace().getName(),
-                                    placeLikelihood.getLikelihood()));
-                        }
-                    } else {
-                        Exception exception = task.getException();
-                        if (exception instanceof ApiException) {
-                            ApiException apiException = (ApiException) exception;
-                            Log.e(TAG, "MAPS FRAGMENT Place not found: " + apiException.getStatusCode());
-                        }
-                    }
-                });
-            } else {
-                requestPermission();
-                Log.e(TAG, "MAPS FRAGMENT onViewCreated: permission not granted", null);
-            }
         }
     };
 
@@ -128,18 +92,21 @@ public class MapsFragment extends Fragment implements EasyPermissions.Permission
                              @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
         binding = FragmentMapsBinding.inflate(inflater, container, false);
+        viewModel = new ViewModelProvider(requireActivity()).get(MapsAndListSharedViewModel.class);
         return binding.getRoot();
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        binding.chipGroup.setVisibility(View.GONE);
+
         SupportMapFragment mapFragment =
                 (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
         if (mapFragment != null) {
             mapFragment.getMapAsync(callback);
         }
+
+        binding.chipGroup.setVisibility(View.GONE);
 
         requestPermission();
 
@@ -153,6 +120,33 @@ public class MapsFragment extends Fragment implements EasyPermissions.Permission
                 requestPermission();
             }
         });
+
+        fetchAndObserveData();
+
+    }
+
+    /**
+     * NearBy Restaurants handling
+     */
+
+    private void fetchAndObserveData() {
+        viewModel.getAllRestaurantList(requireContext());
+        viewModel.getRestaurants().observe(requireActivity(), this::updateMapWithRestaurants);
+    }
+
+    private void updateMapWithRestaurants (List<ResultsItem> resultsItemList) {
+        Log.e(TAG, "updateMapWithRestaurants: new list " + resultsItemList.toString(), null);
+
+        for (ResultsItem resultsItem : resultsItemList) {
+
+            LatLng coordinates = new LatLng(resultsItem.getGeometry().getLocation().getLat(), resultsItem.getGeometry().getLocation().getLng());
+
+            map.addMarker(new MarkerOptions()
+                    .position(coordinates)
+                    .title(resultsItem.getName())
+                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.restaurant_marker))
+            );
+        }
     }
 
     /**
