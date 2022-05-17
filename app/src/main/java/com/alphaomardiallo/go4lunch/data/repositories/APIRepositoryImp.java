@@ -60,11 +60,11 @@ public class APIRepositoryImp implements APIRepository {
     /**
      * Getting NearBySearch results as a list using the radius parameter and managing the recall if there is a page token
      */
+
     @Override
     public void fetchNearBySearchPlaces(String location, int radius) {
 
         Call<PlaceNearBy> call = retrofitNearBySearchAPI.getNearByPlacesRadiusMethod(location, radius, MAXPRICE, RESTAURANT, BuildConfig.PLACES_API_KEY, null);
-
         call.enqueue(new Callback<PlaceNearBy>() {
 
             @Override
@@ -77,8 +77,6 @@ public class APIRepositoryImp implements APIRepository {
 
                 assert response.body() != null;
 
-                Log.e(TAG, "onResponse: call 1 " + response.body().getResults().get(0).getName(), null);
-
                 populateList(response.body().getResults());
 
                 if (response.body().getNextPageToken() != null) {
@@ -90,7 +88,6 @@ public class APIRepositoryImp implements APIRepository {
                     noRestaurantInRadius(location);
 
                 }
-
             }
 
             @Override
@@ -101,7 +98,7 @@ public class APIRepositoryImp implements APIRepository {
             }
         });
 
-        Log.e(TAG, "fetchNearBySearchPlaces: API called", null);
+        Log.i(TAG, "fetchNearBySearchPlaces: API called", null);
     }
 
     /**
@@ -109,37 +106,76 @@ public class APIRepositoryImp implements APIRepository {
      */
 
     public void getNextResultsRadiusMethod(String location, int radius, String pageToken) {
+
         Call<PlaceNearBy> call = retrofitNearBySearchAPI.getNearByPlacesRadiusMethod(location, radius, MAXPRICE, RESTAURANT, BuildConfig.PLACES_API_KEY, pageToken);
         call.enqueue(new Callback<PlaceNearBy>() {
+
             @Override
             public void onResponse(@NonNull Call<PlaceNearBy> call, @NonNull Response<PlaceNearBy> response) {
+
                 if (!response.isSuccessful()) {
                     Log.e(TAG, "onResponse: failed " + response.message(), null);
                     return;
                 }
-                Log.e(TAG, "onResponse: call 2 " + response.body().getResults().get(0).getName(), null);
+
+                assert response.body() != null;
                 populateList(response.body().getResults());
 
                 if (response.body().getNextPageToken() != null) {
-                    Call<PlaceNearBy> call2 = retrofitNearBySearchAPI.getNearByPlacesRadiusMethod(location, radius, MAXPRICE, RESTAURANT, BuildConfig.PLACES_API_KEY, response.body().getNextPageToken());
 
+                    Call<PlaceNearBy> call2 = retrofitNearBySearchAPI.getNearByPlacesRadiusMethod(location, radius, MAXPRICE, RESTAURANT, BuildConfig.PLACES_API_KEY, response.body().getNextPageToken());
                     call2.enqueue(new Callback<PlaceNearBy>() {
+
                         @Override
                         public void onResponse(@NonNull Call<PlaceNearBy> call, @NonNull Response<PlaceNearBy> response) {
                             if (!response.isSuccessful()) {
                                 Log.e(TAG, "onResponse: failed " + response.message(), null);
                                 return;
                             }
-                            Log.e(TAG, "onResponse: call 4 " + response.body().getResults().get(0).getName(), null);
+
+                            assert response.body() != null;
                             populateList(response.body().getResults());
+
                         }
 
                         @Override
                         public void onFailure(@NonNull Call<PlaceNearBy> call, @NonNull Throwable t) {
+
                             Log.e(TAG, "onFailure: " + t.getMessage(), t);
+
                         }
                     });
                 }
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<PlaceNearBy> call, @NonNull Throwable t) {
+
+                Log.e(TAG, "onFailure: " + t.getMessage(), null);
+
+            }
+        });
+    }
+
+    /**
+     * API called when API with Radius method does not return anything
+     */
+
+    private void noRestaurantInRadius (String location) {
+        Call<PlaceNearBy> call3 = retrofitNearBySearchAPI.getNearByPlacesRankByMethod(location, rankBy, MAXPRICE, RESTAURANT, BuildConfig.PLACES_API_KEY, null);
+
+        call3.enqueue(new Callback<PlaceNearBy>() {
+            @Override
+            public void onResponse(@NonNull Call<PlaceNearBy> call, @NonNull Response<PlaceNearBy> response) {
+
+                if (!response.isSuccessful()) {
+                    Log.e(TAG, "onResponse: failed " + response.message(), null);
+                    return;
+                }
+
+                assert response.body() != null;
+
+                populateList(response.body().getResults());
             }
 
             @Override
@@ -156,29 +192,6 @@ public class APIRepositoryImp implements APIRepository {
     private void populateList(List<ResultsItem> list) {
         nearByRestaurantListRankBy.addAll(list);
         nearByRestaurantList.setValue(nearByRestaurantListRankBy);
-    }
-
-    private void noRestaurantInRadius (String location) {
-        Call<PlaceNearBy> call3 = retrofitNearBySearchAPI.getNearByPlacesRankByMethod(location, rankBy, MAXPRICE, RESTAURANT, BuildConfig.PLACES_API_KEY, null);
-
-        call3.enqueue(new Callback<PlaceNearBy>() {
-            @Override
-            public void onResponse(@NonNull Call<PlaceNearBy> call, @NonNull Response<PlaceNearBy> response) {
-                if (!response.isSuccessful()) {
-                    Log.e(TAG, "onResponse: failed " + response.message(), null);
-                    return;
-                }
-                Log.e(TAG, "onResponse: call 3 " + response.body().getResults().get(0).getName(), null);
-                assert response.body() != null;
-
-                populateList(response.body().getResults());
-            }
-
-            @Override
-            public void onFailure(@NonNull Call<PlaceNearBy> call, @NonNull Throwable t) {
-                Log.e(TAG, "onFailure: " + t.getMessage(), null);
-            }
-        });
     }
 
 }
