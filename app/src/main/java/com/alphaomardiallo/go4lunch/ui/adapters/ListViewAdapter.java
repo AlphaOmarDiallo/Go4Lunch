@@ -24,19 +24,16 @@ import com.alphaomardiallo.go4lunch.domain.DistanceCalculatorUtils;
 import com.alphaomardiallo.go4lunch.domain.OnClickItemListener;
 import com.bumptech.glide.Glide;
 
-import java.util.List;
 import java.util.Locale;
 
 public class ListViewAdapter extends ListAdapter<ResultsItem, ListViewAdapter.ListViewHolder> {
 
     //TODO Gives location to adapter
-    private ItemRestaurantBinding binding;
-    private final List<ResultsItem> resultsItemList;
+    public ItemRestaurantBinding binding;
     OnClickItemListener onClickItemListener;
 
-    public ListViewAdapter(@NonNull DiffUtil.ItemCallback<ResultsItem> diffCallback, List<ResultsItem> resultsItemList, OnClickItemListener onClickItemListener) {
+    public ListViewAdapter(@NonNull DiffUtil.ItemCallback<ResultsItem> diffCallback, OnClickItemListener onClickItemListener) {
         super(diffCallback);
-        this.resultsItemList = resultsItemList;
         this.onClickItemListener = onClickItemListener;
     }
 
@@ -104,15 +101,16 @@ public class ListViewAdapter extends ListAdapter<ResultsItem, ListViewAdapter.Li
             restaurantRating.setRating(getRating(restaurant.getRating()));
             restaurantDistance.setText(getDistance("48.86501071160738, 2.3467211059168793", restaurant.getGeometry().getLocation().getLat(), restaurant.getGeometry().getLocation().getLng()));
             Glide.with(restaurantPhoto)
-                    .load("https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference=" + restaurant.getPhotos().get(0).getPhotoReference() + "&key=" + BuildConfig.PLACES_API_KEY)
+                    .load("https://maps.googleapis.com/maps/api/place/photo?maxwidth=100&photo_reference=" + restaurant.getPhotos().get(0).getPhotoReference() + "&key=" + BuildConfig.PLACES_API_KEY)
+                    .placeholder(R.drawable.hungry_droid)
                     .into(restaurantPhoto);
             card.setOnClickListener(view -> onClickItemListener.onClickItem(getAbsoluteAdapterPosition()));
         }
 
-        static ListViewHolder create(ViewGroup parent) {
+/*        static ListViewHolder create(ViewGroup parent) {
             View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_restaurant, parent, false);
             return new ListViewHolder(view);
-        }
+        }*/
 
         private String getOpeningTime(Boolean isOpenNow) {
             if (!isOpenNow) {

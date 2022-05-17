@@ -22,7 +22,9 @@ import com.alphaomardiallo.go4lunch.data.viewModels.MapsAndListSharedViewModel;
 import com.alphaomardiallo.go4lunch.databinding.FragmentListViewBinding;
 import com.alphaomardiallo.go4lunch.domain.OnClickItemListener;
 import com.alphaomardiallo.go4lunch.ui.adapters.ListViewAdapter;
+import com.bumptech.glide.Glide;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -35,8 +37,8 @@ public class ListViewFragment extends Fragment implements OnClickItemListener {
 
     private FragmentListViewBinding binding;
     public MapsAndListSharedViewModel viewModel;
-    private List<ResultsItem> restaurantList;
-    private final ListViewAdapter adapter = new ListViewAdapter(new ListViewAdapter.ListDiff(), restaurantList, this);
+    private List<ResultsItem> restaurantList = new ArrayList<>();
+    private final ListViewAdapter adapter = new ListViewAdapter(new ListViewAdapter.ListDiff(), this);
 
     @Nullable
     @Override
@@ -58,7 +60,7 @@ public class ListViewFragment extends Fragment implements OnClickItemListener {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        loadingGIFSetup();
+        setLoaders();
         getNearByRestaurants();
     }
 
@@ -66,47 +68,9 @@ public class ListViewFragment extends Fragment implements OnClickItemListener {
      * Methods getting API's to populate recyclerView
      */
     public void getNearByRestaurants() {
-        /*viewModel.getAllRestaurantList(requireContext()).observe(requireActivity(), resultsItems -> handler.postDelayed(() -> {
-            if (resultsItems != null *//*&& (restaurantList == null || !restaurantList.equals(resultsItems))*//*) {
-                System.out.println("List change " + resultsItems.size());
-                restaurantList = resultsItems;
-                viewModel.getAllRestaurantList(requireContext()).observe(requireActivity(), adapter::submitList);
-                viewModel.getRestaurants().observe(getViewLifecycleOwner(), this::updateRestaurantList);
-                loadingGIFSetup();
-            }
-        }, 1000));*/
+        viewModel.getRestaurants().observe(requireActivity(), this::updateRestaurantList);
         viewModel.getAllRestaurantList(requireContext());
         viewModel.getRestaurants().observe(requireActivity(), adapter::submitList);
-        viewModel.getRestaurants().observe(requireActivity(), this::updateRestaurantList);
-        loadingGIFSetup();
-    }
-
-    public void updateRestaurantList(List<ResultsItem> list) {
-        restaurantList = list;
-    }
-
-    /**
-     * Managing the idling time with a gif
-     */
-    private void loadingGIFSetup() {
-/*        if (restaurantList == null) {
-            Glide.with(binding.ivLoadingGIF)
-                    .asGif()
-                    .load("https://media.giphy.com/media/0KiLnOipDAnfk5Jgsf/giphy.gif")
-                    .into(binding.ivLoadingGIF);
-        } else if (restaurantList.isEmpty()) {
-            binding.tvLoadingMessage.setText(R.string.no_restaurant_in_your_area);
-            Glide.with(binding.ivLoadingGIF)
-                    .asGif()
-                    .override(100, 100)
-                    .load("https://media.giphy.com/media/MdeHHwPzLpzbEkzl70/giphy.gif")
-                    .into(binding.ivLoadingGIF);
-        } else {
-            binding.tvLoadingMessage.setVisibility(View.INVISIBLE);
-            binding.ivLoadingGIF.setVisibility(View.INVISIBLE);
-        }*/
-        binding.tvLoadingMessage.setVisibility(View.INVISIBLE);
-        binding.ivLoadingGIF.setVisibility(View.INVISIBLE);
     }
 
     /**
@@ -127,5 +91,41 @@ public class ListViewFragment extends Fragment implements OnClickItemListener {
         bundle.putDouble("longitude", restaurant.getGeometry().getLocation().getLng());
         intent.putExtra("bundle", bundle);
         startActivity(intent);
+    }
+
+    /**
+     * Managing the idling time with a gif
+     */
+    private void setLoaders(){
+        binding.tvLoadingMessage.setVisibility(View.VISIBLE);
+        binding.ivLoadingGIF.setVisibility(View.VISIBLE);
+        if (restaurantList == null || restaurantList.isEmpty()) {
+            Glide.with(binding.ivLoadingGIF)
+                    .asGif()
+                    .load("https://media.giphy.com/media/0KiLnOipDAnfk5Jgsf/giphy.gif")
+                    .into(binding.ivLoadingGIF);
+        }
+    }
+
+    public void updateRestaurantList(List<ResultsItem> list) {
+        restaurantList = list;
+        if (list.isEmpty()) {
+            Glide.with(binding.ivLoadingGIF)
+                    .asGif()
+                    .load("https://media.giphy.com/media/0KiLnOipDAnfk5Jgsf/giphy.gif")
+                    .into(binding.ivLoadingGIF);
+        } else {
+            binding.tvLoadingMessage.setVisibility(View.INVISIBLE);
+            binding.ivLoadingGIF.setVisibility(View.INVISIBLE);
+        }
+
+        handler.postDelayed(() -> {
+            binding.tvLoadingMessage.setText(R.string.no_restaurant_in_your_area);
+            Glide.with(binding.ivLoadingGIF)
+                    .asGif()
+                    .override(100, 100)
+                    .load("https://media.giphy.com/media/MdeHHwPzLpzbEkzl70/giphy.gif")
+                    .into(binding.ivLoadingGIF);
+        }, 20000);
     }
 }

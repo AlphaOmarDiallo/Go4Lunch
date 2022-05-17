@@ -8,7 +8,6 @@ import androidx.lifecycle.ViewModel;
 import com.alphaomardiallo.go4lunch.data.dataSources.Model.nearBySearchPojo.ResultsItem;
 import com.alphaomardiallo.go4lunch.data.repositories.APIRepository;
 import com.alphaomardiallo.go4lunch.data.repositories.LocationRepository;
-import com.alphaomardiallo.go4lunch.data.repositories.PermissionRepository;
 
 import java.util.List;
 
@@ -22,16 +21,14 @@ public class MapsAndListSharedViewModel extends ViewModel {
 
     private final APIRepository apiRepository;
     private final LocationRepository locationRepository;
-    private final PermissionRepository permissionRepository;
     LiveData<List<ResultsItem>> restaurants;
     LiveData<List<ResultsItem>> checkList;
     String location;
 
     @Inject
-    public MapsAndListSharedViewModel(APIRepository apiRepository, LocationRepository locationRepository, PermissionRepository permissionRepository) {
+    public MapsAndListSharedViewModel(APIRepository apiRepository, LocationRepository locationRepository) {
         this.apiRepository = apiRepository;
         this.locationRepository = locationRepository;
-        this.permissionRepository = permissionRepository;
         restaurants = apiRepository.getNearBySearchRestaurantList();
         checkList = null;
     }
@@ -43,7 +40,6 @@ public class MapsAndListSharedViewModel extends ViewModel {
         if (location == null) {
             location = locationRepository.getLocationStringFormat(context);
             apiRepository.fetchNearBySearchPlaces(locationRepository.getLocationStringFormat(context), locationRepository.getRadius());
-
         }
     }
 }
