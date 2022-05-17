@@ -33,17 +33,12 @@ public class APIRepositoryImp implements APIRepository {
     private static final int MAXPRICE = 2;
     private static final int HANDLING_TIME = 2000;
     private final Handler handler = new Handler(Looper.getMainLooper());
-    private final MutableLiveData<List<ResultsItem>> nearByRestaurantList = new MutableLiveData<>();
-    private final List<ResultsItem> nearByRestaurantListRankBy = new ArrayList<>();
-
+    private final MutableLiveData<List<ResultsItem>> restaurantListLiveData = new MutableLiveData<>();
+    private final List<ResultsItem> restaurantList = new ArrayList<>();
 
     @Inject
     public APIRepositoryImp() {
     }
-
-    /**
-     * Retrofit Builder
-     */
 
     Retrofit retrofit = new Retrofit.Builder()
             .baseUrl("https://maps.googleapis.com/maps/api/place/")
@@ -54,7 +49,7 @@ public class APIRepositoryImp implements APIRepository {
 
     @Override
     public LiveData<List<ResultsItem>> getNearBySearchRestaurantList() {
-        return nearByRestaurantList;
+        return restaurantListLiveData;
     }
 
     /**
@@ -161,7 +156,7 @@ public class APIRepositoryImp implements APIRepository {
      * API called when API with Radius method does not return anything
      */
 
-    private void noRestaurantInRadius (String location) {
+    private void noRestaurantInRadius(String location) {
         Call<PlaceNearBy> call3 = retrofitNearBySearchAPI.getNearByPlacesRankByMethod(location, rankBy, MAXPRICE, RESTAURANT, BuildConfig.PLACES_API_KEY, null);
 
         call3.enqueue(new Callback<PlaceNearBy>() {
@@ -190,8 +185,8 @@ public class APIRepositoryImp implements APIRepository {
      */
 
     private void populateList(List<ResultsItem> list) {
-        nearByRestaurantListRankBy.addAll(list);
-        nearByRestaurantList.setValue(nearByRestaurantListRankBy);
+        restaurantList.addAll(list);
+        restaurantListLiveData.setValue(restaurantList);
     }
 
 }

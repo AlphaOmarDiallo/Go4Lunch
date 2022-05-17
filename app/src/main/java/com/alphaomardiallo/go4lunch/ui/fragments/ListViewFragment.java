@@ -68,7 +68,7 @@ public class ListViewFragment extends Fragment implements OnClickItemListener {
      * Methods getting API's to populate recyclerView
      */
     public void getNearByRestaurants() {
-        viewModel.getRestaurants().observe(requireActivity(), this::updateRestaurantList);
+        viewModel.getRestaurants().observe(requireActivity(), this::setLoadersAfterAPICalls);
         viewModel.getAllRestaurantList(requireContext());
         viewModel.getRestaurants().observe(requireActivity(), adapter::submitList);
     }
@@ -96,7 +96,7 @@ public class ListViewFragment extends Fragment implements OnClickItemListener {
     /**
      * Managing the idling time with a gif
      */
-    private void setLoaders(){
+    private void setLoaders() {
         binding.tvLoadingMessage.setVisibility(View.VISIBLE);
         binding.ivLoadingGIF.setVisibility(View.VISIBLE);
         if (restaurantList == null || restaurantList.isEmpty()) {
@@ -107,7 +107,7 @@ public class ListViewFragment extends Fragment implements OnClickItemListener {
         }
     }
 
-    public void updateRestaurantList(List<ResultsItem> list) {
+    public void setLoadersAfterAPICalls(List<ResultsItem> list) {
         restaurantList = list;
         if (list.isEmpty()) {
             Glide.with(binding.ivLoadingGIF)
