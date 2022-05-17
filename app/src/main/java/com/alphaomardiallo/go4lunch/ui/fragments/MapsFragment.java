@@ -5,6 +5,7 @@ import static android.content.ContentValues.TAG;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -17,6 +18,7 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.alphaomardiallo.go4lunch.R;
+import com.alphaomardiallo.go4lunch.RestaurantDetails;
 import com.alphaomardiallo.go4lunch.data.dataSources.Model.nearBySearchPojo.ResultsItem;
 import com.alphaomardiallo.go4lunch.data.viewModels.MapsAndListSharedViewModel;
 import com.alphaomardiallo.go4lunch.databinding.FragmentMapsBinding;
@@ -31,6 +33,7 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.CancellationToken;
 import com.google.android.gms.tasks.OnTokenCanceledListener;
@@ -82,6 +85,21 @@ public class MapsFragment extends Fragment implements EasyPermissions.Permission
             } else {
                 map.moveCamera(CameraUpdateFactory.newLatLngZoom(positionUtils.getOfficeLocation(), defaultCameraZoomOverMap));
             }
+
+           googleMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
+               @Override
+               public void onInfoWindowClick(@NonNull Marker marker) {
+                   Log.e(TAG, "onInfoWindowClick: test", null);
+                   List<ResultsItem> list = viewModel.getRestaurants().getValue();
+
+                   for (ResultsItem resultsItem : list) {
+                       if (marker.getTitle().equalsIgnoreCase(resultsItem.getName())) {
+                           Log.e(TAG, "onInfoWindowClick: test OK", null);
+                           openDetailActivity(resultsItem);
+                       }
+                   }
+               }
+           });
 
         }
     };
@@ -144,9 +162,24 @@ public class MapsFragment extends Fragment implements EasyPermissions.Permission
             map.addMarker(new MarkerOptions()
                     .position(coordinates)
                     .title(resultsItem.getName())
-                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.restaurant_marker))
+                    .icon(BitmapDescriptorFactory.fromBitmap(viewModel.resizeMarker(requireContext().getResources(),R.drawable.restaurant)))
             );
         }
+    }
+
+    private void openDetailActivity(ResultsItem restaurant) {
+        Intent intent = new Intent(requireContext(), RestaurantDetails.class);
+        Bundle bundle = new Bundle();
+        bundle.putString("id", restaurant.getPlaceId());
+        bundle.putString("photo", restaurant.getPhotos().get(0).getPhotoReference());
+        bundle.putString("name", restaurant.getName());
+        bundle.putDouble("rating", restaurant.getRating());
+        bundle.putString("address", restaurant.getVicinity());
+        bundle.putBoolean("openNow", restaurant.getOpeningHours().isOpenNow());
+        bundle.putDouble("latitude", restaurant.getGeometry().getLocation().getLat());
+        bundle.putDouble("longitude", restaurant.getGeometry().getLocation().getLng());
+        intent.putExtra("bundle", bundle);
+        startActivity(intent);
     }
 
     /**
