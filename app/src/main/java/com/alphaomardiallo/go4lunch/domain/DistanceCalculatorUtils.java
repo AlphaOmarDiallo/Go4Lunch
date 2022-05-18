@@ -25,7 +25,6 @@ public class DistanceCalculatorUtils {
         Location tempStart = new Location(LocationManager.GPS_PROVIDER);
         tempStart.setLatitude(startLatitude);
         tempStart.setLongitude(startLongitude);
-
         String[] separatedEnd = endLocation.split(",");
         double endLatitude = Double.parseDouble(separatedStart[0]);
         double endLongitude = Double.parseDouble(separatedStart[1]);

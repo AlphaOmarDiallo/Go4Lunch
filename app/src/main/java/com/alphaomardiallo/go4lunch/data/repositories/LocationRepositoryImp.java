@@ -1,11 +1,14 @@
 package com.alphaomardiallo.go4lunch.data.repositories;
 
+import static android.content.ContentValues.TAG;
+
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.Context;
 import android.location.Location;
 import android.os.Looper;
+import android.util.Log;
 
-import androidx.annotation.NonNull;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
@@ -16,6 +19,7 @@ import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.tasks.OnSuccessListener;
 
 import javax.inject.Inject;
 
@@ -29,6 +33,7 @@ public class LocationRepositoryImp implements LocationRepository {
     private final MutableLiveData<Location> locationMutableLiveData = new MutableLiveData<>();
 
     private LocationCallback locationCallback;
+    private LocationRequest locationRequest;
 
     @Inject
     public LocationRepositoryImp() {
@@ -52,38 +57,84 @@ public class LocationRepositoryImp implements LocationRepository {
     public String getLocationStringFormat(Context context) {
         PermissionUtils permissionUtils = new PermissionUtils();
         if (permissionUtils.hasLocationPermissions(context)) {
-
-            return "48.86501071160738, 2.3467211059168793";
+            Location location = getLocationLiveData().getValue();
+            return OFFICE_LOCATION_STRING;
         } else {
             return OFFICE_LOCATION_STRING;
         }
     }
 
     @SuppressLint("MissingPermission")
-    public void startLocationRequest(Context context) {
+    public void startLocationRequest(Context context, Activity activity) {
 
-        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(context);
+        Log.e(TAG, "startLocationRequest: Started", null);
+        instantiateFusedLocationProviderClient(context);
 
-        if (locationCallback == null) {
-            locationCallback = new LocationCallback() {
-                @Override
-                public void onLocationResult(@NonNull LocationResult locationResult) {
-                    Location location = locationResult.getLastLocation();
+        getLastKnownLocation(activity);
 
-                    locationMutableLiveData.setValue(location);
-                }
-            };
-        }
+        setupALocationRequest();
 
-        fusedLocationProviderClient.removeLocationUpdates(locationCallback);
+        createLocationCallback();
 
-        fusedLocationProviderClient.requestLocationUpdates(
-                LocationRequest.create()
-                        .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
-                        .setSmallestDisplacement(SMALLEST_DISPLACEMENT_THRESHOLD_METER)
-                        .setInterval(LOCATION_REQUEST_PROVIDER_IN_MS),
-                locationCallback,
-                Looper.getMainLooper()
-        );
+        startLocationUpdates();
     }
+
+    private void instantiateFusedLocationProviderClient(Context context) {
+        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(context);
+    }
+
+    @SuppressLint("MissingPermission")
+    private Location getLastKnownLocation(Activity activity) {
+        final Location[] lastKnownLocation = {null};
+        fusedLocationProviderClient.getLastLocation()
+                .addOnSuccessListener(activity, new OnSuccessListener<Location>() {
+                    @Override
+                    public void onSuccess(Location location) {
+                        if (location != null) {
+                            Log.e(TAG, "onSuccess: we got the last location", null );
+                            lastKnownLocation[0] = location;
+                        }
+                    }
+                });
+        return lastKnownLocation[0];
+    }
+
+    private void setupALocationRequest () {
+        locationRequest = LocationRequest.create();
+        locationRequest.setInterval(10000);
+        locationRequest.setFastestInterval(5000);
+        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);;
+    }
+
+    private void createLocationCallback() {
+        locationCallback = new LocationCallback() {
+            @Override
+            public void onLocationResult(LocationResult locationResult) {
+                super.onLocationResult(locationResult);
+
+                if (locationResult == null) {
+                    return;
+                }
+
+                for (Location location : locationResult.getLocations()) {
+                    System.out.println(location.getLongitude());
+                }
+            }
+        };
+    }
+
+    @SuppressLint("MissingPermission")
+    private void startLocationUpdates() {
+        fusedLocationProviderClient.requestLocationUpdates(locationRequest,
+                locationCallback,
+                Looper.getMainLooper());
+
+        Log.e(TAG, "startLocationUpdates: updating", null);
+    }
+
+    private void stopLocationUpdates () {
+        fusedLocationProviderClient.removeLocationUpdates(locationCallback);
+    }
+
+
 }

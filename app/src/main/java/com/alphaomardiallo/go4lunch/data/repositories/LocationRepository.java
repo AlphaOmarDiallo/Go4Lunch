@@ -1,5 +1,6 @@
 package com.alphaomardiallo.go4lunch.data.repositories;
 
+import android.app.Activity;
 import android.content.Context;
 import android.location.Location;
 
@@ -11,7 +12,7 @@ public interface LocationRepository {
 
     LiveData<Location> getLocationLiveData();
 
-    public void startLocationRequest(Context context);
+    void startLocationRequest(Context context, Activity activity);
 
     int getRadius();
 

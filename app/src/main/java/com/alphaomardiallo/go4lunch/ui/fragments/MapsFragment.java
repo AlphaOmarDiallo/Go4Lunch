@@ -27,6 +27,7 @@ import com.alphaomardiallo.go4lunch.databinding.FragmentMapsBinding;
 import com.alphaomardiallo.go4lunch.domain.PermissionUtils;
 import com.alphaomardiallo.go4lunch.domain.PositionUtils;
 import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -38,6 +39,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.tasks.OnSuccessListener;
 
 import java.util.List;
 import java.util.Objects;
@@ -139,8 +141,6 @@ public class MapsFragment extends Fragment implements EasyPermissions.Permission
 
         requestPermission();
 
-        fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireContext());
-
         fetchAndObserveData();
 
     }
@@ -151,7 +151,7 @@ public class MapsFragment extends Fragment implements EasyPermissions.Permission
 
     private void fetchAndObserveData() {
         viewModel.getAllRestaurantList(requireContext());
-        viewModel.getLocation(requireContext()).observe(requireActivity(), this::updateLocation);
+        viewModel.getLocation(requireContext(), getActivity()).observe(requireActivity(), this::updateLocation);
         viewModel.getRestaurants().observe(requireActivity(), this::updateMapWithRestaurants);
     }
 
@@ -253,26 +253,30 @@ public class MapsFragment extends Fragment implements EasyPermissions.Permission
 
     @SuppressLint("MissingPermission")
     public void getCurrentLocation(GoogleMap googleMap) {
-        /*fusedLocationClient.getCurrentLocation(LocationRequest.PRIORITY_HIGH_ACCURACY, new CancellationToken() {
-            @SuppressWarnings("ConstantConditions")
-            @NonNull
-            @Override
-            public CancellationToken onCanceledRequested(@NonNull OnTokenCanceledListener onTokenCanceledListener) {
-                return null;
-            }
 
-            @Override
-            public boolean isCancellationRequested() {
-                return false;
-            }
-        }).addOnSuccessListener(location -> {
-            LatLng current = new LatLng(location.getLatitude(), location.getLongitude());
-            googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(current, defaultCameraZoomOverMap));
-        });*/
-        LatLng current = new LatLng(location.latitude, location.longitude);
-        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(current, defaultCameraZoomOverMap));
-        Log.e(TAG, "getCurrentLocation: test", null);
-        Log.e(TAG, "onMapReady: location gotten", null);
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireContext());
+
+        fusedLocationClient.getLastLocation()
+                .addOnSuccessListener(requireActivity(), new OnSuccessListener<Location>() {
+                    @Override
+                    public void onSuccess(Location location) {
+                        System.out.println("Location successfully retrieved");
+
+                        if (location != null ) {
+                            LatLng current = new LatLng(location.getLatitude(), location.getLongitude());
+                            googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(current, defaultCameraZoomOverMap));
+                        }
+                    }
+                }
+        );
+    }
+
+    protected void createLocationRequest() {
+        LocationRequest locationRequest = LocationRequest.create();
+        locationRequest.setInterval(10000);
+        locationRequest.setFastestInterval(5000);
+        locationRequest.setSmallestDisplacement(100);
+        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
     }
 
     /**

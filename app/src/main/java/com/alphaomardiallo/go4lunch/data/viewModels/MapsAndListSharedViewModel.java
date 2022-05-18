@@ -1,5 +1,6 @@
 package com.alphaomardiallo.go4lunch.data.viewModels;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
@@ -36,6 +37,7 @@ public class MapsAndListSharedViewModel extends ViewModel {
         restaurants = apiRepository.getNearBySearchRestaurantList();
         checkList = null;
     }
+
     public LiveData<List<ResultsItem>> getRestaurants() {
         return restaurants;
     }
@@ -47,8 +49,8 @@ public class MapsAndListSharedViewModel extends ViewModel {
         }
     }
 
-    public LiveData<Location> getLocation(Context context) {
-        locationRepository.startLocationRequest(context);
+    public LiveData<Location> getLocation(Context context, Activity activity) {
+        locationRepository.startLocationRequest(context, activity);
         return locationRepository.getLocationLiveData();
     }
 
