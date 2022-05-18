@@ -6,6 +6,7 @@ import static android.content.ContentValues.TAG;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -32,13 +33,16 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.CancellationToken;
 import com.google.android.gms.tasks.OnTokenCanceledListener;
 
 import java.util.List;
+import java.util.Objects;
 
 import dagger.hilt.android.AndroidEntryPoint;
 import pub.devrel.easypermissions.AppSettingsDialog;
@@ -50,8 +54,10 @@ public class MapsFragment extends Fragment implements EasyPermissions.Permission
     private static final int REQUEST_PERMISSIONS_LOCATION = 567;
     private static final PermissionUtils permission = new PermissionUtils();
     private final long defaultCameraZoomOverMap = 19;
+    private CameraPosition cameraPosition;
     private FragmentMapsBinding binding;
     private MapsAndListSharedViewModel viewModel;
+    private List<ResultsItem> restaurantList;
     private GoogleMap map;
     private FusedLocationProviderClient fusedLocationClient;
     private PositionUtils positionUtils = new PositionUtils();
@@ -71,35 +77,39 @@ public class MapsFragment extends Fragment implements EasyPermissions.Permission
         @SuppressLint("MissingPermission")
         @Override
         public void onMapReady(@NonNull GoogleMap googleMap) {
-            map = googleMap;
-            map.getUiSettings().setMyLocationButtonEnabled(false);
-            map.setMapType(GoogleMap.MAP_TYPE_NORMAL);
-            map.addMarker(new MarkerOptions()
-                    .position(positionUtils.getOfficeLocation())
-                    .title("Office")
-                    .icon(BitmapDescriptorFactory.fromBitmap(viewModel.resizeMarker(requireContext().getResources(),R.drawable.office_marker)))
-            );
-            if (permission.hasLocationPermissions(requireContext())) {
-                enableMyLocation();
-                getCurrentLocation();
-            } else {
-                map.moveCamera(CameraUpdateFactory.newLatLngZoom(positionUtils.getOfficeLocation(), defaultCameraZoomOverMap));
+
+            Log.e(TAG, "onMapReady: called", null);
+
+            try {
+                // Customise the styling of the base map using a JSON object defined
+                // in a raw resource file.
+                boolean success = googleMap.setMapStyle(
+                        MapStyleOptions.loadRawResourceStyle(
+                                requireContext(), R.raw.map_styling));
+
+                if (!success) {
+                    Log.e(TAG, "Style parsing failed.");
+                }
+            } catch (Resources.NotFoundException e) {
+                Log.e(TAG, "Can't find style. Error: ", e);
             }
 
-           googleMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
-               @Override
-               public void onInfoWindowClick(@NonNull Marker marker) {
-                   Log.e(TAG, "onInfoWindowClick: test", null);
-                   List<ResultsItem> list = viewModel.getRestaurants().getValue();
+            map = googleMap;
 
-                   for (ResultsItem resultsItem : list) {
-                       if (marker.getTitle().equalsIgnoreCase(resultsItem.getName())) {
-                           Log.e(TAG, "onInfoWindowClick: test OK", null);
-                           openDetailActivity(resultsItem);
-                       }
-                   }
-               }
-           });
+            setMap(googleMap);
+
+            addOfficeMarkerToMap(googleMap);
+
+            setCameraListener(googleMap);
+
+            binding.fabMyLocation.setOnClickListener(view1 -> {
+                if (permission.hasLocationPermissions(requireContext())) {
+                    getCurrentLocation(googleMap);
+                } else {
+                    Log.e(TAG, "MAPS FRAGMENT onClick: permission not granted", null);
+                    requestPermission();
+                }
+            });
 
         }
     };
@@ -110,6 +120,7 @@ public class MapsFragment extends Fragment implements EasyPermissions.Permission
                              @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
         binding = FragmentMapsBinding.inflate(inflater, container, false);
+        Log.e(TAG, "onCreateView: called", null);
         viewModel = new ViewModelProvider(requireActivity()).get(MapsAndListSharedViewModel.class);
         return binding.getRoot();
     }
@@ -117,6 +128,7 @@ public class MapsFragment extends Fragment implements EasyPermissions.Permission
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        Log.e(TAG, "onViewCreated: called", null);
 
         SupportMapFragment mapFragment =
                 (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
@@ -130,21 +142,12 @@ public class MapsFragment extends Fragment implements EasyPermissions.Permission
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireContext());
 
-        binding.fabMyLocation.setOnClickListener(view1 -> {
-            if (permission.hasLocationPermissions(requireContext())) {
-                getCurrentLocation();
-            } else {
-                Log.e(TAG, "MAPS FRAGMENT onClick: permission not granted", null);
-                requestPermission();
-            }
-        });
-
         fetchAndObserveData();
 
     }
 
     /**
-     * NearBy Restaurants handling
+     * Getting data from viewModel
      */
 
     private void fetchAndObserveData() {
@@ -152,19 +155,71 @@ public class MapsFragment extends Fragment implements EasyPermissions.Permission
         viewModel.getRestaurants().observe(requireActivity(), this::updateMapWithRestaurants);
     }
 
-    private void updateMapWithRestaurants (List<ResultsItem> resultsItemList) {
+    private void updateMapWithRestaurants(List<ResultsItem> resultsItemList) {
         Log.e(TAG, "updateMapWithRestaurants: new list " + resultsItemList.toString(), null);
+        restaurantList = resultsItemList;
 
-        for (ResultsItem resultsItem : resultsItemList) {
+        //addRestaurantMarkersToMap(restaurantList, map);
+    }
+
+    /**
+     * Map handling
+     */
+
+    private void setMap(GoogleMap googleMap) {
+        googleMap.getUiSettings().setMyLocationButtonEnabled(false);
+        googleMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
+
+        if (permission.hasLocationPermissions(requireContext())) {
+            enableMyLocation(googleMap);
+            getCurrentLocation(googleMap);
+        } else {
+            googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(positionUtils.getOfficeLocation(), defaultCameraZoomOverMap));
+        }
+    }
+
+    private void addOfficeMarkerToMap(GoogleMap googleMap) {
+        googleMap.addMarker(new MarkerOptions()
+                .position(positionUtils.getOfficeLocation())
+                .title("Office")
+                .icon(BitmapDescriptorFactory.fromBitmap(viewModel.resizeMarker(requireContext().getResources(), R.drawable.office_marker)))
+        );
+    }
+
+    private void addRestaurantMarkersToMap(List<ResultsItem> list, GoogleMap googleMap){
+        for (ResultsItem resultsItem : list) {
 
             LatLng coordinates = new LatLng(resultsItem.getGeometry().getLocation().getLat(), resultsItem.getGeometry().getLocation().getLng());
 
-            map.addMarker(new MarkerOptions()
+            googleMap.addMarker(new MarkerOptions()
                     .position(coordinates)
                     .title(resultsItem.getName())
-                    .icon(BitmapDescriptorFactory.fromBitmap(viewModel.resizeMarker(requireContext().getResources(),R.drawable.restaurant)))
+                    .icon(BitmapDescriptorFactory.fromBitmap(viewModel.resizeMarker(requireContext().getResources(), R.drawable.restaurant)))
             );
         }
+
+        googleMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
+            @Override
+            public void onInfoWindowClick(@NonNull Marker marker) {
+                List<ResultsItem> list = viewModel.getRestaurants().getValue();
+
+                assert list != null;
+                for (ResultsItem resultsItem : list) {
+                    if (Objects.requireNonNull(marker.getTitle()).equalsIgnoreCase(resultsItem.getName())) {
+                        openDetailActivity(resultsItem);
+                    }
+                }
+            }
+        });
+    }
+
+    private void setCameraListener (GoogleMap googleMap) {
+        googleMap.setOnCameraMoveListener(new GoogleMap.OnCameraMoveListener() {
+            @Override
+            public void onCameraMove() {
+                cameraPosition = googleMap.getCameraPosition();
+            }
+        });
     }
 
     private void openDetailActivity(ResultsItem restaurant) {
@@ -187,12 +242,12 @@ public class MapsFragment extends Fragment implements EasyPermissions.Permission
      */
 
     @SuppressLint("MissingPermission")
-    public void enableMyLocation() {
-        map.setMyLocationEnabled(true);
+    public void enableMyLocation(GoogleMap googleMap) {
+        googleMap.setMyLocationEnabled(true);
     }
 
     @SuppressLint("MissingPermission")
-    public void getCurrentLocation() {
+    public void getCurrentLocation(GoogleMap googleMap) {
         fusedLocationClient.getCurrentLocation(LocationRequest.PRIORITY_HIGH_ACCURACY, new CancellationToken() {
             @SuppressWarnings("ConstantConditions")
             @NonNull
@@ -207,7 +262,7 @@ public class MapsFragment extends Fragment implements EasyPermissions.Permission
             }
         }).addOnSuccessListener(location -> {
             LatLng current = new LatLng(location.getLatitude(), location.getLongitude());
-            map.moveCamera(CameraUpdateFactory.newLatLngZoom(current, defaultCameraZoomOverMap));
+            googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(current, defaultCameraZoomOverMap));
         });
     }
 
@@ -230,7 +285,7 @@ public class MapsFragment extends Fragment implements EasyPermissions.Permission
 
     @Override
     public void onPermissionsGranted(int requestCode, @NonNull List<String> perms) {
-        enableMyLocation();
+        enableMyLocation(map);
     }
 
     @Override
