@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.location.Location;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.ViewModel;
@@ -44,6 +45,11 @@ public class MapsAndListSharedViewModel extends ViewModel {
             location = locationRepository.getLocationStringFormat(context);
             apiRepository.fetchNearBySearchPlaces(locationRepository.getLocationStringFormat(context), locationRepository.getRadius());
         }
+    }
+
+    public LiveData<Location> getLocation(Context context) {
+        locationRepository.startLocationRequest(context);
+        return locationRepository.getLocationLiveData();
     }
 
     public Bitmap resizeMarker(Resources resources, int drawable) {

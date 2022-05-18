@@ -58,10 +58,9 @@ public class APIRepositoryImp implements APIRepository {
 
     @Override
     public void fetchNearBySearchPlaces(String location, int radius) {
-        Log.e(TAG, "fetchNearBySearchPlaces: API CALLED", null);
+
         Call<PlaceNearBy> call = retrofitNearBySearchAPI.getNearByPlacesRadiusMethod(location, radius, MAXPRICE, RESTAURANT, BuildConfig.PLACES_API_KEY, null);
         call.enqueue(new Callback<PlaceNearBy>() {
-
             @Override
             public void onResponse(@NonNull Call<PlaceNearBy> call, @NonNull Response<PlaceNearBy> response) {
 
@@ -91,7 +90,7 @@ public class APIRepositoryImp implements APIRepository {
                 Log.e(TAG, "onFailure: " + t.getMessage(), t);
 
             }
-        });
+        } );
 
         Log.i(TAG, "fetchNearBySearchPlaces: API called", null);
     }
