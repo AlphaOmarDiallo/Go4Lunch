@@ -159,7 +159,7 @@ public class MapsFragment extends Fragment implements EasyPermissions.Permission
         Log.e(TAG, "updateMapWithRestaurants: new list " + resultsItemList.toString(), null);
         restaurantList = resultsItemList;
 
-        //addRestaurantMarkersToMap(restaurantList, map);
+        addRestaurantMarkersToMap(resultsItemList, map);
     }
 
     /**
@@ -303,4 +303,10 @@ public class MapsFragment extends Fragment implements EasyPermissions.Permission
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         EasyPermissions.onRequestPermissionsResult(requestCode, permissions, grantResults, this);
     }
+
+    /**
+     * LifeCycle handling
+     */
+
+
 }
