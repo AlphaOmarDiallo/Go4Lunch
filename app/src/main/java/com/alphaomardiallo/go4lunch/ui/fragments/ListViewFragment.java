@@ -66,7 +66,11 @@ public class ListViewFragment extends Fragment implements OnClickItemListener {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         setLoaders();
-        getNearByRestaurants();
+
+        if (viewModel.hasPermission(requireContext())) {
+            getNearByRestaurants();
+        }
+
     }
 
     /**
@@ -148,9 +152,12 @@ public class ListViewFragment extends Fragment implements OnClickItemListener {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        viewModel.getRestaurants().removeObservers(this);
-        viewModel.stopTrackingLocation();
-        viewModel.getRestaurants().removeObservers(this);
+
+        if (viewModel.hasPermission(requireContext())) {
+            viewModel.getRestaurants().removeObservers(this);
+            viewModel.stopTrackingLocation();
+        }
+
         Log.e(TAG, "onDestroyView: Destroy", null);
     }
 }

@@ -105,7 +105,7 @@ public class MapsFragment extends Fragment implements EasyPermissions.Permission
                     getCurrentLocation(googleMap);
                 } else {
                     Log.e(TAG, "MAPS FRAGMENT onClick: permission not granted", null);
-                    getCurrentLocation(googleMap);
+                    requestPermission();
                 }
             });
 
@@ -126,7 +126,12 @@ public class MapsFragment extends Fragment implements EasyPermissions.Permission
                              @Nullable Bundle savedInstanceState) {
         binding = FragmentMapsBinding.inflate(inflater, container, false);
         Log.e(TAG, "onCreateView: called", null);
+
         viewModel = new ViewModelProvider(requireActivity()).get(MapsAndListSharedViewModel.class);
+
+        this.onAttach(requireContext());
+        Log.e(TAG, "attached ", null);
+
         return binding.getRoot();
     }
 
@@ -145,7 +150,7 @@ public class MapsFragment extends Fragment implements EasyPermissions.Permission
 
         requestPermission();
 
-        fetchAndObserveData();
+        //fetchAndObserveData();
 
     }
 
@@ -155,11 +160,9 @@ public class MapsFragment extends Fragment implements EasyPermissions.Permission
 
     private void fetchAndObserveData() {
         if (viewModel.hasPermission(requireContext())) {
+            onAttach(requireActivity());
             viewModel.startTrackingLocation(requireContext(), getActivity());
-            viewModel.getLocation().observe(requireActivity(), this::updateLocation);
-        } else {
-            /*location = viewModel.getOfficeLocation();
-            updateRestaurantWithoutPermission(viewModel.getOfficeLocation());*/
+            viewModel.getLocation().observe(getActivity(), this::updateLocation);
         }
     }
 
@@ -172,22 +175,16 @@ public class MapsFragment extends Fragment implements EasyPermissions.Permission
 
     private void updateLocation(Location location) {
 
-        if( location != null ) {
+        if (this.isAdded()) {
             this.location = location;
             getCurrentLocation(map);
+
+            //API call
+            viewModel.getAllRestaurantList(requireContext(), this.location);
+            viewModel.getRestaurants().observe(requireActivity(), this::updateMapWithRestaurants);
+            Log.e(TAG, "updateLocation: updated", null);
         }
 
-        //API call
-        viewModel.getAllRestaurantList(requireContext(), this.location);
-        viewModel.getRestaurants().observe(requireActivity(), this::updateMapWithRestaurants);
-
-        Log.e(TAG, "updateLocation: updated", null);
-    }
-
-    private void updateRestaurantWithoutPermission(Location location) {
-        //API call
-        viewModel.getAllRestaurantList(requireContext(), this.location);
-        viewModel.getRestaurants().observe(requireActivity(), this::updateMapWithRestaurants);
     }
 
     /**
@@ -285,6 +282,7 @@ public class MapsFragment extends Fragment implements EasyPermissions.Permission
 
     public void requestPermission() {
         if (permission.hasLocationPermissions(requireContext())) {
+            fetchAndObserveData();
             return;
         }
 
@@ -300,6 +298,7 @@ public class MapsFragment extends Fragment implements EasyPermissions.Permission
     @Override
     public void onPermissionsGranted(int requestCode, @NonNull List<String> perms) {
         enableMyLocation(map);
+        fetchAndObserveData();
     }
 
     @Override
@@ -325,10 +324,12 @@ public class MapsFragment extends Fragment implements EasyPermissions.Permission
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        viewModel.stopTrackingLocation();
-        viewModel.getRestaurants().removeObservers(this);
+        if (viewModel.hasPermission(requireContext())) {
+            viewModel.stopTrackingLocation();
+            viewModel.getRestaurants().removeObservers(this);
+            binding = null;
+        }
         Log.e(TAG, "onDestroyView: Destroy", null);
     }
-
 }
 
