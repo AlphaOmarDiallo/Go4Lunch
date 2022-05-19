@@ -12,13 +12,11 @@ import android.util.Log;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
-import com.alphaomardiallo.go4lunch.domain.PermissionUtils;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.tasks.OnSuccessListener;
 
 import javax.inject.Inject;
@@ -27,7 +25,7 @@ public class LocationRepositoryImp implements LocationRepository {
 
     private static final String OFFICE_LOCATION_STRING = "48.86501071160738, 2.3467211059168793";
     private static final int LOCATION_REQUEST_PROVIDER_IN_MS = 60000;
-    private static final float SMALLEST_DISPLACEMENT_THRESHOLD_METER = 50;
+    private static final float SMALLEST_DISPLACEMENT_THRESHOLD_METER = 100;
 
     private FusedLocationProviderClient fusedLocationProviderClient;
     private final MutableLiveData<Location> locationMutableLiveData = new MutableLiveData<>();
@@ -39,29 +37,21 @@ public class LocationRepositoryImp implements LocationRepository {
     public LocationRepositoryImp() {
     }
 
-    public LiveData<Location> getLocationLiveData() {
-        return locationMutableLiveData;
-    }
-
     @Override
     public int getRadius() {
         return 500;
     }
 
-    @Override
-    public LatLng getOfficeAddressLatLngFormat() {
-        return new LatLng(48.86501071160738, 2.3467211059168793);
+    public LiveData<Location> getCurrentLocation() {
+        return locationMutableLiveData;
     }
 
     @Override
-    public String getLocationStringFormat(Context context) {
-        PermissionUtils permissionUtils = new PermissionUtils();
-        if (permissionUtils.hasLocationPermissions(context)) {
-            Location location = getLocationLiveData().getValue();
-            return OFFICE_LOCATION_STRING;
-        } else {
-            return OFFICE_LOCATION_STRING;
-        }
+    public Location getOfficeLocation() {
+        Location officeLocation = new Location("Office");
+        officeLocation.setLongitude(2.3467211059168793);
+        officeLocation.setLatitude(48.86501071160738);
+        return officeLocation;
     }
 
     @SuppressLint("MissingPermission")
@@ -79,6 +69,10 @@ public class LocationRepositoryImp implements LocationRepository {
         startLocationUpdates();
     }
 
+    public void stopLocationUpdates() {
+        fusedLocationProviderClient.removeLocationUpdates(locationCallback);
+    }
+
     private void instantiateFusedLocationProviderClient(Context context) {
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(context);
     }
@@ -91,7 +85,7 @@ public class LocationRepositoryImp implements LocationRepository {
                     @Override
                     public void onSuccess(Location location) {
                         if (location != null) {
-                            Log.e(TAG, "onSuccess: we got the last location", null );
+                            Log.e(TAG, "onSuccess: we got the last location", null);
                             lastKnownLocation[0] = location;
                         }
                     }
@@ -99,11 +93,11 @@ public class LocationRepositoryImp implements LocationRepository {
         return lastKnownLocation[0];
     }
 
-    private void setupALocationRequest () {
+    private void setupALocationRequest() {
         locationRequest = LocationRequest.create();
-        locationRequest.setInterval(10000);
-        locationRequest.setSmallestDisplacement(5);
-        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);;
+        locationRequest.setInterval(LOCATION_REQUEST_PROVIDER_IN_MS);
+        locationRequest.setSmallestDisplacement(SMALLEST_DISPLACEMENT_THRESHOLD_METER);
+        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
     }
 
     private void createLocationCallback() {
@@ -117,7 +111,7 @@ public class LocationRepositoryImp implements LocationRepository {
                 }
 
                 for (Location location : locationResult.getLocations()) {
-                    System.out.println(location.getLongitude());
+                    locationMutableLiveData.setValue(location);
                 }
             }
         };
@@ -131,10 +125,5 @@ public class LocationRepositoryImp implements LocationRepository {
 
         Log.e(TAG, "startLocationUpdates: updating", null);
     }
-
-    private void stopLocationUpdates () {
-        fusedLocationProviderClient.removeLocationUpdates(locationCallback);
-    }
-
 
 }

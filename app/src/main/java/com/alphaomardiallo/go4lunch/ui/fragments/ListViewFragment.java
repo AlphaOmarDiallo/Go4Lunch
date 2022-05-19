@@ -1,10 +1,14 @@
 package com.alphaomardiallo.go4lunch.ui.fragments;
 
+import static android.content.ContentValues.TAG;
+
 import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.location.Location;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -38,6 +42,7 @@ public class ListViewFragment extends Fragment implements OnClickItemListener {
     private FragmentListViewBinding binding;
     public MapsAndListSharedViewModel viewModel;
     private List<ResultsItem> restaurantList = new ArrayList<>();
+    private Location currentLocation;
     private final ListViewAdapter adapter = new ListViewAdapter(new ListViewAdapter.ListDiff(), this);
 
     @Nullable
@@ -68,8 +73,15 @@ public class ListViewFragment extends Fragment implements OnClickItemListener {
      * Methods getting API's to populate recyclerView
      */
     public void getNearByRestaurants() {
+        viewModel.startTrackingLocation(requireContext(), requireActivity());
+        viewModel.getLocation().observe(requireActivity(), this::updateLocation);
+    }
+
+    private void updateLocation(Location location) {
+        currentLocation = location;
+
         viewModel.getRestaurants().observe(requireActivity(), this::setLoadersAfterAPICalls);
-        viewModel.getAllRestaurantList(requireContext());
+        viewModel.getAllRestaurantList(requireContext(), currentLocation);
         viewModel.getRestaurants().observe(requireActivity(), adapter::submitList);
     }
 
@@ -127,5 +139,18 @@ public class ListViewFragment extends Fragment implements OnClickItemListener {
                     .load("https://media.giphy.com/media/MdeHHwPzLpzbEkzl70/giphy.gif")
                     .into(binding.ivLoadingGIF);
         }, 20000);
+    }
+
+    /**
+     * LifeCycle
+     */
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        viewModel.getRestaurants().removeObservers(this);
+        viewModel.stopTrackingLocation();
+        viewModel.getRestaurants().removeObservers(this);
+        Log.e(TAG, "onDestroyView: Destroy", null);
     }
 }

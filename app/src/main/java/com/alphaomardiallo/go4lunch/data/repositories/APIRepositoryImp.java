@@ -17,6 +17,7 @@ import com.alphaomardiallo.go4lunch.data.dataSources.remoteData.RetrofitNearBySe
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import javax.inject.Inject;
 
@@ -59,6 +60,11 @@ public class APIRepositoryImp implements APIRepository {
     @Override
     public void fetchNearBySearchPlaces(String location, int radius) {
 
+        if (restaurantList.size() > 0) {
+            restaurantList.clear();
+            Objects.requireNonNull(restaurantListLiveData.getValue()).clear();
+        }
+
         Call<PlaceNearBy> call = retrofitNearBySearchAPI.getNearByPlacesRadiusMethod(location, radius, MAXPRICE, RESTAURANT, BuildConfig.PLACES_API_KEY, null);
         call.enqueue(new Callback<PlaceNearBy>() {
             @Override
@@ -90,7 +96,7 @@ public class APIRepositoryImp implements APIRepository {
                 Log.e(TAG, "onFailure: " + t.getMessage(), t);
 
             }
-        } );
+        });
 
         Log.i(TAG, "fetchNearBySearchPlaces: API called", null);
     }

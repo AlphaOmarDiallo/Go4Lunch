@@ -6,18 +6,16 @@ import android.location.Location;
 
 import androidx.lifecycle.LiveData;
 
-import com.google.android.gms.maps.model.LatLng;
-
 public interface LocationRepository {
 
-    LiveData<Location> getLocationLiveData();
+    LiveData<Location> getCurrentLocation();
 
     void startLocationRequest(Context context, Activity activity);
 
     int getRadius();
 
-    LatLng getOfficeAddressLatLngFormat();
+    Location getOfficeLocation();
 
-    String getLocationStringFormat(Context context);
+    void stopLocationUpdates();
 
 }
