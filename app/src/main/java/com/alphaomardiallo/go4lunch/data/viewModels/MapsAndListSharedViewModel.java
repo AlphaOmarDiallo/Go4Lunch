@@ -63,7 +63,7 @@ public class MapsAndListSharedViewModel extends ViewModel {
             apiRepository.fetchNearBySearchPlaces(locationString, locationRepository.getRadius());
 
         } else {
-            if (savedLocation.distanceTo(location) > 100) {
+            if (savedLocation.distanceTo(location) > 3) {
                 Location currentLocation = locationRepository.getCurrentLocation().getValue();
 
                 String locationString = currentLocation.getLatitude() + "," + currentLocation.getLongitude();

@@ -45,13 +45,14 @@ public class WorkmatesFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         if (viewModel.hasPermission(requireContext())) {
-            viewModel.startTrackingLocation(requireContext(), requireActivity());
+            if (this.isAdded()) {
+                viewModel.startTrackingLocation(requireContext(), requireActivity());
+            }
         }
-
     }
 
     /**
-     * LyfeCycle
+     * LifeCycle
      */
 
     @Override

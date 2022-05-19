@@ -42,7 +42,6 @@ public class ListViewFragment extends Fragment implements OnClickItemListener {
     private FragmentListViewBinding binding;
     public MapsAndListSharedViewModel viewModel;
     private List<ResultsItem> restaurantList = new ArrayList<>();
-    private Location currentLocation;
     private final ListViewAdapter adapter = new ListViewAdapter(new ListViewAdapter.ListDiff(), this);
 
     @Nullable
@@ -77,15 +76,16 @@ public class ListViewFragment extends Fragment implements OnClickItemListener {
      * Methods getting API's to populate recyclerView
      */
     public void getNearByRestaurants() {
-        viewModel.startTrackingLocation(requireContext(), requireActivity());
-        viewModel.getLocation().observe(requireActivity(), this::updateLocation);
+        if (this.isAdded()) {
+            viewModel.startTrackingLocation(requireContext(), requireActivity());
+            viewModel.getLocation().observe(requireActivity(), this::updateLocation);
+        }
     }
 
     private void updateLocation(Location location) {
-        currentLocation = location;
 
         viewModel.getRestaurants().observe(requireActivity(), this::setLoadersAfterAPICalls);
-        viewModel.getAllRestaurantList(requireContext(), currentLocation);
+        viewModel.getAllRestaurantList(requireContext(), location);
         viewModel.getRestaurants().observe(requireActivity(), adapter::submitList);
     }
 

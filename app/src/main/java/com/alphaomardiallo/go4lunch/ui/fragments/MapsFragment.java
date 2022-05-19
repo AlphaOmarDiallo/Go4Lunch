@@ -26,7 +26,6 @@ import com.alphaomardiallo.go4lunch.data.viewModels.MapsAndListSharedViewModel;
 import com.alphaomardiallo.go4lunch.databinding.FragmentMapsBinding;
 import com.alphaomardiallo.go4lunch.domain.PermissionUtils;
 import com.alphaomardiallo.go4lunch.domain.PositionUtils;
-import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -35,7 +34,6 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MapStyleOptions;
-import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.util.List;
@@ -57,8 +55,7 @@ public class MapsFragment extends Fragment implements EasyPermissions.Permission
     private List<ResultsItem> restaurantList;
     private GoogleMap map;
     private Location location;
-    private FusedLocationProviderClient fusedLocationClient;
-    private PositionUtils positionUtils = new PositionUtils();
+    private final PositionUtils positionUtils = new PositionUtils();
 
     private final OnMapReadyCallback callback = new OnMapReadyCallback() {
 
@@ -150,8 +147,6 @@ public class MapsFragment extends Fragment implements EasyPermissions.Permission
 
         requestPermission();
 
-        //fetchAndObserveData();
-
     }
 
     /**
@@ -160,9 +155,8 @@ public class MapsFragment extends Fragment implements EasyPermissions.Permission
 
     private void fetchAndObserveData() {
         if (viewModel.hasPermission(requireContext())) {
-            onAttach(requireActivity());
             viewModel.startTrackingLocation(requireContext(), getActivity());
-            viewModel.getLocation().observe(getActivity(), this::updateLocation);
+            viewModel.getLocation().observe(requireActivity(), this::updateLocation);
         }
     }
 
@@ -222,28 +216,20 @@ public class MapsFragment extends Fragment implements EasyPermissions.Permission
             );
         }
 
-        googleMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
-            @Override
-            public void onInfoWindowClick(@NonNull Marker marker) {
-                List<ResultsItem> list = viewModel.getRestaurants().getValue();
+        googleMap.setOnInfoWindowClickListener(marker -> {
+            List<ResultsItem> list1 = viewModel.getRestaurants().getValue();
 
-                assert list != null;
-                for (ResultsItem resultsItem : list) {
-                    if (Objects.requireNonNull(marker.getTitle()).equalsIgnoreCase(resultsItem.getName())) {
-                        openDetailActivity(resultsItem);
-                    }
+            assert list1 != null;
+            for (ResultsItem resultsItem : list1) {
+                if (Objects.requireNonNull(marker.getTitle()).equalsIgnoreCase(resultsItem.getName())) {
+                    openDetailActivity(resultsItem);
                 }
             }
         });
     }
 
     private void setCameraListener(GoogleMap googleMap) {
-        googleMap.setOnCameraMoveListener(new GoogleMap.OnCameraMoveListener() {
-            @Override
-            public void onCameraMove() {
-                cameraPosition = googleMap.getCameraPosition();
-            }
-        });
+        googleMap.setOnCameraMoveListener(() -> cameraPosition = googleMap.getCameraPosition());
     }
 
     private void openDetailActivity(ResultsItem restaurant) {
@@ -329,7 +315,17 @@ public class MapsFragment extends Fragment implements EasyPermissions.Permission
             viewModel.getRestaurants().removeObservers(this);
             binding = null;
         }
+        setCameraListener(map);
         Log.e(TAG, "onDestroyView: Destroy", null);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (cameraPosition != null) {
+            Log.e(TAG, "onResume: called here", null);
+            map.moveCamera(CameraUpdateFactory.newLatLngZoom(cameraPosition.target, defaultCameraZoomOverMap));
+        }
     }
 }
 

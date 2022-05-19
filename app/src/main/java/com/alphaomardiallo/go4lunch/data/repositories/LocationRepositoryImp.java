@@ -17,15 +17,13 @@ import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.tasks.OnSuccessListener;
 
 import javax.inject.Inject;
 
 public class LocationRepositoryImp implements LocationRepository {
 
-    private static final String OFFICE_LOCATION_STRING = "48.86501071160738, 2.3467211059168793";
     private static final int LOCATION_REQUEST_PROVIDER_IN_MS = 60000;
-    private static final float SMALLEST_DISPLACEMENT_THRESHOLD_METER = 100;
+    private static final float SMALLEST_DISPLACEMENT_THRESHOLD_METER = 2;
 
     private FusedLocationProviderClient fusedLocationProviderClient;
     private final MutableLiveData<Location> locationMutableLiveData = new MutableLiveData<>();
@@ -78,19 +76,13 @@ public class LocationRepositoryImp implements LocationRepository {
     }
 
     @SuppressLint("MissingPermission")
-    private Location getLastKnownLocation(Activity activity) {
-        final Location[] lastKnownLocation = {null};
+    private void getLastKnownLocation(Activity activity) {
         fusedLocationProviderClient.getLastLocation()
-                .addOnSuccessListener(activity, new OnSuccessListener<Location>() {
-                    @Override
-                    public void onSuccess(Location location) {
-                        if (location != null) {
-                            Log.e(TAG, "onSuccess: we got the last location", null);
-                            lastKnownLocation[0] = location;
-                        }
+                .addOnSuccessListener(activity, location -> {
+                    if (location != null) {
+                        Log.e(TAG, "onSuccess: we got the last location", null);
                     }
                 });
-        return lastKnownLocation[0];
     }
 
     private void setupALocationRequest() {

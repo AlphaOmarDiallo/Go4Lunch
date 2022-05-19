@@ -17,7 +17,6 @@ import com.alphaomardiallo.go4lunch.data.dataSources.remoteData.RetrofitNearBySe
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 import javax.inject.Inject;
 
@@ -60,10 +59,10 @@ public class APIRepositoryImp implements APIRepository {
     @Override
     public void fetchNearBySearchPlaces(String location, int radius) {
 
-        if (restaurantList.size() > 0) {
+       /* if (restaurantList.size() > 0) {
             restaurantList.clear();
             Objects.requireNonNull(restaurantListLiveData.getValue()).clear();
-        }
+        }*/
 
         Call<PlaceNearBy> call = retrofitNearBySearchAPI.getNearByPlacesRadiusMethod(location, radius, MAXPRICE, RESTAURANT, BuildConfig.PLACES_API_KEY, null);
         call.enqueue(new Callback<PlaceNearBy>() {
@@ -98,7 +97,7 @@ public class APIRepositoryImp implements APIRepository {
             }
         });
 
-        Log.i(TAG, "fetchNearBySearchPlaces: API called", null);
+        Log.e(TAG, "fetchNearBySearchPlaces: API called", null);
     }
 
     /**
@@ -190,7 +189,23 @@ public class APIRepositoryImp implements APIRepository {
      */
 
     private void populateList(List<ResultsItem> list) {
-        restaurantList.addAll(list);
+        for (ResultsItem newItem : list) {
+            boolean isNotInList = true;
+
+            for (ResultsItem oldItem : restaurantList) {
+                if (oldItem.getName().equalsIgnoreCase(newItem.getName())){
+                    isNotInList = false;
+                    break;
+                }
+            }
+
+            if (isNotInList) {
+                restaurantList.add(newItem);
+            }
+
+        }
+
+        //restaurantList.addAll(list);
         restaurantListLiveData.setValue(restaurantList);
     }
 
