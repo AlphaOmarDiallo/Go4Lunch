@@ -3,6 +3,8 @@ package com.alphaomardiallo.go4lunch;
 import static android.content.ContentValues.TAG;
 
 import android.content.Intent;
+import android.location.Location;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -23,6 +25,7 @@ public class RestaurantDetails extends AppCompatActivity {
 
     private ActivityRestaurantDetailsBinding binding;
     private RestaurantDetailsViewModel viewModel;
+    private Location location;
 
     private String restaurantID;
     private String restaurantPhoto;
@@ -33,7 +36,6 @@ public class RestaurantDetails extends AppCompatActivity {
     private double restaurantLatitude;
     private double restaurantLongitude;
     private String restaurantPhoneNumber;
-    private Boolean restaurantIsInMyFavourite;
     private String restaurantWebsite;
     private Intent intent;
 
@@ -45,17 +47,31 @@ public class RestaurantDetails extends AppCompatActivity {
         viewModel = new ViewModelProvider(this).get(RestaurantDetailsViewModel.class);
         setContentView(view);
 
+        location = viewModel.getOfficeLocation();
+
         //View setup
-        intent = getIntent();
+        startTrackingLocation();
+
         retrieveInformation();
 
     }
 
-    private String getLocation() {
-        return "48.86501071160738, 2.3467211059168793";
+    private void startTrackingLocation(){
+        viewModel.getLocation(getBaseContext(), this).observe(this, this::updateLocation);
+    }
+
+    private void updateLocation(Location location) {
+        this.location = location;
+        Location restaurantLocationUpdate = new Location("Restaurant Location");
+        restaurantLocationUpdate.setLongitude(restaurantLongitude);
+        restaurantLocationUpdate.setLatitude(restaurantLatitude);
+        binding.tvDistanceRestaurantDetails.setText(String.format("%sm", Math.round(this.location.distanceTo(restaurantLocationUpdate))));
     }
 
     private void retrieveInformation() {
+
+        intent = getIntent();
+
         if (!intent.hasExtra("bundle")) {
             //TODO API CALL
             Log.i(TAG, "onCreate: Empty bundle, API call needed");
@@ -79,6 +95,11 @@ public class RestaurantDetails extends AppCompatActivity {
     private void setupViews() {
         DistanceCalculatorUtils calculatorUtils = new DistanceCalculatorUtils();
 
+        binding.ibWebSiteDetails.setVisibility(View.INVISIBLE);
+        binding.ibCallDetail.setVisibility(View.INVISIBLE);
+        binding.tvCallDetails.setVisibility(View.INVISIBLE);
+        binding.tvWebsiteDetails.setVisibility(View.INVISIBLE);
+
         Glide.with(binding.ivRestaurantPhotoDetail)
                 .load(restaurantPhoto)
                 .into(binding.ivRestaurantPhotoDetail);
@@ -94,9 +115,11 @@ public class RestaurantDetails extends AppCompatActivity {
         } else {
             binding.tvIsOpenDetails.setText(R.string.closed);
         }
-        getLocation();
-        int distance = Math.round(calculatorUtils.getDistance(getLocation(), restaurantLatitude, restaurantLongitude));
-        binding.tvDistanceRestaurantDetails.setText(String.format("%sm", distance));
+
+        Location restaurantLocation = new Location("Restaurant Location");
+        restaurantLocation.setLongitude(restaurantLongitude);
+        restaurantLocation.setLatitude(restaurantLatitude);
+        binding.tvDistanceRestaurantDetails.setText(String.format("%sm", Math.round(location.distanceTo(restaurantLocation))));
 
         //TODO setup Missing information
 
@@ -112,23 +135,38 @@ public class RestaurantDetails extends AppCompatActivity {
 
         Log.e(TAG, "setupContact: works ", null);
 
-        restaurantPhoneNumber = result.getInternationalPhoneNumber();
+        //Phone number
+        if (result.getInternationalPhoneNumber() != null){
+
+            restaurantPhoneNumber = result.getInternationalPhoneNumber();
+            binding.ibCallDetail.setVisibility(View.VISIBLE);
+            binding.tvCallDetails.setVisibility(View.VISIBLE);
+            binding.ibCallDetail.setOnClickListener(view -> {
+                String phoneFormatted = String.format("tel:%s", restaurantPhoneNumber);
+                Intent callIntent = new Intent (Intent.ACTION_DIAL);
+                callIntent.setData(Uri.parse(phoneFormatted));
+                startActivity(callIntent);
+            });
+        }
 
         // Website settings
-        restaurantWebsite = result.getWebsite();
-        binding.ibWebSiteDetails.setColorFilter(R.color.teal_700);
-        binding.ibWebSiteDetails.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                System.out.println(restaurantWebsite);
-            }
-        });
+        if (result.getWebsite() != null){
 
+            restaurantWebsite = result.getWebsite();
+            binding.ibWebSiteDetails.setVisibility(View.VISIBLE);
+            binding.tvWebsiteDetails.setVisibility(View.VISIBLE);
+            binding.ibWebSiteDetails.setOnClickListener(view -> {
+                Uri uri = Uri.parse(restaurantWebsite);
+                Intent websiteIntent = new Intent(Intent.ACTION_VIEW, uri);
+                startActivity(websiteIntent);
+            });
+        }
     }
 
     @Override
     protected void onPause() {
         super.onPause();
         viewModel.getDetails(restaurantID).removeObservers(this);
+        viewModel.getLocation(getBaseContext(), this).removeObservers(this);
     }
 }
