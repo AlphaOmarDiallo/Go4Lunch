@@ -23,7 +23,7 @@ import javax.inject.Inject;
 public class LocationRepositoryImp implements LocationRepository {
 
     private static final int LOCATION_REQUEST_PROVIDER_IN_MS = 60000;
-    private static final float SMALLEST_DISPLACEMENT_THRESHOLD_METER = 2;
+    private static final float SMALLEST_DISPLACEMENT_THRESHOLD_METER = 50;
 
     private FusedLocationProviderClient fusedLocationProviderClient;
     private final MutableLiveData<Location> locationMutableLiveData = new MutableLiveData<>();

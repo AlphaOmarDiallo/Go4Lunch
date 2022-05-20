@@ -3,6 +3,7 @@ package com.alphaomardiallo.go4lunch.ui.adapters;
 
 import android.annotation.SuppressLint;
 import android.graphics.Color;
+import android.location.Location;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -31,10 +32,12 @@ public class ListViewAdapter extends ListAdapter<ResultsItem, ListViewAdapter.Li
     //TODO Gives location to adapter
     public ItemRestaurantBinding binding;
     OnClickItemListener onClickItemListener;
+    Location location;
 
-    public ListViewAdapter(@NonNull DiffUtil.ItemCallback<ResultsItem> diffCallback, OnClickItemListener onClickItemListener) {
+    public ListViewAdapter(@NonNull DiffUtil.ItemCallback<ResultsItem> diffCallback, OnClickItemListener onClickItemListener, Location location) {
         super(diffCallback);
         this.onClickItemListener = onClickItemListener;
+        this.location = location;
     }
 
     @NonNull
@@ -46,7 +49,7 @@ public class ListViewAdapter extends ListAdapter<ResultsItem, ListViewAdapter.Li
 
     @Override
     public void onBindViewHolder(@NonNull ListViewHolder holder, int position) {
-        holder.bind(getItem(position), onClickItemListener);
+        holder.bind(getItem(position), onClickItemListener, location);
     }
 
     public static class ListDiff extends DiffUtil.ItemCallback<ResultsItem> {
@@ -67,6 +70,7 @@ public class ListViewAdapter extends ListAdapter<ResultsItem, ListViewAdapter.Li
     }
 
     public static class ListViewHolder extends RecyclerView.ViewHolder {
+        private Location location;
         TextView restaurantName;
         TextView restaurantStyleAndAddress;
         TextView restaurantOpeningTime;
@@ -79,6 +83,7 @@ public class ListViewAdapter extends ListAdapter<ResultsItem, ListViewAdapter.Li
 
         public ListViewHolder(@NonNull View itemView) {
             super(itemView);
+
             restaurantName = itemView.findViewById(R.id.tvRestaurantName);
             restaurantStyleAndAddress = itemView.findViewById(R.id.tvStyleAndAddress);
             restaurantOpeningTime = itemView.findViewById(R.id.tvOpeningHours);
@@ -92,14 +97,19 @@ public class ListViewAdapter extends ListAdapter<ResultsItem, ListViewAdapter.Li
             setupRatingBar();
         }
 
-        public void bind(ResultsItem restaurant, OnClickItemListener onClickItemListener) {
+        public void bind(ResultsItem restaurant, OnClickItemListener onClickItemListener, Location location) {
             restaurantName.setText(restaurant.getName());
             restaurantStyleAndAddress.setText(restaurant.getVicinity());
             restaurantOpeningTime.setText(getOpeningTime(restaurant.getOpeningHours().isOpenNow()));
             restaurantDistance.setText(restaurant.getGeometry().getLocation().toString());
             restaurantNumberOfWorkmates.setText(getNumberOfWorkmates());
             restaurantRating.setRating(getRating(restaurant.getRating()));
-            restaurantDistance.setText(getDistance("48.86501071160738, 2.3467211059168793", restaurant.getGeometry().getLocation().getLat(), restaurant.getGeometry().getLocation().getLng()));
+            //restaurantDistance.setText(getDistance("48.86501071160738, 2.3467211059168793", restaurant.getGeometry().getLocation().getLat(), restaurant.getGeometry().getLocation().getLng()));
+            Location restaurantLocation = new Location("restaurant");
+            restaurantLocation.setLatitude(restaurant.getGeometry().getLocation().getLat());
+            restaurantLocation.setLongitude(restaurant.getGeometry().getLocation().getLng());
+            restaurantDistance.setText(String.format("%sm",Math.round(location.distanceTo(restaurantLocation))));
+
             Glide.with(restaurantPhoto)
                     .load("https://maps.googleapis.com/maps/api/place/photo?maxwidth=100&photo_reference=" + restaurant.getPhotos().get(0).getPhotoReference() + "&key=" + BuildConfig.PLACES_API_KEY)
                     .placeholder(R.drawable.hungry_droid)
@@ -140,6 +150,5 @@ public class ListViewAdapter extends ListAdapter<ResultsItem, ListViewAdapter.Li
             //TODO set method
             return String.format(Locale.getDefault(), "(%d)", 2);
         }
-
     }
 }

@@ -25,6 +25,7 @@ import com.alphaomardiallo.go4lunch.data.dataSources.Model.nearBySearchPojo.Resu
 import com.alphaomardiallo.go4lunch.data.viewModels.MapsAndListSharedViewModel;
 import com.alphaomardiallo.go4lunch.databinding.FragmentListViewBinding;
 import com.alphaomardiallo.go4lunch.domain.OnClickItemListener;
+import com.alphaomardiallo.go4lunch.domain.PositionUtils;
 import com.alphaomardiallo.go4lunch.ui.adapters.ListViewAdapter;
 import com.bumptech.glide.Glide;
 
@@ -42,7 +43,14 @@ public class ListViewFragment extends Fragment implements OnClickItemListener {
     private FragmentListViewBinding binding;
     public MapsAndListSharedViewModel viewModel;
     private List<ResultsItem> restaurantList = new ArrayList<>();
-    private final ListViewAdapter adapter = new ListViewAdapter(new ListViewAdapter.ListDiff(), this);
+    private final PositionUtils positionUtils = new PositionUtils();
+    private final Location location = positionUtils.getOfficeLocationFormat();
+    private ListViewAdapter adapter = new ListViewAdapter(new ListViewAdapter.ListDiff(), this, location);
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+    }
 
     @Nullable
     @Override
@@ -55,7 +63,6 @@ public class ListViewFragment extends Fragment implements OnClickItemListener {
 
         binding.recyclerView.setHasFixedSize(true);
         binding.recyclerView.setLayoutManager(new LinearLayoutManager(view.getContext(), LinearLayoutManager.VERTICAL, false));
-        binding.recyclerView.setAdapter(adapter);
 
         return binding.getRoot();
     }
@@ -69,24 +76,45 @@ public class ListViewFragment extends Fragment implements OnClickItemListener {
         if (viewModel.hasPermission(requireContext())) {
             getNearByRestaurants();
         }
-
     }
 
     /**
      * Methods getting API's to populate recyclerView
      */
     public void getNearByRestaurants() {
+
         if (this.isAdded()) {
             viewModel.startTrackingLocation(requireContext(), requireActivity());
             viewModel.getLocation().observe(requireActivity(), this::updateLocation);
         }
     }
 
+    public void fetchAndObserveData(Location location) {
+
+        if (this.isAdded()) {
+            viewModel.getRestaurants().observe(requireActivity(), this::setLoadersAfterAPICalls);
+            viewModel.getAllRestaurantList(requireContext(), location);
+            viewModel.getRestaurants().observe(requireActivity(), adapter::submitList);
+        }
+    }
+
     private void updateLocation(Location location) {
 
-        viewModel.getRestaurants().observe(requireActivity(), this::setLoadersAfterAPICalls);
-        viewModel.getAllRestaurantList(requireContext(), location);
-        viewModel.getRestaurants().observe(requireActivity(), adapter::submitList);
+        setAdapter(location);
+
+        if (this.isAdded()) {
+            viewModel.getLocation().observe(requireActivity(), this::fetchAndObserveData);
+        }
+        Log.e(TAG, "updateLocation: updated location", null);
+    }
+
+    /**
+     * Adapter settings
+     */
+
+    private void setAdapter(Location location) {
+        adapter = new ListViewAdapter(new ListViewAdapter.ListDiff(), this, location);
+        binding.recyclerView.setAdapter(adapter);
     }
 
     /**
@@ -113,13 +141,27 @@ public class ListViewFragment extends Fragment implements OnClickItemListener {
      * Managing the idling time with a gif
      */
     private void setLoaders() {
-        binding.tvLoadingMessage.setVisibility(View.VISIBLE);
-        binding.ivLoadingGIF.setVisibility(View.VISIBLE);
+
+        if (!viewModel.hasPermission(requireContext())) {
+            binding.tvLoadingMessage.setText("We need your location, return to the MapView.");
+            Glide.with(binding.ivLoadingGIF)
+                    .asGif()
+                    .load("https://media.giphy.com/media/Vh8zf1nIfQRRXksAm1/giphy.gif")
+                    .into(binding.ivLoadingGIF);
+            return;
+        }
+
         if (restaurantList == null || restaurantList.isEmpty()) {
             Glide.with(binding.ivLoadingGIF)
                     .asGif()
                     .load("https://media.giphy.com/media/0KiLnOipDAnfk5Jgsf/giphy.gif")
                     .into(binding.ivLoadingGIF);
+
+            binding.tvLoadingMessage.setVisibility(View.VISIBLE);
+            binding.ivLoadingGIF.setVisibility(View.VISIBLE);
+        } else {
+            binding.tvLoadingMessage.setVisibility(View.INVISIBLE);
+            binding.ivLoadingGIF.setVisibility(View.INVISIBLE);
         }
     }
 
@@ -155,6 +197,7 @@ public class ListViewFragment extends Fragment implements OnClickItemListener {
 
         if (viewModel.hasPermission(requireContext())) {
             viewModel.getRestaurants().removeObservers(this);
+            viewModel.getLocation().removeObservers(this);
             viewModel.stopTrackingLocation();
         }
 
