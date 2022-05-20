@@ -10,7 +10,8 @@ public interface RetrofitDetailsAPI {
 
     @GET("details/json?")
     Call<PlaceDetails> getPlaceDetails(
-            @Query("key") String key,
-            @Query("place_id") String place_id
+            @Query("fields") String fields,
+            @Query("place_id") String placeId,
+            @Query("key") String key
     );
 }

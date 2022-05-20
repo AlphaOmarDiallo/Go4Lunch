@@ -11,8 +11,11 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
 import com.alphaomardiallo.go4lunch.BuildConfig;
+import com.alphaomardiallo.go4lunch.data.dataSources.Model.detailsPojo.PlaceDetails;
+import com.alphaomardiallo.go4lunch.data.dataSources.Model.detailsPojo.Result;
 import com.alphaomardiallo.go4lunch.data.dataSources.Model.nearBySearchPojo.PlaceNearBy;
 import com.alphaomardiallo.go4lunch.data.dataSources.Model.nearBySearchPojo.ResultsItem;
+import com.alphaomardiallo.go4lunch.data.dataSources.remoteData.RetrofitDetailsAPI;
 import com.alphaomardiallo.go4lunch.data.dataSources.remoteData.RetrofitNearBySearchAPI;
 
 import java.util.ArrayList;
@@ -26,18 +29,20 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-public class APIRepositoryImp implements APIRepository {
+public class PlacesAPIRepositoryImp implements PlacesAPIRepository {
 
     private static final String RESTAURANT = "restaurant";
     private static final String rankBy = "distance";
+    private static final String fieldsRestaurantDetailActivity = "international_phone_number,website";
     private static final int MAXPRICE = 2;
     private static final int HANDLING_TIME = 2000;
     private final Handler handler = new Handler(Looper.getMainLooper());
     private final MutableLiveData<List<ResultsItem>> restaurantListLiveData = new MutableLiveData<>();
     private final List<ResultsItem> restaurantList = new ArrayList<>();
+    private final MutableLiveData<Result> contact = new MutableLiveData<>();
 
     @Inject
-    public APIRepositoryImp() {
+    public PlacesAPIRepositoryImp() {
     }
 
     Retrofit retrofit = new Retrofit.Builder()
@@ -47,14 +52,16 @@ public class APIRepositoryImp implements APIRepository {
 
     RetrofitNearBySearchAPI retrofitNearBySearchAPI = retrofit.create(RetrofitNearBySearchAPI.class);
 
+    /**
+     * NearBySearch
+     */
+
     @Override
     public LiveData<List<ResultsItem>> getNearBySearchRestaurantList() {
         return restaurantListLiveData;
     }
 
-    /**
-     * Getting NearBySearch results as a list using the radius parameter and managing the recall if there is a page token
-     */
+    //Getting NearBySearch results as a list using the radius parameter and managing the recall if there is a page token
 
     @Override
     public void fetchNearBySearchPlaces(String location, int radius) {
@@ -100,9 +107,7 @@ public class APIRepositoryImp implements APIRepository {
         Log.e(TAG, "fetchNearBySearchPlaces: API called", null);
     }
 
-    /**
-     * PageToken recall if it is found
-     */
+    //PageToken recall if it is found
 
     public void getNextResultsRadiusMethod(String location, int radius, String pageToken) {
 
@@ -156,9 +161,7 @@ public class APIRepositoryImp implements APIRepository {
         });
     }
 
-    /**
-     * API called when API with Radius method does not return anything
-     */
+    //API called when API with Radius method does not return anything
 
     private void noRestaurantInRadius(String location) {
         Call<PlaceNearBy> call3 = retrofitNearBySearchAPI.getNearByPlacesRankByMethod(location, rankBy, MAXPRICE, RESTAURANT, BuildConfig.PLACES_API_KEY, null);
@@ -184,16 +187,14 @@ public class APIRepositoryImp implements APIRepository {
         });
     }
 
-    /**
-     * populate the list to avoid double results
-     */
+    //populate the list to avoid double results
 
     private void populateList(List<ResultsItem> list) {
         for (ResultsItem newItem : list) {
             boolean isNotInList = true;
 
             for (ResultsItem oldItem : restaurantList) {
-                if (oldItem.getName().equalsIgnoreCase(newItem.getName())){
+                if (oldItem.getName().equalsIgnoreCase(newItem.getName())) {
                     isNotInList = false;
                     break;
                 }
@@ -207,6 +208,42 @@ public class APIRepositoryImp implements APIRepository {
 
         //restaurantList.addAll(list);
         restaurantListLiveData.setValue(restaurantList);
+    }
+
+    /**
+     * Places Detail
+     */
+
+    RetrofitDetailsAPI retrofitDetailsAPI = retrofit.create(RetrofitDetailsAPI.class);
+
+    @Override
+    public LiveData<Result> getDetails() {
+        return contact;
+    }
+
+    public void fetchDetails(String placeID){
+
+        Call<PlaceDetails> call4 = retrofitDetailsAPI.getPlaceDetails(fieldsRestaurantDetailActivity, placeID, BuildConfig.PLACES_API_KEY);
+        call4.enqueue(new Callback<PlaceDetails>() {
+            @Override
+            public void onResponse(Call<PlaceDetails> call, Response<PlaceDetails> response) {
+                if (!response.isSuccessful()) {
+                    Log.e(TAG, "onResponse: failed " + response.message(), null);
+                    return;
+                }
+
+                contact.setValue(response.body().getResult());
+
+            }
+
+            @Override
+            public void onFailure(Call<PlaceDetails> call, Throwable t) {
+
+            }
+        });
+
+        Log.e(TAG, "getDetails: PLACE DETAILS API CALLED", null);
+
     }
 
 }

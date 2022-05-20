@@ -14,7 +14,7 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.ViewModel;
 
 import com.alphaomardiallo.go4lunch.data.dataSources.Model.nearBySearchPojo.ResultsItem;
-import com.alphaomardiallo.go4lunch.data.repositories.APIRepository;
+import com.alphaomardiallo.go4lunch.data.repositories.PlacesAPIRepository;
 import com.alphaomardiallo.go4lunch.data.repositories.LocationRepository;
 import com.alphaomardiallo.go4lunch.data.repositories.PermissionRepository;
 
@@ -27,7 +27,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel;
 @HiltViewModel
 public class MapsAndListSharedViewModel extends ViewModel {
 
-    private final APIRepository apiRepository;
+    private final PlacesAPIRepository placesApiRepository;
     private final LocationRepository locationRepository;
     private final PermissionRepository permissionRepository;
 
@@ -36,12 +36,12 @@ public class MapsAndListSharedViewModel extends ViewModel {
     Location savedLocation;
 
     @Inject
-    public MapsAndListSharedViewModel(APIRepository apiRepository, LocationRepository locationRepository, PermissionRepository permissionRepository) {
-        this.apiRepository = apiRepository;
+    public MapsAndListSharedViewModel(PlacesAPIRepository placesApiRepository, LocationRepository locationRepository, PermissionRepository permissionRepository) {
+        this.placesApiRepository = placesApiRepository;
         this.locationRepository = locationRepository;
         this.permissionRepository = permissionRepository;
 
-        restaurants = apiRepository.getNearBySearchRestaurantList();
+        restaurants = placesApiRepository.getNearBySearchRestaurantList();
         checkList = null;
     }
 
@@ -60,14 +60,14 @@ public class MapsAndListSharedViewModel extends ViewModel {
             Location currentLocation = locationRepository.getCurrentLocation().getValue();
 
             String locationString = currentLocation.getLatitude() + "," + currentLocation.getLongitude();
-            apiRepository.fetchNearBySearchPlaces(locationString, locationRepository.getRadius());
+            placesApiRepository.fetchNearBySearchPlaces(locationString, locationRepository.getRadius());
 
         } else {
             if (savedLocation.distanceTo(location) > 51) {
                 Location currentLocation = locationRepository.getCurrentLocation().getValue();
 
                 String locationString = currentLocation.getLatitude() + "," + currentLocation.getLongitude();
-                apiRepository.fetchNearBySearchPlaces(locationString, locationRepository.getRadius());
+                placesApiRepository.fetchNearBySearchPlaces(locationString, locationRepository.getRadius());
                 Log.e(TAG, "getAllRestaurantList: distance condition met", null);
             }
         }

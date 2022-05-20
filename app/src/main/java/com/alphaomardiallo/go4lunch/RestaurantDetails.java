@@ -8,14 +8,22 @@ import android.util.Log;
 import android.view.View;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.ViewModelProvider;
 
+import com.alphaomardiallo.go4lunch.data.dataSources.Model.detailsPojo.Result;
+import com.alphaomardiallo.go4lunch.data.viewModels.RestaurantDetailsViewModel;
 import com.alphaomardiallo.go4lunch.databinding.ActivityRestaurantDetailsBinding;
 import com.alphaomardiallo.go4lunch.domain.DistanceCalculatorUtils;
 import com.bumptech.glide.Glide;
 
+import dagger.hilt.android.AndroidEntryPoint;
+
+@AndroidEntryPoint
 public class RestaurantDetails extends AppCompatActivity {
 
     private ActivityRestaurantDetailsBinding binding;
+    private RestaurantDetailsViewModel viewModel;
+
     private String restaurantID;
     private String restaurantPhoto;
     private String restaurantName;
@@ -34,7 +42,7 @@ public class RestaurantDetails extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         binding = ActivityRestaurantDetailsBinding.inflate(getLayoutInflater());
         View view = binding.getRoot();
-        //viewModel = new ViewModelProvider(this).get(MainViewModel.class);
+        viewModel = new ViewModelProvider(this).get(RestaurantDetailsViewModel.class);
         setContentView(view);
 
         //View setup
@@ -48,7 +56,7 @@ public class RestaurantDetails extends AppCompatActivity {
     }
 
     private void retrieveInformation() {
-        if (!intent.hasExtra("bundle")){
+        if (!intent.hasExtra("bundle")) {
             //TODO API CALL
             Log.i(TAG, "onCreate: Empty bundle, API call needed");
         } else {
@@ -96,5 +104,31 @@ public class RestaurantDetails extends AppCompatActivity {
                 .asGif()
                 .load("https://media.giphy.com/media/p1NqIBmDgA2P8Kwz8E/giphy.gif")
                 .into(binding.ivEatingAloneDetail);
+
+        viewModel.getDetails(restaurantID).observe(this, this::setupContact);
+    }
+
+    private void setupContact(Result result) {
+
+        Log.e(TAG, "setupContact: works ", null);
+
+        restaurantPhoneNumber = result.getInternationalPhoneNumber();
+
+        // Website settings
+        restaurantWebsite = result.getWebsite();
+        binding.ibWebSiteDetails.setColorFilter(R.color.teal_700);
+        binding.ibWebSiteDetails.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                System.out.println(restaurantWebsite);
+            }
+        });
+
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        viewModel.getDetails(restaurantID).removeObservers(this);
     }
 }
