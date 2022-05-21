@@ -16,7 +16,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Go4Lunch">
         <activity
-            android:name=".RestaurantDetails"
+            android:name=".ui.RestaurantDetails"
             android:exported="false"
             android:screenOrientation="portrait" />
         <activity

@@ -20,7 +20,7 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.alphaomardiallo.go4lunch.R;
-import com.alphaomardiallo.go4lunch.RestaurantDetails;
+import com.alphaomardiallo.go4lunch.ui.RestaurantDetails;
 import com.alphaomardiallo.go4lunch.data.dataSources.Model.nearBySearchPojo.ResultsItem;
 import com.alphaomardiallo.go4lunch.data.viewModels.MapsAndListSharedViewModel;
 import com.alphaomardiallo.go4lunch.databinding.FragmentMapsBinding;
@@ -234,16 +234,7 @@ public class MapsFragment extends Fragment implements EasyPermissions.Permission
 
     private void openDetailActivity(ResultsItem restaurant) {
         Intent intent = new Intent(requireContext(), RestaurantDetails.class);
-        Bundle bundle = new Bundle();
-        bundle.putString("id", restaurant.getPlaceId());
-        bundle.putString("photo", restaurant.getPhotos().get(0).getPhotoReference());
-        bundle.putString("name", restaurant.getName());
-        bundle.putDouble("rating", restaurant.getRating());
-        bundle.putString("address", restaurant.getVicinity());
-        bundle.putBoolean("openNow", restaurant.getOpeningHours().isOpenNow());
-        bundle.putDouble("latitude", restaurant.getGeometry().getLocation().getLat());
-        bundle.putDouble("longitude", restaurant.getGeometry().getLocation().getLng());
-        intent.putExtra("bundle", bundle);
+        intent.putExtra("id", restaurant.getPlaceId());
         startActivity(intent);
     }
 

@@ -20,7 +20,7 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.alphaomardiallo.go4lunch.R;
-import com.alphaomardiallo.go4lunch.RestaurantDetails;
+import com.alphaomardiallo.go4lunch.ui.RestaurantDetails;
 import com.alphaomardiallo.go4lunch.data.dataSources.Model.nearBySearchPojo.ResultsItem;
 import com.alphaomardiallo.go4lunch.data.viewModels.MapsAndListSharedViewModel;
 import com.alphaomardiallo.go4lunch.databinding.FragmentListViewBinding;
@@ -124,16 +124,7 @@ public class ListViewFragment extends Fragment implements OnClickItemListener {
     public void onClickItem(int position) {
         ResultsItem restaurant = Objects.requireNonNull(viewModel.getRestaurants().getValue()).get(position);
         Intent intent = new Intent(requireContext(), RestaurantDetails.class);
-        Bundle bundle = new Bundle();
-        bundle.putString("id", restaurant.getPlaceId());
-        bundle.putString("photo", restaurant.getPhotos().get(0).getPhotoReference());
-        bundle.putString("name", restaurant.getName());
-        bundle.putDouble("rating", restaurant.getRating());
-        bundle.putString("address", restaurant.getVicinity());
-        bundle.putBoolean("openNow", restaurant.getOpeningHours().isOpenNow());
-        bundle.putDouble("latitude", restaurant.getGeometry().getLocation().getLat());
-        bundle.putDouble("longitude", restaurant.getGeometry().getLocation().getLng());
-        intent.putExtra("bundle", bundle);
+        intent.putExtra("id", restaurant.getPlaceId());
         startActivity(intent);
     }
 
@@ -143,7 +134,7 @@ public class ListViewFragment extends Fragment implements OnClickItemListener {
     private void setLoaders() {
 
         if (!viewModel.hasPermission(requireContext())) {
-            binding.tvLoadingMessage.setText("We need your location, return to the MapView.");
+            binding.tvLoadingMessage.setText(R.string.location_missing);
             Glide.with(binding.ivLoadingGIF)
                     .asGif()
                     .load("https://media.giphy.com/media/Vh8zf1nIfQRRXksAm1/giphy.gif")

@@ -88,7 +88,6 @@ public class PlacesAPIRepositoryImp implements PlacesAPIRepository {
                 } else {
 
                     noRestaurantInRadius(location);
-
                 }
             }
 
@@ -96,7 +95,6 @@ public class PlacesAPIRepositoryImp implements PlacesAPIRepository {
             public void onFailure(@NonNull Call<PlaceNearBy> call, @NonNull Throwable t) {
 
                 Log.e(TAG, "onFailure: " + t.getMessage(), t);
-
             }
         });
 
@@ -142,7 +140,6 @@ public class PlacesAPIRepositoryImp implements PlacesAPIRepository {
                         public void onFailure(@NonNull Call<PlaceNearBy> call, @NonNull Throwable t) {
 
                             Log.e(TAG, "onFailure: " + t.getMessage(), t);
-
                         }
                     });
                 }
@@ -152,7 +149,6 @@ public class PlacesAPIRepositoryImp implements PlacesAPIRepository {
             public void onFailure(@NonNull Call<PlaceNearBy> call, @NonNull Throwable t) {
 
                 Log.e(TAG, "onFailure: " + t.getMessage(), null);
-
             }
         });
     }
@@ -172,7 +168,6 @@ public class PlacesAPIRepositoryImp implements PlacesAPIRepository {
                 }
 
                 assert response.body() != null;
-
                 populateList(response.body().getResults());
             }
 
@@ -199,7 +194,6 @@ public class PlacesAPIRepositoryImp implements PlacesAPIRepository {
             if (isNotInList) {
                 restaurantList.add(newItem);
             }
-
         }
 
         //restaurantList.addAll(list);
@@ -232,7 +226,6 @@ public class PlacesAPIRepositoryImp implements PlacesAPIRepository {
                 if (response.body() != null) {
                     contact.setValue(response.body().getResult());
                 }
-
             }
 
             @Override
@@ -256,12 +249,9 @@ public class PlacesAPIRepositoryImp implements PlacesAPIRepository {
                     return;
                 }
 
-                System.out.println(response.raw().request().url());
-
                 if (response.body() != null) {
                     contact.setValue(response.body().getResult());
                 }
-
             }
 
             @Override
