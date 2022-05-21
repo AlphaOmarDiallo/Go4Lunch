@@ -15,7 +15,6 @@ import androidx.lifecycle.ViewModelProvider;
 import com.alphaomardiallo.go4lunch.data.dataSources.Model.detailsPojo.Result;
 import com.alphaomardiallo.go4lunch.data.viewModels.RestaurantDetailsViewModel;
 import com.alphaomardiallo.go4lunch.databinding.ActivityRestaurantDetailsBinding;
-import com.alphaomardiallo.go4lunch.domain.DistanceCalculatorUtils;
 import com.bumptech.glide.Glide;
 
 import dagger.hilt.android.AndroidEntryPoint;
@@ -37,7 +36,6 @@ public class RestaurantDetails extends AppCompatActivity {
     private double restaurantLongitude;
     private String restaurantPhoneNumber;
     private String restaurantWebsite;
-    private Intent intent;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,10 +68,11 @@ public class RestaurantDetails extends AppCompatActivity {
 
     private void retrieveInformation() {
 
-        intent = getIntent();
+        Intent intent = getIntent();
 
         if (!intent.hasExtra("bundle")) {
             //TODO API CALL
+            viewModel.getAllDetails(intent.getStringExtra("id"));
             Log.i(TAG, "onCreate: Empty bundle, API call needed");
         } else {
             Bundle bundle = intent.getBundleExtra("bundle");
@@ -93,7 +92,6 @@ public class RestaurantDetails extends AppCompatActivity {
     }
 
     private void setupViews() {
-        DistanceCalculatorUtils calculatorUtils = new DistanceCalculatorUtils();
 
         binding.ibWebSiteDetails.setVisibility(View.INVISIBLE);
         binding.ibCallDetail.setVisibility(View.INVISIBLE);

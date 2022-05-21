@@ -17,4 +17,6 @@ public interface PlacesAPIRepository {
 
     void fetchDetails(String placeID);
 
+    void fetchAllDetails (String placeID);
+
 }

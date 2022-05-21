@@ -32,8 +32,9 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class PlacesAPIRepositoryImp implements PlacesAPIRepository {
 
     private static final String RESTAURANT = "restaurant";
-    private static final String rankBy = "distance";
-    private static final String fieldsRestaurantDetailActivity = "international_phone_number,website";
+    private static final String RANK_BY = "distance";
+    private static final String FIELDS_RESTAURANT_DETAIL_ACTIVITY = "international_phone_number,website";
+    private static final String FIELDS_RESTAURANT_DETAIL_ACTIVITY_COMPLETE = "name,photo,vicinity,rating,geometry/location,international_phone_number,opening_hours/open_now,website";
     private static final int MAXPRICE = 2;
     private static final int HANDLING_TIME = 2000;
     private final Handler handler = new Handler(Looper.getMainLooper());
@@ -65,11 +66,6 @@ public class PlacesAPIRepositoryImp implements PlacesAPIRepository {
 
     @Override
     public void fetchNearBySearchPlaces(String location, int radius) {
-
-       /* if (restaurantList.size() > 0) {
-            restaurantList.clear();
-            Objects.requireNonNull(restaurantListLiveData.getValue()).clear();
-        }*/
 
         Call<PlaceNearBy> call = retrofitNearBySearchAPI.getNearByPlacesRadiusMethod(location, radius, MAXPRICE, RESTAURANT, BuildConfig.PLACES_API_KEY, null);
         call.enqueue(new Callback<PlaceNearBy>() {
@@ -164,7 +160,7 @@ public class PlacesAPIRepositoryImp implements PlacesAPIRepository {
     //API called when API with Radius method does not return anything
 
     private void noRestaurantInRadius(String location) {
-        Call<PlaceNearBy> call3 = retrofitNearBySearchAPI.getNearByPlacesRankByMethod(location, rankBy, MAXPRICE, RESTAURANT, BuildConfig.PLACES_API_KEY, null);
+        Call<PlaceNearBy> call3 = retrofitNearBySearchAPI.getNearByPlacesRankByMethod(location, RANK_BY, MAXPRICE, RESTAURANT, BuildConfig.PLACES_API_KEY, null);
 
         call3.enqueue(new Callback<PlaceNearBy>() {
             @Override
@@ -221,29 +217,60 @@ public class PlacesAPIRepositoryImp implements PlacesAPIRepository {
         return contact;
     }
 
+    @Override
     public void fetchDetails(String placeID){
 
-        Call<PlaceDetails> call4 = retrofitDetailsAPI.getPlaceDetails(fieldsRestaurantDetailActivity, placeID, BuildConfig.PLACES_API_KEY);
+        Call<PlaceDetails> call4 = retrofitDetailsAPI.getPlaceDetails(FIELDS_RESTAURANT_DETAIL_ACTIVITY, placeID, BuildConfig.PLACES_API_KEY);
         call4.enqueue(new Callback<PlaceDetails>() {
             @Override
-            public void onResponse(Call<PlaceDetails> call, Response<PlaceDetails> response) {
+            public void onResponse(@NonNull Call<PlaceDetails> call, @NonNull Response<PlaceDetails> response) {
                 if (!response.isSuccessful()) {
                     Log.e(TAG, "onResponse: failed " + response.message(), null);
                     return;
                 }
 
-                contact.setValue(response.body().getResult());
+                if (response.body() != null) {
+                    contact.setValue(response.body().getResult());
+                }
 
             }
 
             @Override
-            public void onFailure(Call<PlaceDetails> call, Throwable t) {
+            public void onFailure(@NonNull Call<PlaceDetails> call, @NonNull Throwable t) {
 
             }
         });
 
         Log.e(TAG, "getDetails: PLACE DETAILS API CALLED", null);
 
+    }
+
+    @Override
+    public void fetchAllDetails (String placeID){
+        Call<PlaceDetails> call5 = retrofitDetailsAPI.getPlaceDetails(FIELDS_RESTAURANT_DETAIL_ACTIVITY_COMPLETE, placeID, BuildConfig.PLACES_API_KEY);
+        call5.enqueue(new Callback<PlaceDetails>() {
+            @Override
+            public void onResponse(@NonNull Call<PlaceDetails> call, @NonNull Response<PlaceDetails> response) {
+                if (!response.isSuccessful()) {
+                    Log.e(TAG, "onResponse: failed " + response.message(), null);
+                    return;
+                }
+
+                System.out.println(response.raw().request().url());
+
+                if (response.body() != null) {
+                    contact.setValue(response.body().getResult());
+                }
+
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<PlaceDetails> call, @NonNull Throwable t) {
+
+            }
+        });
+
+        Log.e(TAG, "getDetails: PLACE DETAILS API CALLED", null);
     }
 
 }
