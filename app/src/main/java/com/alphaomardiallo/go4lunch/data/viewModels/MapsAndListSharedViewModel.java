@@ -13,10 +13,13 @@ import android.util.Log;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.ViewModel;
 
+import com.alphaomardiallo.go4lunch.data.dataSources.Model.autocompletePojo.PredictionsItem;
+import com.alphaomardiallo.go4lunch.data.dataSources.Model.detailsPojo.Result;
 import com.alphaomardiallo.go4lunch.data.dataSources.Model.nearBySearchPojo.ResultsItem;
-import com.alphaomardiallo.go4lunch.data.repositories.PlacesAPIRepository;
+import com.alphaomardiallo.go4lunch.data.repositories.AutocompleteRepository;
 import com.alphaomardiallo.go4lunch.data.repositories.LocationRepository;
 import com.alphaomardiallo.go4lunch.data.repositories.PermissionRepository;
+import com.alphaomardiallo.go4lunch.data.repositories.PlacesAPIRepository;
 
 import java.util.List;
 
@@ -30,16 +33,18 @@ public class MapsAndListSharedViewModel extends ViewModel {
     private final PlacesAPIRepository placesApiRepository;
     private final LocationRepository locationRepository;
     private final PermissionRepository permissionRepository;
+    private final AutocompleteRepository autocompleteRepository;
 
     LiveData<List<ResultsItem>> restaurants;
     LiveData<List<ResultsItem>> checkList;
     Location savedLocation;
 
     @Inject
-    public MapsAndListSharedViewModel(PlacesAPIRepository placesApiRepository, LocationRepository locationRepository, PermissionRepository permissionRepository) {
+    public MapsAndListSharedViewModel(PlacesAPIRepository placesApiRepository, LocationRepository locationRepository, PermissionRepository permissionRepository, AutocompleteRepository autocompleteRepository) {
         this.placesApiRepository = placesApiRepository;
         this.locationRepository = locationRepository;
         this.permissionRepository = permissionRepository;
+        this.autocompleteRepository = autocompleteRepository;
 
         restaurants = placesApiRepository.getNearBySearchRestaurantList();
         checkList = null;
@@ -87,6 +92,18 @@ public class MapsAndListSharedViewModel extends ViewModel {
 
     public Location getOfficeLocation() {
         return locationRepository.getOfficeLocation();
+    }
+
+    public LiveData<PredictionsItem> getSelectedRestaurant () {
+        return autocompleteRepository.getSelectedRestaurant();
+    }
+
+    public LiveData<Result> getSelectedRestaurantDetails() {
+        return placesApiRepository.getSelectedRestaurantDetails();
+    }
+
+    public void getSelectedRestaurantDetail(String placeID){
+        placesApiRepository.fetchDetails(placeID);
     }
 
     public Boolean hasPermission(Context context) {

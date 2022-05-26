@@ -3,9 +3,8 @@ package com.alphaomardiallo.go4lunch.ui;
 import static android.content.ContentValues.TAG;
 
 import android.annotation.SuppressLint;
-import android.app.SearchManager;
-import android.content.Context;
 import android.content.Intent;
+import android.location.Location;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -52,6 +51,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private ActivityMainBinding binding;
     public MainViewModel viewModel;
     private ActionBarDrawerToggle toggle;
+    private Location currentLocation;
 
     /**
      * setup to get back data from FirebaseUI activity if sign in needed
@@ -70,10 +70,19 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         setContentView(view);
 
         setupToolBar();
+
         setupBottomNavBar();
+
         setupNavDrawer();
 
+        observeLocation();
+
+        //initializePlaceSDK();
+
+        binding.ibLauchAutoComplete.setVisibility(View.INVISIBLE);
+
         handler.postDelayed(this::checkIfSignedIn, 1000);
+
     }
 
     /**
@@ -132,6 +141,19 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     /**
+     * Observing current location
+     */
+
+    private void observeLocation() {
+        viewModel.startTrackingLocation(this, this);
+        viewModel.getLocation().observe(this, this::updateLocation);
+    }
+
+    private void updateLocation(Location location) {
+        currentLocation = location;
+    }
+
+    /**
      * SearchBar setup
      */
     @Override
@@ -139,20 +161,32 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.options_menu, menu);
 
-        // Associate searchable configuration with the SearchView
-        SearchManager searchManager =
-                (SearchManager) getSystemService(Context.SEARCH_SERVICE);
-        SearchView searchView =
-                (SearchView) menu.findItem(R.id.search).getActionView();
-        searchView.setSearchableInfo(
-                searchManager.getSearchableInfo(getComponentName()));
+        SearchView searchView = (SearchView) menu.findItem(R.id.searchActivity).getActionView();
         searchView.setBackgroundColor(getResources().getColor(R.color.white));
-        searchView.setQueryHint(getString(R.string.search_hint));
         searchView.setIconifiedByDefault(false);
         searchView.getOverlay();
 
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String s) {
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String s) {
+                if (s.length() > 0) {
+                    Intent intent = new Intent(MainActivity.this, SearchActivity.class);
+                    intent.putExtra("Query", s);
+                    intent.putExtra("Location", String.format("%s,%s", currentLocation.getLatitude(), currentLocation.getLongitude()));
+                    startActivity(intent);
+                }
+                return true;
+            }
+        });
+
         return true;
     }
+
 
     /**
      * Navigation drawer setup
@@ -252,5 +286,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             }
             handler.postDelayed(this::checkIfSignedIn, 1000);
         }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        Log.e("Search activity", "onResume: called", null);
+        binding.toolbar.collapseActionView();
     }
 }

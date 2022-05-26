@@ -21,7 +21,6 @@ import com.alphaomardiallo.go4lunch.BuildConfig;
 import com.alphaomardiallo.go4lunch.R;
 import com.alphaomardiallo.go4lunch.data.dataSources.Model.nearBySearchPojo.ResultsItem;
 import com.alphaomardiallo.go4lunch.databinding.ItemRestaurantBinding;
-import com.alphaomardiallo.go4lunch.domain.DistanceCalculatorUtils;
 import com.alphaomardiallo.go4lunch.domain.OnClickItemListener;
 import com.bumptech.glide.Glide;
 
@@ -29,7 +28,6 @@ import java.util.Locale;
 
 public class ListViewAdapter extends ListAdapter<ResultsItem, ListViewAdapter.ListViewHolder> {
 
-    //TODO Gives location to adapter
     public ItemRestaurantBinding binding;
     OnClickItemListener onClickItemListener;
     Location location;
@@ -65,12 +63,10 @@ public class ListViewAdapter extends ListAdapter<ResultsItem, ListViewAdapter.Li
             return oldItem.getPlaceId().equals(newItem.getPlaceId()) &&
                     oldItem.getName().equalsIgnoreCase(newItem.getName()) &&
                     oldItem.getGeometry().getLocation() == newItem.getGeometry().getLocation();
-
         }
     }
 
     public static class ListViewHolder extends RecyclerView.ViewHolder {
-        private Location location;
         TextView restaurantName;
         TextView restaurantStyleAndAddress;
         TextView restaurantOpeningTime;
@@ -108,7 +104,7 @@ public class ListViewAdapter extends ListAdapter<ResultsItem, ListViewAdapter.Li
             Location restaurantLocation = new Location("restaurant");
             restaurantLocation.setLatitude(restaurant.getGeometry().getLocation().getLat());
             restaurantLocation.setLongitude(restaurant.getGeometry().getLocation().getLng());
-            restaurantDistance.setText(String.format("%sm",Math.round(location.distanceTo(restaurantLocation))));
+            restaurantDistance.setText(String.format("%sm", Math.round(location.distanceTo(restaurantLocation))));
 
             Glide.with(restaurantPhoto)
                     .load("https://maps.googleapis.com/maps/api/place/photo?maxwidth=100&photo_reference=" + restaurant.getPhotos().get(0).getPhotoReference() + "&key=" + BuildConfig.PLACES_API_KEY)
@@ -133,17 +129,10 @@ public class ListViewAdapter extends ListAdapter<ResultsItem, ListViewAdapter.Li
             restaurantRating.setNumStars(3);
             restaurantRating.setStepSize(0.1f);
             restaurantRating.setScaleX(-1f);
-
         }
 
         private float getRating(Double rating) {
             return (float) ((rating / 5) * 3);
-        }
-
-        private String getDistance(String currentLocation, double destinationLat, double destinationLng) {
-            DistanceCalculatorUtils calculatorUtils = new DistanceCalculatorUtils();
-            int distance = Math.round(calculatorUtils.getDistance(currentLocation, destinationLat, destinationLng));
-            return String.format("%sm", distance);
         }
 
         private String getNumberOfWorkmates() {

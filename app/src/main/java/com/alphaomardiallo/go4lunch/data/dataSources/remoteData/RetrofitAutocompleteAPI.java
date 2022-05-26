@@ -10,12 +10,13 @@ public interface RetrofitAutocompleteAPI {
 
     @GET("autocomplete/json?")
     Call<PlaceAutoComplete> getPlaceAutocomplete(
-            @Query("key") String key,
             @Query("input") String input,
             @Query("offset") int offset,
             @Query("origin") String origin,
             @Query("location") String location,
             @Query("types") String types,
-            @Query("radius") int radius
+            @Query("radius") int radius,
+            @Query("strictbounds") boolean strictBounds,
+            @Query("key") String key
     );
 }

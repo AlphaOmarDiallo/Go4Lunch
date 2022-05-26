@@ -11,10 +11,13 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
 import com.alphaomardiallo.go4lunch.BuildConfig;
+import com.alphaomardiallo.go4lunch.data.dataSources.Model.autocompletePojo.PlaceAutoComplete;
+import com.alphaomardiallo.go4lunch.data.dataSources.Model.autocompletePojo.PredictionsItem;
 import com.alphaomardiallo.go4lunch.data.dataSources.Model.detailsPojo.PlaceDetails;
 import com.alphaomardiallo.go4lunch.data.dataSources.Model.detailsPojo.Result;
 import com.alphaomardiallo.go4lunch.data.dataSources.Model.nearBySearchPojo.PlaceNearBy;
 import com.alphaomardiallo.go4lunch.data.dataSources.Model.nearBySearchPojo.ResultsItem;
+import com.alphaomardiallo.go4lunch.data.dataSources.remoteData.RetrofitAutocompleteAPI;
 import com.alphaomardiallo.go4lunch.data.dataSources.remoteData.RetrofitDetailsAPI;
 import com.alphaomardiallo.go4lunch.data.dataSources.remoteData.RetrofitNearBySearchAPI;
 
@@ -31,16 +34,21 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class PlacesAPIRepositoryImp implements PlacesAPIRepository {
 
+    private static final String PLACES_API_KEY = BuildConfig.PLACES_API_KEY;
     private static final String RESTAURANT = "restaurant";
     private static final String RANK_BY = "distance";
-    private static final String FIELDS_RESTAURANT_DETAIL_ACTIVITY = "international_phone_number,website";
+    private static final String FIELDS_RESTAURANT_DETAIL_ACTIVITY = "name,geometry/location";
     private static final String FIELDS_RESTAURANT_DETAIL_ACTIVITY_COMPLETE = "name,photo,vicinity,rating,geometry/location,international_phone_number,opening_hours/open_now,website";
     private static final int MAXPRICE = 2;
     private static final int HANDLING_TIME = 2000;
+    private static final int OFFSET = 2;
+    private static final boolean STRICTBOUNDS = true;
     private final Handler handler = new Handler(Looper.getMainLooper());
     private final MutableLiveData<List<ResultsItem>> restaurantListLiveData = new MutableLiveData<>();
     private final List<ResultsItem> restaurantList = new ArrayList<>();
-    private final MutableLiveData<Result> contact = new MutableLiveData<>();
+    private final MutableLiveData<Result> restaurantDetails = new MutableLiveData<>();
+    private final MutableLiveData<List<PredictionsItem>> predictionAutoComplete = new MutableLiveData<>();
+    private final MutableLiveData<Result> selectedRestaurantDetails = new MutableLiveData<>();
 
     @Inject
     public PlacesAPIRepositoryImp() {
@@ -67,7 +75,7 @@ public class PlacesAPIRepositoryImp implements PlacesAPIRepository {
     @Override
     public void fetchNearBySearchPlaces(String location, int radius) {
 
-        Call<PlaceNearBy> call = retrofitNearBySearchAPI.getNearByPlacesRadiusMethod(location, radius, MAXPRICE, RESTAURANT, BuildConfig.PLACES_API_KEY, null);
+        Call<PlaceNearBy> call = retrofitNearBySearchAPI.getNearByPlacesRadiusMethod(location, radius, MAXPRICE, RESTAURANT, PLACES_API_KEY, null);
         call.enqueue(new Callback<PlaceNearBy>() {
             @Override
             public void onResponse(@NonNull Call<PlaceNearBy> call, @NonNull Response<PlaceNearBy> response) {
@@ -105,7 +113,7 @@ public class PlacesAPIRepositoryImp implements PlacesAPIRepository {
 
     public void getNextResultsRadiusMethod(String location, int radius, String pageToken) {
 
-        Call<PlaceNearBy> call = retrofitNearBySearchAPI.getNearByPlacesRadiusMethod(location, radius, MAXPRICE, RESTAURANT, BuildConfig.PLACES_API_KEY, pageToken);
+        Call<PlaceNearBy> call = retrofitNearBySearchAPI.getNearByPlacesRadiusMethod(location, radius, MAXPRICE, RESTAURANT, PLACES_API_KEY, pageToken);
         call.enqueue(new Callback<PlaceNearBy>() {
 
             @Override
@@ -121,7 +129,7 @@ public class PlacesAPIRepositoryImp implements PlacesAPIRepository {
 
                 if (response.body().getNextPageToken() != null) {
 
-                    Call<PlaceNearBy> call2 = retrofitNearBySearchAPI.getNearByPlacesRadiusMethod(location, radius, MAXPRICE, RESTAURANT, BuildConfig.PLACES_API_KEY, response.body().getNextPageToken());
+                    Call<PlaceNearBy> call2 = retrofitNearBySearchAPI.getNearByPlacesRadiusMethod(location, radius, MAXPRICE, RESTAURANT, PLACES_API_KEY, response.body().getNextPageToken());
                     call2.enqueue(new Callback<PlaceNearBy>() {
 
                         @Override
@@ -156,7 +164,7 @@ public class PlacesAPIRepositoryImp implements PlacesAPIRepository {
     //API called when API with Radius method does not return anything
 
     private void noRestaurantInRadius(String location) {
-        Call<PlaceNearBy> call3 = retrofitNearBySearchAPI.getNearByPlacesRankByMethod(location, RANK_BY, MAXPRICE, RESTAURANT, BuildConfig.PLACES_API_KEY, null);
+        Call<PlaceNearBy> call3 = retrofitNearBySearchAPI.getNearByPlacesRankByMethod(location, RANK_BY, MAXPRICE, RESTAURANT, PLACES_API_KEY, null);
 
         call3.enqueue(new Callback<PlaceNearBy>() {
             @Override
@@ -196,7 +204,6 @@ public class PlacesAPIRepositoryImp implements PlacesAPIRepository {
             }
         }
 
-        //restaurantList.addAll(list);
         restaurantListLiveData.setValue(restaurantList);
     }
 
@@ -208,13 +215,17 @@ public class PlacesAPIRepositoryImp implements PlacesAPIRepository {
 
     @Override
     public LiveData<Result> getDetails() {
-        return contact;
+        return restaurantDetails;
+    }
+
+    public LiveData<Result> getSelectedRestaurantDetails() {
+        return selectedRestaurantDetails;
     }
 
     @Override
-    public void fetchDetails(String placeID){
+    public void fetchDetails(String placeID) {
 
-        Call<PlaceDetails> call4 = retrofitDetailsAPI.getPlaceDetails(FIELDS_RESTAURANT_DETAIL_ACTIVITY, placeID, BuildConfig.PLACES_API_KEY);
+        Call<PlaceDetails> call4 = retrofitDetailsAPI.getPlaceDetails(FIELDS_RESTAURANT_DETAIL_ACTIVITY, placeID, PLACES_API_KEY);
         call4.enqueue(new Callback<PlaceDetails>() {
             @Override
             public void onResponse(@NonNull Call<PlaceDetails> call, @NonNull Response<PlaceDetails> response) {
@@ -224,7 +235,7 @@ public class PlacesAPIRepositoryImp implements PlacesAPIRepository {
                 }
 
                 if (response.body() != null) {
-                    contact.setValue(response.body().getResult());
+                    selectedRestaurantDetails.setValue(response.body().getResult());
                 }
             }
 
@@ -235,12 +246,12 @@ public class PlacesAPIRepositoryImp implements PlacesAPIRepository {
         });
 
         Log.e(TAG, "getDetails: PLACE DETAILS API CALLED", null);
-
     }
 
     @Override
-    public void fetchAllDetails (String placeID){
-        Call<PlaceDetails> call5 = retrofitDetailsAPI.getPlaceDetails(FIELDS_RESTAURANT_DETAIL_ACTIVITY_COMPLETE, placeID, BuildConfig.PLACES_API_KEY);
+    public void fetchAllDetails(String placeID) {
+
+        Call<PlaceDetails> call5 = retrofitDetailsAPI.getPlaceDetails(FIELDS_RESTAURANT_DETAIL_ACTIVITY_COMPLETE, placeID, PLACES_API_KEY);
         call5.enqueue(new Callback<PlaceDetails>() {
             @Override
             public void onResponse(@NonNull Call<PlaceDetails> call, @NonNull Response<PlaceDetails> response) {
@@ -250,7 +261,7 @@ public class PlacesAPIRepositoryImp implements PlacesAPIRepository {
                 }
 
                 if (response.body() != null) {
-                    contact.setValue(response.body().getResult());
+                    restaurantDetails.setValue(response.body().getResult());
                 }
             }
 
@@ -261,6 +272,43 @@ public class PlacesAPIRepositoryImp implements PlacesAPIRepository {
         });
 
         Log.e(TAG, "getDetails: PLACE DETAILS API CALLED", null);
+    }
+
+    /**
+     * Places AutoComplete
+     */
+
+    RetrofitAutocompleteAPI retrofitAutocompleteAPI = retrofit.create(RetrofitAutocompleteAPI.class);
+
+    public LiveData<List<PredictionsItem>> autoCompleteSearch(String Query, String location, int radius) {
+
+        Call<PlaceAutoComplete> call6 = retrofitAutocompleteAPI.getPlaceAutocomplete(Query, OFFSET, location, location, RESTAURANT, radius, STRICTBOUNDS, PLACES_API_KEY);
+        call6.enqueue(new Callback<PlaceAutoComplete>() {
+            @Override
+            public void onResponse(@NonNull Call<PlaceAutoComplete> call, @NonNull Response<PlaceAutoComplete> response) {
+
+                Log.e(TAG, "onResponse: AUTOCOMPLETE API CALLED", null);
+
+                if (!response.isSuccessful()) {
+                    Log.e(TAG, "onResponse: failed " + response.message(), null);
+                    return;
+                }
+
+                if (response.body() != null) {
+                    System.out.println(response.raw().request().url());
+                    predictionAutoComplete.setValue(response.body().getPredictions());
+                }
+
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<PlaceAutoComplete> call, @NonNull Throwable t) {
+
+            }
+
+        });
+
+        return predictionAutoComplete;
     }
 
 }

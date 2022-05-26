@@ -20,12 +20,14 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.alphaomardiallo.go4lunch.R;
-import com.alphaomardiallo.go4lunch.ui.RestaurantDetails;
+import com.alphaomardiallo.go4lunch.data.dataSources.Model.autocompletePojo.PredictionsItem;
+import com.alphaomardiallo.go4lunch.data.dataSources.Model.detailsPojo.Result;
 import com.alphaomardiallo.go4lunch.data.dataSources.Model.nearBySearchPojo.ResultsItem;
 import com.alphaomardiallo.go4lunch.data.viewModels.MapsAndListSharedViewModel;
 import com.alphaomardiallo.go4lunch.databinding.FragmentMapsBinding;
 import com.alphaomardiallo.go4lunch.domain.PermissionUtils;
 import com.alphaomardiallo.go4lunch.domain.PositionUtils;
+import com.alphaomardiallo.go4lunch.ui.RestaurantDetails;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -116,6 +118,12 @@ public class MapsFragment extends Fragment implements EasyPermissions.Permission
         }
     };
 
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        Log.e(TAG, "onCreate: called", null);
+    }
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -146,6 +154,12 @@ public class MapsFragment extends Fragment implements EasyPermissions.Permission
         binding.chipGroup.setVisibility(View.GONE);
 
         requestPermission();
+
+        try {
+            System.out.println(viewModel.getSelectedRestaurant().getValue().getDescription());
+        } catch (Exception e) {
+            e.getMessage();
+        }
 
     }
 
@@ -179,6 +193,17 @@ public class MapsFragment extends Fragment implements EasyPermissions.Permission
             Log.e(TAG, "updateLocation: updated", null);
         }
 
+    }
+
+    private void focusOnSelectedRestaurant(){
+        PredictionsItem selectedRestaurant = viewModel.getSelectedRestaurant().getValue();
+        if (selectedRestaurant != null) {
+            Log.e(TAG, "focusOnSelectedRestaurant: CALLED", null);
+            viewModel.getSelectedRestaurantDetail(selectedRestaurant.getPlaceId());
+            Result restaurant = viewModel.getSelectedRestaurantDetails().getValue();
+            LatLng restaurantLatLng = new LatLng(restaurant.getGeometry().getLocation().getLat(),restaurant.getGeometry().getLocation().getLng());
+            map.moveCamera(CameraUpdateFactory.newLatLngZoom(restaurantLatLng, defaultCameraZoomOverMap));
+        }
     }
 
     /**
@@ -249,8 +274,10 @@ public class MapsFragment extends Fragment implements EasyPermissions.Permission
 
     @SuppressLint("MissingPermission")
     public void getCurrentLocation(GoogleMap googleMap) {
-        LatLng current = new LatLng(location.getLatitude(), location.getLongitude());
-        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(current, defaultCameraZoomOverMap));
+        if (location != null) {
+            LatLng current = new LatLng(location.getLatitude(), location.getLongitude());
+            googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(current, defaultCameraZoomOverMap));
+        }
     }
 
     /**
@@ -294,15 +321,22 @@ public class MapsFragment extends Fragment implements EasyPermissions.Permission
         EasyPermissions.onRequestPermissionsResult(requestCode, permissions, grantResults, this);
     }
 
+    @Override
+    public void onPause() {
+        super.onPause();
+        viewModel.stopTrackingLocation();
+        Log.e(TAG, "onPause: called", null);
+    }
+
     /**
      * LifeCycle
      */
+
 
     @Override
     public void onDestroyView() {
         super.onDestroyView();
         if (viewModel.hasPermission(requireContext())) {
-            viewModel.stopTrackingLocation();
             viewModel.getRestaurants().removeObservers(this);
             binding = null;
         }

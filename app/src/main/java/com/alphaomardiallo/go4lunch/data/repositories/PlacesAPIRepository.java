@@ -2,6 +2,7 @@ package com.alphaomardiallo.go4lunch.data.repositories;
 
 import androidx.lifecycle.LiveData;
 
+import com.alphaomardiallo.go4lunch.data.dataSources.Model.autocompletePojo.PredictionsItem;
 import com.alphaomardiallo.go4lunch.data.dataSources.Model.detailsPojo.Result;
 import com.alphaomardiallo.go4lunch.data.dataSources.Model.nearBySearchPojo.ResultsItem;
 
@@ -15,8 +16,12 @@ public interface PlacesAPIRepository {
 
     LiveData<Result> getDetails();
 
+    LiveData<Result> getSelectedRestaurantDetails();
+
     void fetchDetails(String placeID);
 
     void fetchAllDetails (String placeID);
+
+    LiveData<List<PredictionsItem>> autoCompleteSearch(String Query, String location, int radius);
 
 }
