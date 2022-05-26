@@ -20,7 +20,6 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.alphaomardiallo.go4lunch.R;
-import com.alphaomardiallo.go4lunch.data.dataSources.Model.autocompletePojo.PredictionsItem;
 import com.alphaomardiallo.go4lunch.data.dataSources.Model.detailsPojo.Result;
 import com.alphaomardiallo.go4lunch.data.dataSources.Model.nearBySearchPojo.ResultsItem;
 import com.alphaomardiallo.go4lunch.data.viewModels.MapsAndListSharedViewModel;
@@ -177,8 +176,13 @@ public class MapsFragment extends Fragment implements EasyPermissions.Permission
     private void updateMapWithRestaurants(List<ResultsItem> resultsItemList) {
         Log.e(TAG, "updateMapWithRestaurants: new list " + resultsItemList.toString(), null);
         restaurantList = resultsItemList;
-
         addRestaurantMarkersToMap(resultsItemList, map);
+
+        try {
+            viewModel.getSelectedRestaurantDetails().observe(requireActivity(), this::focusOnSelectedRestaurant);
+        } catch (Exception e){
+            Log.e(TAG, "updateMapWithRestaurants: " + e.getMessage(), null);
+        }
     }
 
     private void updateLocation(Location location) {
@@ -195,8 +199,8 @@ public class MapsFragment extends Fragment implements EasyPermissions.Permission
 
     }
 
-    private void focusOnSelectedRestaurant(){
-        PredictionsItem selectedRestaurant = viewModel.getSelectedRestaurant().getValue();
+    private void focusOnSelectedRestaurant(Result selectedRestaurant){
+        //PredictionsItem selectedRestaurant = viewModel.getSelectedRestaurant().getValue();
         if (selectedRestaurant != null) {
             Log.e(TAG, "focusOnSelectedRestaurant: CALLED", null);
             viewModel.getSelectedRestaurantDetail(selectedRestaurant.getPlaceId());

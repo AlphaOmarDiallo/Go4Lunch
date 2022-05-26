@@ -77,8 +77,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         observeLocation();
 
-        //initializePlaceSDK();
-
         binding.ibLauchAutoComplete.setVisibility(View.INVISIBLE);
 
         handler.postDelayed(this::checkIfSignedIn, 1000);

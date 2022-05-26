@@ -31,7 +31,7 @@ public class AutocompleteRepositoryImp implements AutocompleteRepository {
 
     public void setPlaceToFocusOn(PredictionsItem restaurant) {
         selectedRestaurant.setValue(restaurant);
-        System.out.println("done");
+        System.out.println(selectedRestaurant.getValue().getStructuredFormatting().getMainText());
     }
 
     public LiveData<PredictionsItem> getSelectedRestaurant() {
