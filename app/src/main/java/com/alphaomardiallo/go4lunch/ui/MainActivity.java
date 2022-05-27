@@ -1,14 +1,11 @@
 package com.alphaomardiallo.go4lunch.ui;
 
-import static android.content.ContentValues.TAG;
-
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.location.Location;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -49,9 +46,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     private final Handler handler = new Handler(Looper.getMainLooper());
     private ActivityMainBinding binding;
-    public MainViewModel viewModel;
     private ActionBarDrawerToggle toggle;
     private Location currentLocation;
+    private SearchView searchView;
+    public MainViewModel viewModel;
 
     /**
      * setup to get back data from FirebaseUI activity if sign in needed
@@ -159,7 +157,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.options_menu, menu);
 
-        SearchView searchView = (SearchView) menu.findItem(R.id.searchActivity).getActionView();
+        searchView = (SearchView) menu.findItem(R.id.searchActivity).getActionView();
         searchView.setBackgroundColor(getResources().getColor(R.color.white));
         searchView.setIconifiedByDefault(false);
         searchView.getOverlay();
@@ -217,7 +215,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     break;
                 case R.id.logoutNavDrawer:
                     viewModel.signOut(MainActivity.this).addOnSuccessListener(aVoid -> {
-                        Log.e(TAG, "onNavigationItemSelected: after logout " + viewModel.getCurrentUser(), null);
                         createSignInIntent();
                     });
                     break;
@@ -286,10 +283,16 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
     }
 
+    /**
+     * LifeCycle related methods
+     */
+
     @Override
     protected void onResume() {
         super.onResume();
-        Log.e("Search activity", "onResume: called", null);
+        if (searchView != null) {
+            searchView.setQuery("", false);
+        }
         binding.toolbar.collapseActionView();
     }
 }
