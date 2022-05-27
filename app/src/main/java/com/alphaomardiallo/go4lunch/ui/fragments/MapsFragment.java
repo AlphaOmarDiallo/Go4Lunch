@@ -154,6 +154,8 @@ public class MapsFragment extends Fragment implements EasyPermissions.Permission
 
         requestPermission();
 
+        checkIfRestaurantHasBeenSelected();
+
     }
 
     /**
@@ -164,6 +166,7 @@ public class MapsFragment extends Fragment implements EasyPermissions.Permission
         if (viewModel.hasPermission(requireContext())) {
             viewModel.startTrackingLocation(requireContext(), getActivity());
             viewModel.getLocation().observe(requireActivity(), this::updateLocation);
+            viewModel.getSelectedRestaurant().observe(requireActivity(), this::focusOnSelectedRestaurant);
         }
     }
 
@@ -183,13 +186,13 @@ public class MapsFragment extends Fragment implements EasyPermissions.Permission
             viewModel.getAllRestaurantList(requireContext(), this.location);
             viewModel.getRestaurants().observe(requireActivity(), this::updateMapWithRestaurants);
             Log.e(TAG, "updateLocation: updated", null);
-            checkIfRestaurantHasBeenSelected();
         }
 
     }
 
     private void checkIfRestaurantHasBeenSelected() {
         viewModel.getSelectedRestaurant().observe(requireActivity(), this::focusOnSelectedRestaurant);
+        Log.e(TAG, "checkIfRestaurantHasBeenSelected: accessed", null);
     }
 
     private void focusOnSelectedRestaurant(PredictionsItem item){
@@ -330,7 +333,6 @@ public class MapsFragment extends Fragment implements EasyPermissions.Permission
      * LifeCycle
      */
 
-
     @Override
     public void onDestroyView() {
         super.onDestroyView();
@@ -351,10 +353,5 @@ public class MapsFragment extends Fragment implements EasyPermissions.Permission
         }
     }
 
-    @Override
-    public void onStart() {
-        super.onStart();
-        Log.e(TAG, "onStart: called", null);
-    }
 }
 

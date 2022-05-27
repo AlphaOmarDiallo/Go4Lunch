@@ -1,11 +1,14 @@
 package com.alphaomardiallo.go4lunch.ui;
 
+import static android.content.ContentValues.TAG;
+
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.location.Location;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -14,7 +17,10 @@ import android.widget.ImageView;
 import android.widget.SearchView;
 import android.widget.TextView;
 
+import androidx.activity.result.ActivityResult;
+import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
@@ -49,6 +55,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private ActionBarDrawerToggle toggle;
     private Location currentLocation;
     private SearchView searchView;
+    private String selectedRestaurant;
     public MainViewModel viewModel;
 
     /**
@@ -57,6 +64,22 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private final ActivityResultLauncher<Intent> signInLauncher = registerForActivityResult(
             new FirebaseAuthUIActivityResultContract(),
             this::onSignInResult
+    );
+
+    private final ActivityResultLauncher<Intent> searchLauncher = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(),
+            new ActivityResultCallback<ActivityResult>() {
+                @Override
+                public void onActivityResult(ActivityResult result) {
+                    if (result.getResultCode() == RESULT_OK) {
+                        Intent returnedIntent = result.getData();
+                        selectedRestaurant = returnedIntent.getStringExtra("placeID");
+                        Log.e(TAG, "onActivityResult: OK " + selectedRestaurant, null);
+                    } else {
+                        Log.e(TAG, "onActivityResult: Not OK", null);
+                    }
+                }
+            }
     );
 
     @Override
@@ -78,7 +101,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         binding.ibLauchAutoComplete.setVisibility(View.INVISIBLE);
 
         handler.postDelayed(this::checkIfSignedIn, 1000);
-
     }
 
     /**
@@ -171,16 +193,24 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             @Override
             public boolean onQueryTextChange(String s) {
                 if (s.length() > 0) {
-                    Intent intent = new Intent(MainActivity.this, SearchActivity.class);
+                   Intent intent = new Intent(MainActivity.this, SearchActivity.class);
                     intent.putExtra("Query", s);
                     intent.putExtra("Location", String.format("%s,%s", currentLocation.getLatitude(), currentLocation.getLongitude()));
-                    startActivity(intent);
+                    //startActivity(intent);
+                    searchLauncher.launch(intent);
+
                 }
+
                 return true;
             }
         });
 
         return true;
+    }
+
+    private void passDataToFragments(Intent intent) {
+
+        Log.e(TAG, "passDataToFragments: Has been called", null);
     }
 
 
@@ -214,9 +244,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     startActivity(settingIntent);
                     break;
                 case R.id.logoutNavDrawer:
-                    viewModel.signOut(MainActivity.this).addOnSuccessListener(aVoid -> {
-                        createSignInIntent();
-                    });
+                    viewModel.signOut(MainActivity.this).addOnSuccessListener(aVoid -> createSignInIntent());
                     break;
             }
             return true;

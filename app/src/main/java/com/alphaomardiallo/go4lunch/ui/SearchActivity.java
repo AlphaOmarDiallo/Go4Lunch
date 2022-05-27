@@ -2,7 +2,6 @@ package com.alphaomardiallo.go4lunch.ui;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.SearchView;
 
@@ -11,8 +10,7 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.alphaomardiallo.go4lunch.data.dataSources.Model.autocompletePojo.PredictionsItem;
-import com.alphaomardiallo.go4lunch.data.viewModels.SearchViewModel;
-
+import com.alphaomardiallo.go4lunch.data.viewModels.MapsAndListSharedViewModel;
 import com.alphaomardiallo.go4lunch.databinding.ActivitySearchBinding;
 import com.alphaomardiallo.go4lunch.domain.OnClickItemListener;
 import com.alphaomardiallo.go4lunch.ui.adapters.SearchAdapter;
@@ -24,7 +22,8 @@ import dagger.hilt.android.AndroidEntryPoint;
 @AndroidEntryPoint
 public class SearchActivity extends AppCompatActivity implements OnClickItemListener {
 
-    private SearchViewModel viewModel;
+    //private SearchViewModel viewModel;
+    private MapsAndListSharedViewModel viewModel;
     private ActivitySearchBinding binding;
     private final SearchAdapter adapter = new SearchAdapter(new SearchAdapter.ListSearchDiff(), this);
 
@@ -33,13 +32,12 @@ public class SearchActivity extends AppCompatActivity implements OnClickItemList
         super.onCreate(savedInstanceState);
         binding = ActivitySearchBinding.inflate(getLayoutInflater());
         View view = binding.getRoot();
-        viewModel = new ViewModelProvider(this).get(SearchViewModel.class);
+        viewModel = new ViewModelProvider(this).get(MapsAndListSharedViewModel.class);
         setContentView(view);
 
         Intent intent = getIntent();
         String query = intent.getStringExtra("Query");
         String location = intent.getStringExtra("Location");
-        Log.e("Search", "onCreate: " + query);
 
         binding.searchViewSA.setIconifiedByDefault(false);
         binding.searchViewSA.setQuery(query, true);
@@ -68,6 +66,9 @@ public class SearchActivity extends AppCompatActivity implements OnClickItemList
     public void onClickItem(int position) {
         PredictionsItem restaurant = Objects.requireNonNull(viewModel.getPredictionList().getValue()).get(position);
         viewModel.setRestaurantToFocusOn(restaurant);
+        Intent returnIntent = new Intent();
+        returnIntent.putExtra("placeID", restaurant.getPlaceId());
+        setResult(RESULT_OK, returnIntent);
         finish();
     }
 

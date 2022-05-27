@@ -11,6 +11,7 @@ import android.location.Location;
 import android.util.Log;
 
 import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 import com.alphaomardiallo.go4lunch.data.dataSources.Model.autocompletePojo.PredictionsItem;
@@ -37,6 +38,7 @@ public class MapsAndListSharedViewModel extends ViewModel {
 
     LiveData<List<ResultsItem>> restaurants;
     LiveData<List<ResultsItem>> checkList;
+    MutableLiveData<PredictionsItem> selectedRestaurant = new MutableLiveData<>();
     Location savedLocation;
 
     @Inject
@@ -95,7 +97,9 @@ public class MapsAndListSharedViewModel extends ViewModel {
     }
 
     public LiveData<PredictionsItem> getSelectedRestaurant () {
-        return autocompleteRepository.getSelectedRestaurant();
+        //return autocompleteRepository.getSelectedRestaurant();
+        Log.e(TAG, "getSelectedRestaurant: " + selectedRestaurant, null);
+        return selectedRestaurant;
     }
 
     public LiveData<Result> getSelectedRestaurantDetails() {
@@ -116,4 +120,22 @@ public class MapsAndListSharedViewModel extends ViewModel {
         Bitmap icon = BitmapFactory.decodeResource(resources, drawable);
         return Bitmap.createScaledBitmap(icon, width, height, false);
     }
+
+    //****************************************
+
+    public LiveData<List<PredictionsItem>> getPredictionList() {
+        return autocompleteRepository.searchPrediction();
+    }
+
+    public LiveData<List<PredictionsItem>> searchAutoComplete(String query, String location) {
+        autocompleteRepository.updatePredictionList(placesApiRepository.autoCompleteSearch(query,location, locationRepository.getRadius()).getValue());
+        return placesApiRepository.autoCompleteSearch(query,location, locationRepository.getRadius());
+    }
+
+    public void setRestaurantToFocusOn(PredictionsItem predictionsItem){
+        //autocompleteRepository.setPlaceToFocusOn(predictionsItem);
+        selectedRestaurant.setValue(predictionsItem);
+        Log.e(TAG, "setRestaurantToFocusOn: " + predictionsItem.getPlaceId(), null);
+    }
+
 }
