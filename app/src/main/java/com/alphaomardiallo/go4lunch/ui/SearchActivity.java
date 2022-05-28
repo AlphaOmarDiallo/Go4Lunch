@@ -1,8 +1,10 @@
 package com.alphaomardiallo.go4lunch.ui;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.SearchView;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -10,7 +12,7 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.alphaomardiallo.go4lunch.data.dataSources.Model.autocompletePojo.PredictionsItem;
-import com.alphaomardiallo.go4lunch.data.viewModels.MapsAndListSharedViewModel;
+import com.alphaomardiallo.go4lunch.data.viewModels.SearchViewModel;
 import com.alphaomardiallo.go4lunch.databinding.ActivitySearchBinding;
 import com.alphaomardiallo.go4lunch.domain.OnClickItemListener;
 import com.alphaomardiallo.go4lunch.ui.adapters.SearchAdapter;
@@ -22,8 +24,7 @@ import dagger.hilt.android.AndroidEntryPoint;
 @AndroidEntryPoint
 public class SearchActivity extends AppCompatActivity implements OnClickItemListener {
 
-    //private SearchViewModel viewModel;
-    private MapsAndListSharedViewModel viewModel;
+    private SearchViewModel viewModel;
     private ActivitySearchBinding binding;
     private final SearchAdapter adapter = new SearchAdapter(new SearchAdapter.ListSearchDiff(), this);
 
@@ -32,7 +33,7 @@ public class SearchActivity extends AppCompatActivity implements OnClickItemList
         super.onCreate(savedInstanceState);
         binding = ActivitySearchBinding.inflate(getLayoutInflater());
         View view = binding.getRoot();
-        viewModel = new ViewModelProvider(this).get(MapsAndListSharedViewModel.class);
+        viewModel = new ViewModelProvider(this).get(SearchViewModel.class);
         setContentView(view);
 
         Intent intent = getIntent();
@@ -55,6 +56,8 @@ public class SearchActivity extends AppCompatActivity implements OnClickItemList
             }
         });
 
+        showSoftKeyboard(binding.searchViewSA);
+
         binding.recyclerViewSA.setHasFixedSize(true);
         binding.recyclerViewSA.setLayoutManager(new LinearLayoutManager(view.getContext(), LinearLayoutManager.VERTICAL, false));
         binding.recyclerViewSA.setAdapter(adapter);
@@ -70,6 +73,13 @@ public class SearchActivity extends AppCompatActivity implements OnClickItemList
         returnIntent.putExtra("placeID", restaurant.getPlaceId());
         setResult(RESULT_OK, returnIntent);
         finish();
+    }
+
+    public void showSoftKeyboard(View view){
+        if(view.requestFocus()){
+            InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+            imm.showSoftInput(view,InputMethodManager.SHOW_IMPLICIT);
+        }
     }
 
 }
