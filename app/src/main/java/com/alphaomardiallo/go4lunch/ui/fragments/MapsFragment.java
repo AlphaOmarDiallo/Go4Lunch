@@ -13,6 +13,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -20,9 +21,8 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.alphaomardiallo.go4lunch.R;
-import com.alphaomardiallo.go4lunch.data.dataSources.Model.autocompletePojo.PredictionsItem;
 import com.alphaomardiallo.go4lunch.data.dataSources.Model.nearBySearchPojo.ResultsItem;
-import com.alphaomardiallo.go4lunch.data.viewModels.MapsAndListSharedViewModel;
+import com.alphaomardiallo.go4lunch.data.viewModels.MainSharedViewModel;
 import com.alphaomardiallo.go4lunch.databinding.FragmentMapsBinding;
 import com.alphaomardiallo.go4lunch.domain.PermissionUtils;
 import com.alphaomardiallo.go4lunch.domain.PositionUtils;
@@ -52,7 +52,8 @@ public class MapsFragment extends Fragment implements EasyPermissions.Permission
     private final long defaultCameraZoomOverMap = 19;
     private CameraPosition cameraPosition;
     private FragmentMapsBinding binding;
-    private MapsAndListSharedViewModel viewModel;
+    //private MapsAndListSharedViewModel viewModel;
+    public MainSharedViewModel viewModel;
     private List<ResultsItem> restaurantList;
     private GoogleMap map;
     private Location location;
@@ -131,7 +132,7 @@ public class MapsFragment extends Fragment implements EasyPermissions.Permission
         binding = FragmentMapsBinding.inflate(inflater, container, false);
         Log.e(TAG, "onCreateView: called", null);
 
-        viewModel = new ViewModelProvider(requireActivity()).get(MapsAndListSharedViewModel.class);
+        viewModel = new ViewModelProvider(requireActivity()).get(MainSharedViewModel.class);
 
         this.onAttach(requireContext());
         Log.e(TAG, "attached ", null);
@@ -166,7 +167,8 @@ public class MapsFragment extends Fragment implements EasyPermissions.Permission
         if (viewModel.hasPermission(requireContext())) {
             viewModel.startTrackingLocation(requireContext(), getActivity());
             viewModel.getLocation().observe(requireActivity(), this::updateLocation);
-            viewModel.getSelectedRestaurant().observe(requireActivity(), this::focusOnSelectedRestaurant);
+            //viewModel.getSelectedRestaurant().observe(requireActivity(), this::focusOnSelectedRestaurant);
+            viewModel.getRestaurantToFocusOn().observe(requireActivity(), this::focusOnSelectedRestaurant);
         }
     }
 
@@ -191,11 +193,11 @@ public class MapsFragment extends Fragment implements EasyPermissions.Permission
     }
 
     private void checkIfRestaurantHasBeenSelected() {
-        viewModel.getSelectedRestaurant().observe(requireActivity(), this::focusOnSelectedRestaurant);
+        //viewModel.getSelectedRestaurant().observe(requireActivity(), this::focusOnSelectedRestaurant);
         Log.e(TAG, "checkIfRestaurantHasBeenSelected: accessed", null);
     }
 
-    private void focusOnSelectedRestaurant(PredictionsItem item){
+    private void focusOnSelectedRestaurant(String id){
         //PredictionsItem selectedRestaurant = viewModel.getSelectedRestaurant().getValue();
 /*        if (selectedRestaurant != null) {
             Log.e(TAG, "focusOnSelectedRestaurant: CALLED", null);
@@ -204,7 +206,8 @@ public class MapsFragment extends Fragment implements EasyPermissions.Permission
             LatLng restaurantLatLng = new LatLng(restaurant.getGeometry().getLocation().getLat(),restaurant.getGeometry().getLocation().getLng());
             map.moveCamera(CameraUpdateFactory.newLatLngZoom(restaurantLatLng, defaultCameraZoomOverMap));
         }*/
-        Log.e(TAG, "focusOnSelectedRestaurant: called " + item, null);
+        Log.e(TAG, "focusOnSelectedRestaurant: called " + id, null);
+        Toast.makeText(requireContext(), id, Toast.LENGTH_LONG).show();
     }
 
     /**

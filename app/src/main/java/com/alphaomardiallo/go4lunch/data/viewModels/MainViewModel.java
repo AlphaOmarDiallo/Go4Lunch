@@ -29,6 +29,7 @@ public class MainViewModel extends ViewModel {
     private final LocationRepository locationRepository;
     private final PlacesAPIRepository placesAPIRepository;
 
+
     @Inject
     public MainViewModel(UserRepositoryImp userRepositoryImp, LocationRepository locationRepository, PlacesAPIRepository placesAPIRepository) {
         this.userRepositoryImp = userRepositoryImp;

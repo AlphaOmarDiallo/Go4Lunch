@@ -28,7 +28,7 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.alphaomardiallo.go4lunch.R;
-import com.alphaomardiallo.go4lunch.data.viewModels.MainViewModel;
+import com.alphaomardiallo.go4lunch.data.viewModels.MainSharedViewModel;
 import com.alphaomardiallo.go4lunch.databinding.ActivityMainBinding;
 import com.alphaomardiallo.go4lunch.ui.fragments.ListViewFragment;
 import com.alphaomardiallo.go4lunch.ui.fragments.MapsFragment;
@@ -59,7 +59,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private Bundle bundleSelectedRestaurant;
     private String selectedRestaurant;
 
-    public MainViewModel viewModel;
+    //public MainViewModel viewModel;
+    public MainSharedViewModel viewModel;
 
     /**
      * setup to get back data from FirebaseUI activity if sign in needed
@@ -78,6 +79,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         Intent returnedIntent = result.getData();
                         selectedRestaurant = returnedIntent.getStringExtra("placeID");
                         Log.e(TAG, "onActivityResult: OK " + selectedRestaurant, null);
+                        viewModel.getIdRestaurantToFocusOn(selectedRestaurant);
                         setupBottomNavBar();
                     } else {
                         Log.e(TAG, "onActivityResult: Not OK", null);
@@ -91,7 +93,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         super.onCreate(savedInstanceState);
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         View view = binding.getRoot();
-        viewModel = new ViewModelProvider(this).get(MainViewModel.class);
+        viewModel = new ViewModelProvider(this).get(MainSharedViewModel.class);
         setContentView(view);
 
         setupToolBar();
