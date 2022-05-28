@@ -24,6 +24,7 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.alphaomardiallo.go4lunch.R;
@@ -55,7 +56,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private ActionBarDrawerToggle toggle;
     private Location currentLocation;
     private SearchView searchView;
+    private Bundle bundleSelectedRestaurant;
     private String selectedRestaurant;
+
     public MainViewModel viewModel;
 
     /**
@@ -75,6 +78,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         Intent returnedIntent = result.getData();
                         selectedRestaurant = returnedIntent.getStringExtra("placeID");
                         Log.e(TAG, "onActivityResult: OK " + selectedRestaurant, null);
+                        setupBottomNavBar();
                     } else {
                         Log.e(TAG, "onActivityResult: Not OK", null);
                     }
@@ -139,10 +143,16 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @SuppressLint("NonConstantResourceId")
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+        Log.e(TAG, "onNavigationItemSelected: called", null);
+        Bundle bundle = new Bundle();
+        bundle.putString("selectedRestaurantID", selectedRestaurant);
         switch (item.getItemId()) {
             case R.id.menuItemMapView:
-                getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainerView, mapsFragment).commit();
+                Fragment fragment = new Fragment();
+                fragment.setArguments(bundle);
+                getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainerView, mapsFragment, "selectedBundle").commit();
                 Objects.requireNonNull(getSupportActionBar()).setTitle(getString(R.string.i_m_hungry));
+                Log.e(TAG, "onNavigationItemSelected: Maps recreated " + bundle, null );
                 return true;
 
             case R.id.menuItemListView:
@@ -198,7 +208,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     intent.putExtra("Location", String.format("%s,%s", currentLocation.getLatitude(), currentLocation.getLongitude()));
                     //startActivity(intent);
                     searchLauncher.launch(intent);
-
                 }
 
                 return true;
@@ -208,7 +217,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         return true;
     }
 
-    private void passDataToFragments(Intent intent) {
+    private void  passDataToFragments(Intent intent) {
 
         Log.e(TAG, "passDataToFragments: Has been called", null);
     }

@@ -24,9 +24,11 @@ import dagger.hilt.android.AndroidEntryPoint;
 @AndroidEntryPoint
 public class SearchActivity extends AppCompatActivity implements OnClickItemListener {
 
+    private final SearchAdapter adapter = new SearchAdapter(new SearchAdapter.ListSearchDiff(), this);
     private SearchViewModel viewModel;
     private ActivitySearchBinding binding;
-    private final SearchAdapter adapter = new SearchAdapter(new SearchAdapter.ListSearchDiff(), this);
+    private String query;
+    private String location;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,10 +38,23 @@ public class SearchActivity extends AppCompatActivity implements OnClickItemList
         viewModel = new ViewModelProvider(this).get(SearchViewModel.class);
         setContentView(view);
 
-        Intent intent = getIntent();
-        String query = intent.getStringExtra("Query");
-        String location = intent.getStringExtra("Location");
+        getIntentAndData();
 
+        setupSearch();
+
+        showSoftKeyboard(binding.searchViewSA);
+
+        setupResultsInRecyclerView();
+
+    }
+
+    public void getIntentAndData() {
+        Intent intent = getIntent();
+        query = intent.getStringExtra("Query");
+        location = intent.getStringExtra("Location");
+    }
+
+    private void setupSearch() {
         binding.searchViewSA.setIconifiedByDefault(false);
         binding.searchViewSA.setQuery(query, true);
         binding.searchViewSA.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
@@ -55,11 +70,18 @@ public class SearchActivity extends AppCompatActivity implements OnClickItemList
                 return true;
             }
         });
+    }
 
-        showSoftKeyboard(binding.searchViewSA);
+    public void showSoftKeyboard(View view) {
+        if (view.requestFocus()) {
+            InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+            imm.showSoftInput(view, InputMethodManager.SHOW_IMPLICIT);
+        }
+    }
 
+    private void setupResultsInRecyclerView() {
         binding.recyclerViewSA.setHasFixedSize(true);
-        binding.recyclerViewSA.setLayoutManager(new LinearLayoutManager(view.getContext(), LinearLayoutManager.VERTICAL, false));
+        binding.recyclerViewSA.setLayoutManager(new LinearLayoutManager(getApplicationContext(), LinearLayoutManager.VERTICAL, false));
         binding.recyclerViewSA.setAdapter(adapter);
 
         viewModel.getPredictionList().observe(this, adapter::submitList);
@@ -73,13 +95,6 @@ public class SearchActivity extends AppCompatActivity implements OnClickItemList
         returnIntent.putExtra("placeID", restaurant.getPlaceId());
         setResult(RESULT_OK, returnIntent);
         finish();
-    }
-
-    public void showSoftKeyboard(View view){
-        if(view.requestFocus()){
-            InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-            imm.showSoftInput(view,InputMethodManager.SHOW_IMPLICIT);
-        }
     }
 
 }
