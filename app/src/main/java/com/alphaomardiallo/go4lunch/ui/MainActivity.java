@@ -172,11 +172,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     private void observeLocation() {
         viewModel.startTrackingLocation(this, this);
-        viewModel.getCurrentLocation().observe(this, this::updateLocation);
+        viewModel.getCurrentLocation().observe(this, this::updateLocationAndFetchRestaurantList);
     }
 
-    private void updateLocation(Location location) {
+    private void updateLocationAndFetchRestaurantList(Location location) {
         currentLocation = location;
+        viewModel.getAllRestaurantList(this, currentLocation);
     }
 
     /**

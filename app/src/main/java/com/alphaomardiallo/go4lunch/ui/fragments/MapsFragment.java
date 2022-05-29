@@ -162,11 +162,9 @@ public class MapsFragment extends Fragment implements EasyPermissions.Permission
      * Getting data from viewModel
      */
 
-    private void fetchAndObserveData() {
+    private void observeData() {
         if (viewModel.hasPermission(requireContext())) {
-            viewModel.startTrackingLocation(requireContext(), getActivity());
             viewModel.getCurrentLocation().observe(requireActivity(), this::updateLocation);
-            //viewModel.getSelectedRestaurant().observe(requireActivity(), this::focusOnSelectedRestaurant);
             viewModel.getRestaurantToFocusOn().observe(requireActivity(), this::focusOnSelectedRestaurant);
         }
     }
@@ -182,11 +180,7 @@ public class MapsFragment extends Fragment implements EasyPermissions.Permission
         if (this.isAdded()) {
             this.location = location;
             getCurrentLocation(map);
-
-            //API call
-            viewModel.getAllRestaurantList(requireContext(), this.location);
             viewModel.getRestaurants().observe(requireActivity(), this::updateMapWithRestaurants);
-            Log.e(TAG, "updateLocation: updated", null);
         }
 
     }
@@ -289,7 +283,7 @@ public class MapsFragment extends Fragment implements EasyPermissions.Permission
 
     public void requestPermission() {
         if (permission.hasLocationPermissions(requireContext())) {
-            fetchAndObserveData();
+            observeData();
             return;
         }
 
@@ -305,7 +299,7 @@ public class MapsFragment extends Fragment implements EasyPermissions.Permission
     @Override
     public void onPermissionsGranted(int requestCode, @NonNull List<String> perms) {
         enableMyLocation(map);
-        fetchAndObserveData();
+        observeData();
     }
 
     @Override
@@ -324,13 +318,6 @@ public class MapsFragment extends Fragment implements EasyPermissions.Permission
         EasyPermissions.onRequestPermissionsResult(requestCode, permissions, grantResults, this);
     }
 
-    @Override
-    public void onPause() {
-        super.onPause();
-        viewModel.stopTrackingLocation();
-        Log.e(TAG, "onPause: called", null);
-    }
-
     /**
      * LifeCycle
      */
@@ -343,14 +330,12 @@ public class MapsFragment extends Fragment implements EasyPermissions.Permission
             binding = null;
         }
         setCameraListener(map);
-        Log.e(TAG, "onDestroyView: Destroy", null);
     }
 
     @Override
     public void onResume() {
         super.onResume();
         if (cameraPosition != null) {
-            Log.e(TAG, "onResume: called here", null);
             map.moveCamera(CameraUpdateFactory.newLatLngZoom(cameraPosition.target, defaultCameraZoomOverMap));
         }
     }
