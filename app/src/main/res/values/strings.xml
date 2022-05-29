@@ -66,7 +66,7 @@
     <string name="Open_drawer_menu">Open drawer menu</string>
     <string name="Close_drawer_menu">Close drawer menu</string>
     <string name="search_title">Search title</string>
-    <string name="search_hint">Restaurant name</string>
+    <string name="search_query_hint">Search for a restaurant</string>
     <string name="activate">Activate</string>
     <string name="background_image">Background image</string>
     <string name="less_than_1km">Less than 1km</string>
@@ -92,5 +92,7 @@
     <string name="location_missing">We need your location, return to the MapView</string>
     <string name="message_activity_result_not_ok">Something went wrong with the search</string>
     <string name="message_activity_result_ok">Selected restaurant: %s</string>
+    <string name="location_to_string">%f,%f</string>
+    <string name="remove_query" />
 
 </resources>

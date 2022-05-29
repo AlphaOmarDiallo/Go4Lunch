@@ -49,6 +49,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     private static final String KEY_SELECTED_RESTAURANT_ID = "placeID";
     private static final String KEY_SELECTED_RESTAURANT_NAME = "placeName";
+    private static final String KEY_SEARCH_QUERY = "Query";
+    private static final String KEY_LOCATION_STRING  = "Location";
     private final Handler handler = new Handler(Looper.getMainLooper());
     private final MapsFragment mapsFragment = new MapsFragment();
     private final ListViewFragment listViewFragment = new ListViewFragment();
@@ -188,24 +190,23 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         searchView = (SearchView) menu.findItem(R.id.searchActivity).getActionView();
         searchView.setBackgroundColor(getResources().getColor(R.color.white));
         searchView.setIconifiedByDefault(false);
+        searchView.setQueryHint(getString(R.string.search_query_hint));
         searchView.getOverlay();
 
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
-            public boolean onQueryTextSubmit(String s) {
+            public boolean onQueryTextSubmit(String query) {
                 return false;
             }
 
             @Override
-            public boolean onQueryTextChange(String s) {
-                if (s.length() > 0) {
+            public boolean onQueryTextChange(String query) {
+                if (query.length() > 0) {
                     Intent intent = new Intent(MainActivity.this, SearchActivity.class);
-                    intent.putExtra("Query", s);
-                    intent.putExtra("Location", String.format("%s,%s", currentLocation.getLatitude(), currentLocation.getLongitude()));
-                    //startActivity(intent);
+                    intent.putExtra(KEY_SEARCH_QUERY, query);
+                    intent.putExtra(KEY_LOCATION_STRING, String.format(getString(R.string.location_to_string), currentLocation.getLatitude(), currentLocation.getLongitude()));
                     searchLauncher.launch(intent);
                 }
-
                 return true;
             }
         });
@@ -236,6 +237,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         binding.navigationView.setNavigationItemSelectedListener(item -> {
             switch (item.getItemId()) {
                 case R.id.yourLunchNavDrawer:
+                    //TODO implement your lunch activity
                     showSnackBarMessage("your lunch");
                     break;
                 case R.id.settingsNavDrawer:
@@ -318,7 +320,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     protected void onResume() {
         super.onResume();
         if (searchView != null) {
-            searchView.setQuery("", false);
+            searchView.setQuery(getString(R.string.remove_query), false);
         }
         binding.toolbar.collapseActionView();
     }
