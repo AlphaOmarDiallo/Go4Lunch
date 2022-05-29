@@ -14,10 +14,7 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
-import com.alphaomardiallo.go4lunch.data.dataSources.Model.autocompletePojo.PredictionsItem;
-import com.alphaomardiallo.go4lunch.data.dataSources.Model.detailsPojo.Result;
 import com.alphaomardiallo.go4lunch.data.dataSources.Model.nearBySearchPojo.ResultsItem;
-import com.alphaomardiallo.go4lunch.data.repositories.AutocompleteRepository;
 import com.alphaomardiallo.go4lunch.data.repositories.LocationRepository;
 import com.alphaomardiallo.go4lunch.data.repositories.PermissionRepository;
 import com.alphaomardiallo.go4lunch.data.repositories.PlacesAPIRepository;
@@ -27,6 +24,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseUser;
 
 import java.util.List;
+import java.util.Objects;
 
 import javax.inject.Inject;
 
@@ -39,28 +37,21 @@ public class MainSharedViewModel extends ViewModel {
     private final LocationRepository locationRepository;
     private final PlacesAPIRepository placesAPIRepository;
     private final PermissionRepository permissionRepository;
-    private final AutocompleteRepository autocompleteRepository;
-
-    LiveData<List<ResultsItem>> restaurants;
-    LiveData<List<ResultsItem>> checkList;
-    MutableLiveData<PredictionsItem> selectedRestaurant = new MutableLiveData<>();
-    Location savedLocation;
-    MutableLiveData<String> restaurantToFocusOn = new MutableLiveData<>();
+    private final MutableLiveData<String> restaurantToFocusOn = new MutableLiveData<>();
+    private final LiveData<List<ResultsItem>> restaurants;
+    private Location savedLocation;
 
     @Inject
-    public MainSharedViewModel(UserRepositoryImp userRepositoryImp, LocationRepository locationRepository, PlacesAPIRepository placesAPIRepository, PermissionRepository permissionRepository, AutocompleteRepository autocompleteRepository) {
+    public MainSharedViewModel(UserRepositoryImp userRepositoryImp, LocationRepository locationRepository, PlacesAPIRepository placesAPIRepository, PermissionRepository permissionRepository) {
         this.userRepositoryImp = userRepositoryImp;
         this.locationRepository = locationRepository;
         this.placesAPIRepository = placesAPIRepository;
         this.permissionRepository = permissionRepository;
-        this.autocompleteRepository = autocompleteRepository;
-
         restaurants = placesAPIRepository.getNearBySearchRestaurantList();
-        checkList = null;
     }
 
     /**
-     * Main Activity Methods
+     * Firebase login
      */
 
     public UserRepository getInstance() {
@@ -79,6 +70,10 @@ public class MainSharedViewModel extends ViewModel {
         return userRepositoryImp.signOut(context);
     }
 
+    /**
+     * Location tracking
+     */
+
     public void startTrackingLocation(Context context, Activity activity) {
         locationRepository.startLocationRequest(context, activity);
     }
@@ -87,25 +82,12 @@ public class MainSharedViewModel extends ViewModel {
         locationRepository.stopLocationUpdates();
     }
 
-    public LiveData<Location> getLocation() {
+    public LiveData<Location> getCurrentLocation() {
         return locationRepository.getCurrentLocation();
     }
 
-    public LiveData<List<PredictionsItem>> searchAutoComplete(String query, String location) {
-
-        if (location != null) {
-            return placesAPIRepository.autoCompleteSearch(query, location, locationRepository.getRadius());
-        }
-
-        return null;
-    }
-
-    public LiveData<List<ResultsItem>> getRestaurantList() {
-        return placesAPIRepository.getNearBySearchRestaurantList();
-    }
-
     /**
-     * Others
+     * Restaurant list
      */
 
     public LiveData<List<ResultsItem>> getRestaurants() {
@@ -122,60 +104,23 @@ public class MainSharedViewModel extends ViewModel {
 
             Location currentLocation = locationRepository.getCurrentLocation().getValue();
 
-            String locationString = currentLocation.getLatitude() + "," + currentLocation.getLongitude();
+            String locationString = Objects.requireNonNull(currentLocation).getLatitude() + "," + currentLocation.getLongitude();
             placesAPIRepository.fetchNearBySearchPlaces(locationString, locationRepository.getRadius());
 
         } else {
             if (savedLocation.distanceTo(location) > 51) {
                 Location currentLocation = locationRepository.getCurrentLocation().getValue();
 
-                String locationString = currentLocation.getLatitude() + "," + currentLocation.getLongitude();
+                String locationString = Objects.requireNonNull(currentLocation).getLatitude() + "," + currentLocation.getLongitude();
                 placesAPIRepository.fetchNearBySearchPlaces(locationString, locationRepository.getRadius());
                 Log.e(TAG, "getAllRestaurantList: distance condition met", null);
             }
         }
     }
 
-    public Location getOfficeLocation() {
-        return locationRepository.getOfficeLocation();
-    }
-
-    public LiveData<PredictionsItem> getSelectedRestaurant() {
-        //return autocompleteRepository.getSelectedRestaurant();
-        Log.e(TAG, "getSelectedRestaurant: " + selectedRestaurant, null);
-        return selectedRestaurant;
-    }
-
-    public LiveData<Result> getSelectedRestaurantDetails() {
-        return placesAPIRepository.getSelectedRestaurantDetails();
-    }
-
-    public void getSelectedRestaurantDetail(String placeID) {
-        placesAPIRepository.fetchDetails(placeID);
-    }
-
-    public Boolean hasPermission(Context context) {
-        return permissionRepository.hasLocationPermissions(context);
-    }
-
-    public Bitmap resizeMarker(Resources resources, int drawable) {
-        int height = 120;
-        int width = 100;
-        Bitmap icon = BitmapFactory.decodeResource(resources, drawable);
-        return Bitmap.createScaledBitmap(icon, width, height, false);
-    }
-
-    //****************************************
-
-    public LiveData<List<PredictionsItem>> getPredictionList() {
-        return autocompleteRepository.searchPrediction();
-    }
-
-    public void setRestaurantToFocusOn(PredictionsItem predictionsItem) {
-        //autocompleteRepository.setPlaceToFocusOn(predictionsItem);
-        selectedRestaurant.setValue(predictionsItem);
-        Log.e(TAG, "setRestaurantToFocusOn: " + predictionsItem.getPlaceId(), null);
-    }
+    /**
+     * Search result
+     */
 
     public void getIdRestaurantToFocusOn(String id) {
         restaurantToFocusOn.setValue(id);
@@ -185,5 +130,23 @@ public class MainSharedViewModel extends ViewModel {
         return restaurantToFocusOn;
     }
 
+    /**
+     * Permission
+     */
+
+    public Boolean hasPermission(Context context) {
+        return permissionRepository.hasLocationPermissions(context);
+    }
+
+    /**
+     * UI related
+     */
+
+    public Bitmap resizeMarker(Resources resources, int drawable) {
+        int height = 120;
+        int width = 100;
+        Bitmap icon = BitmapFactory.decodeResource(resources, drawable);
+        return Bitmap.createScaledBitmap(icon, width, height, false);
+    }
 
 }

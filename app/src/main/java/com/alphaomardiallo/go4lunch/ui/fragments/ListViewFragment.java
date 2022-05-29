@@ -20,12 +20,12 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.alphaomardiallo.go4lunch.R;
-import com.alphaomardiallo.go4lunch.ui.RestaurantDetails;
 import com.alphaomardiallo.go4lunch.data.dataSources.Model.nearBySearchPojo.ResultsItem;
-import com.alphaomardiallo.go4lunch.data.viewModels.MapsAndListSharedViewModel;
+import com.alphaomardiallo.go4lunch.data.viewModels.MainSharedViewModel;
 import com.alphaomardiallo.go4lunch.databinding.FragmentListViewBinding;
 import com.alphaomardiallo.go4lunch.domain.OnClickItemListener;
 import com.alphaomardiallo.go4lunch.domain.PositionUtils;
+import com.alphaomardiallo.go4lunch.ui.RestaurantDetails;
 import com.alphaomardiallo.go4lunch.ui.adapters.ListViewAdapter;
 import com.bumptech.glide.Glide;
 
@@ -41,7 +41,7 @@ public class ListViewFragment extends Fragment implements OnClickItemListener {
     private final Handler handler = new Handler(Looper.getMainLooper());
 
     private FragmentListViewBinding binding;
-    public MapsAndListSharedViewModel viewModel;
+    public MainSharedViewModel viewModel;
     private List<ResultsItem> restaurantList = new ArrayList<>();
     private final PositionUtils positionUtils = new PositionUtils();
     private final Location location = positionUtils.getOfficeLocationFormat();
@@ -58,7 +58,7 @@ public class ListViewFragment extends Fragment implements OnClickItemListener {
                              @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
         binding = FragmentListViewBinding.inflate(inflater, container, false);
-        viewModel = new ViewModelProvider(requireActivity()).get(MapsAndListSharedViewModel.class);
+        viewModel = new ViewModelProvider(requireActivity()).get(MainSharedViewModel.class);
         View view = inflater.inflate(R.layout.fragment_list_view, container, false);
 
         binding.recyclerView.setHasFixedSize(true);
@@ -85,7 +85,7 @@ public class ListViewFragment extends Fragment implements OnClickItemListener {
 
         if (this.isAdded()) {
             viewModel.startTrackingLocation(requireContext(), requireActivity());
-            viewModel.getLocation().observe(requireActivity(), this::updateLocation);
+            viewModel.getCurrentLocation().observe(requireActivity(), this::updateLocation);
         }
     }
 
@@ -103,7 +103,7 @@ public class ListViewFragment extends Fragment implements OnClickItemListener {
         setAdapter(location);
 
         if (this.isAdded()) {
-            viewModel.getLocation().observe(requireActivity(), this::fetchAndObserveData);
+            viewModel.getCurrentLocation().observe(requireActivity(), this::fetchAndObserveData);
         }
         Log.e(TAG, "updateLocation: updated location", null);
     }
@@ -188,7 +188,7 @@ public class ListViewFragment extends Fragment implements OnClickItemListener {
 
         if (viewModel.hasPermission(requireContext())) {
             viewModel.getRestaurants().removeObservers(this);
-            viewModel.getLocation().removeObservers(this);
+            viewModel.getCurrentLocation().removeObservers(this);
             viewModel.stopTrackingLocation();
         }
 

@@ -1,14 +1,11 @@
 package com.alphaomardiallo.go4lunch.ui;
 
-import static android.content.ContentValues.TAG;
-
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.location.Location;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -24,7 +21,6 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.alphaomardiallo.go4lunch.R;
@@ -51,19 +47,20 @@ import dagger.hilt.android.AndroidEntryPoint;
 @AndroidEntryPoint
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
+    private static final String KEY_SELECTED_RESTAURANT_ID = "placeID";
+    private static final String KEY_SELECTED_RESTAURANT_NAME = "placeName";
     private final Handler handler = new Handler(Looper.getMainLooper());
+    private final MapsFragment mapsFragment = new MapsFragment();
+    private final ListViewFragment listViewFragment = new ListViewFragment();
+    private final WorkmatesFragment workmatesFragment = new WorkmatesFragment();
     private ActivityMainBinding binding;
     private ActionBarDrawerToggle toggle;
     private Location currentLocation;
     private SearchView searchView;
-    private Bundle bundleSelectedRestaurant;
-    private String selectedRestaurant;
-
-    //public MainViewModel viewModel;
-    public MainSharedViewModel viewModel;
+    private MainSharedViewModel viewModel;
 
     /**
-     * setup to get back data from FirebaseUI activity if sign in needed
+     * Contracts to start activities
      */
     private final ActivityResultLauncher<Intent> signInLauncher = registerForActivityResult(
             new FirebaseAuthUIActivityResultContract(),
@@ -77,16 +74,22 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 public void onActivityResult(ActivityResult result) {
                     if (result.getResultCode() == RESULT_OK) {
                         Intent returnedIntent = result.getData();
-                        selectedRestaurant = returnedIntent.getStringExtra("placeID");
-                        Log.e(TAG, "onActivityResult: OK " + selectedRestaurant, null);
-                        viewModel.getIdRestaurantToFocusOn(selectedRestaurant);
-                        setupBottomNavBar();
+                        if (returnedIntent != null) {
+                            String selectedRestaurantID = returnedIntent.getStringExtra(KEY_SELECTED_RESTAURANT_ID);
+                            String selectedRestaurantName = returnedIntent.getStringExtra(KEY_SELECTED_RESTAURANT_NAME);
+                            viewModel.getIdRestaurantToFocusOn(selectedRestaurantID);
+                            showSnackBarMessage(String.format(getString(R.string.message_activity_result_ok), selectedRestaurantName));
+                        }
                     } else {
-                        Log.e(TAG, "onActivityResult: Not OK", null);
+                        showSnackBarMessage(getString(R.string.message_activity_result_not_ok));
                     }
                 }
             }
     );
+
+    /**
+     * OnCreate
+     */
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -106,7 +109,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         binding.ibLauchAutoComplete.setVisibility(View.INVISIBLE);
 
-        handler.postDelayed(this::checkIfSignedIn, 1000);
+        handler.postDelayed(this::checkIfUserIsSignedIn, 1000);
     }
 
     /**
@@ -118,11 +121,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         getSupportActionBar().setDisplayShowTitleEnabled(true);
     }
 
-    private void showSnackBar(String message) {
+    private void showSnackBarMessage(String message) {
         Snackbar.make(binding.mainLayout, message, Snackbar.LENGTH_SHORT).show();
     }
 
-    private void checkIfSignedIn() {
+    private void checkIfUserIsSignedIn() {
         if (viewModel.isCurrentUserNotLoggedIn()) {
             createSignInIntent();
         } else {
@@ -133,9 +136,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     /**
      * Bottom navigation bar setup
      */
-    MapsFragment mapsFragment = new MapsFragment();
-    ListViewFragment listViewFragment = new ListViewFragment();
-    WorkmatesFragment workmatesFragment = new WorkmatesFragment();
 
     private void setupBottomNavBar() {
         binding.bottomNavigationView.setOnItemSelectedListener(this::onNavigationItemSelected);
@@ -145,16 +145,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @SuppressLint("NonConstantResourceId")
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-        Log.e(TAG, "onNavigationItemSelected: called", null);
-        Bundle bundle = new Bundle();
-        bundle.putString("selectedRestaurantID", selectedRestaurant);
         switch (item.getItemId()) {
             case R.id.menuItemMapView:
-                Fragment fragment = new Fragment();
-                fragment.setArguments(bundle);
-                getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainerView, mapsFragment, "selectedBundle").commit();
+                getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainerView, mapsFragment).commit();
                 Objects.requireNonNull(getSupportActionBar()).setTitle(getString(R.string.i_m_hungry));
-                Log.e(TAG, "onNavigationItemSelected: Maps recreated " + bundle, null );
                 return true;
 
             case R.id.menuItemListView:
@@ -176,7 +170,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     private void observeLocation() {
         viewModel.startTrackingLocation(this, this);
-        viewModel.getLocation().observe(this, this::updateLocation);
+        viewModel.getCurrentLocation().observe(this, this::updateLocation);
     }
 
     private void updateLocation(Location location) {
@@ -205,7 +199,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             @Override
             public boolean onQueryTextChange(String s) {
                 if (s.length() > 0) {
-                   Intent intent = new Intent(MainActivity.this, SearchActivity.class);
+                    Intent intent = new Intent(MainActivity.this, SearchActivity.class);
                     intent.putExtra("Query", s);
                     intent.putExtra("Location", String.format("%s,%s", currentLocation.getLatitude(), currentLocation.getLongitude()));
                     //startActivity(intent);
@@ -218,12 +212,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         return true;
     }
-
-    private void  passDataToFragments(Intent intent) {
-
-        Log.e(TAG, "passDataToFragments: Has been called", null);
-    }
-
 
     /**
      * Navigation drawer setup
@@ -248,7 +236,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         binding.navigationView.setNavigationItemSelectedListener(item -> {
             switch (item.getItemId()) {
                 case R.id.yourLunchNavDrawer:
-                    showSnackBar("your lunch");
+                    showSnackBarMessage("your lunch");
                     break;
                 case R.id.settingsNavDrawer:
                     Intent settingIntent = new Intent(this, SettingsActivity.class);
@@ -306,19 +294,19 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private void onSignInResult(FirebaseAuthUIAuthenticationResult result) {
         IdpResponse response = result.getIdpResponse();
         if (result.getResultCode() == RESULT_OK) {
-            showSnackBar(getString(R.string.connection_succeed));
+            showSnackBarMessage(getString(R.string.connection_succeed));
             setupNavigationHeader();
         } else {
             if (response == null) {
-                showSnackBar(getString(R.string.error_authentication_canceled));
+                showSnackBarMessage(getString(R.string.error_authentication_canceled));
             } else if (response.getError() != null) {
                 if (response.getError().getErrorCode() == ErrorCodes.NO_NETWORK) {
-                    showSnackBar(getString(R.string.error_no_internet));
+                    showSnackBarMessage(getString(R.string.error_no_internet));
                 } else if (response.getError().getErrorCode() == ErrorCodes.UNKNOWN_ERROR) {
-                    showSnackBar(getString(R.string.error_unknown_error));
+                    showSnackBarMessage(getString(R.string.error_unknown_error));
                 }
             }
-            handler.postDelayed(this::checkIfSignedIn, 1000);
+            handler.postDelayed(this::checkIfUserIsSignedIn, 1000);
         }
     }
 

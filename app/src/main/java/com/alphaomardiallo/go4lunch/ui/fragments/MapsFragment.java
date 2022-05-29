@@ -52,7 +52,6 @@ public class MapsFragment extends Fragment implements EasyPermissions.Permission
     private final long defaultCameraZoomOverMap = 19;
     private CameraPosition cameraPosition;
     private FragmentMapsBinding binding;
-    //private MapsAndListSharedViewModel viewModel;
     public MainSharedViewModel viewModel;
     private List<ResultsItem> restaurantList;
     private GoogleMap map;
@@ -166,7 +165,7 @@ public class MapsFragment extends Fragment implements EasyPermissions.Permission
     private void fetchAndObserveData() {
         if (viewModel.hasPermission(requireContext())) {
             viewModel.startTrackingLocation(requireContext(), getActivity());
-            viewModel.getLocation().observe(requireActivity(), this::updateLocation);
+            viewModel.getCurrentLocation().observe(requireActivity(), this::updateLocation);
             //viewModel.getSelectedRestaurant().observe(requireActivity(), this::focusOnSelectedRestaurant);
             viewModel.getRestaurantToFocusOn().observe(requireActivity(), this::focusOnSelectedRestaurant);
         }

@@ -24,6 +24,8 @@ import dagger.hilt.android.AndroidEntryPoint;
 @AndroidEntryPoint
 public class SearchActivity extends AppCompatActivity implements OnClickItemListener {
 
+    private static final String KEY_SELECTED_RESTAURANT_ID = "placeID";
+    private static final String KEY_SELECTED_RESTAURANT_NAME = "placeName";
     private final SearchAdapter adapter = new SearchAdapter(new SearchAdapter.ListSearchDiff(), this);
     private SearchViewModel viewModel;
     private ActivitySearchBinding binding;
@@ -92,7 +94,8 @@ public class SearchActivity extends AppCompatActivity implements OnClickItemList
         PredictionsItem restaurant = Objects.requireNonNull(viewModel.getPredictionList().getValue()).get(position);
         viewModel.setRestaurantToFocusOn(restaurant);
         Intent returnIntent = new Intent();
-        returnIntent.putExtra("placeID", restaurant.getPlaceId());
+        returnIntent.putExtra(KEY_SELECTED_RESTAURANT_ID, restaurant.getPlaceId());
+        returnIntent.putExtra(KEY_SELECTED_RESTAURANT_NAME, restaurant.getStructuredFormatting().getMainText());
         setResult(RESULT_OK, returnIntent);
         finish();
     }

@@ -90,5 +90,7 @@
     <string name="closed">Closed</string>
     <string name="restaurant_icon">Restaurant Icon</string>
     <string name="location_missing">We need your location, return to the MapView</string>
+    <string name="message_activity_result_not_ok">Something went wrong with the search</string>
+    <string name="message_activity_result_ok">Selected restaurant: %s</string>
 
 </resources>

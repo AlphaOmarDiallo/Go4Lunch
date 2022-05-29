@@ -14,7 +14,7 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.alphaomardiallo.go4lunch.R;
-import com.alphaomardiallo.go4lunch.data.viewModels.MapsAndListSharedViewModel;
+import com.alphaomardiallo.go4lunch.data.viewModels.MainSharedViewModel;
 import com.alphaomardiallo.go4lunch.databinding.FragmentWorkmatesBinding;
 
 import dagger.hilt.android.AndroidEntryPoint;
@@ -23,7 +23,7 @@ import dagger.hilt.android.AndroidEntryPoint;
 public class WorkmatesFragment extends Fragment {
 
     FragmentWorkmatesBinding binding;
-    MapsAndListSharedViewModel viewModel;
+    MainSharedViewModel viewModel;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -35,7 +35,7 @@ public class WorkmatesFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         binding = FragmentWorkmatesBinding.inflate(inflater, container, false);
-        viewModel = new ViewModelProvider(requireActivity()).get(MapsAndListSharedViewModel.class);
+        viewModel = new ViewModelProvider(requireActivity()).get(MainSharedViewModel.class);
         View view = inflater.inflate(R.layout.fragment_list_view, container, false);
         return binding.getRoot();
     }
