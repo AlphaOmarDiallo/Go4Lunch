@@ -31,7 +31,6 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
-import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -51,7 +50,6 @@ public class MapsFragment extends Fragment implements EasyPermissions.Permission
     private static final int REQUEST_PERMISSIONS_LOCATION = 567;
     private static final PermissionUtils permission = new PermissionUtils();
     private final long defaultCameraZoomOverMap = 19;
-    private CameraPosition cameraPosition;
     private FragmentMapsBinding binding;
     public MainSharedViewModel viewModel;
     private List<ResultsItem> restaurantList;
@@ -93,8 +91,6 @@ public class MapsFragment extends Fragment implements EasyPermissions.Permission
             setMap(googleMap);
 
             addOfficeMarkerToMap(googleMap);
-
-            setCameraListener(googleMap);
 
             binding.fabMyLocation.setOnClickListener(view1 -> {
                 if (permission.hasLocationPermissions(requireContext())) {
@@ -246,10 +242,6 @@ public class MapsFragment extends Fragment implements EasyPermissions.Permission
         });
     }
 
-    private void setCameraListener(GoogleMap googleMap) {
-        googleMap.setOnCameraMoveListener(() -> cameraPosition = googleMap.getCameraPosition());
-    }
-
     private void openDetailActivity(String restaurantID) {
         Intent intent = new Intent(requireContext(), RestaurantDetails.class);
         intent.putExtra("id", restaurantID);
@@ -325,15 +317,6 @@ public class MapsFragment extends Fragment implements EasyPermissions.Permission
             viewModel.getRestaurants().removeObservers(this);
             viewModel.getPartialRestaurantDetails().removeObservers(this);
             binding = null;
-        }
-        setCameraListener(map);
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        if (cameraPosition != null) {
-            map.moveCamera(CameraUpdateFactory.newLatLngZoom(cameraPosition.target, defaultCameraZoomOverMap));
         }
     }
 

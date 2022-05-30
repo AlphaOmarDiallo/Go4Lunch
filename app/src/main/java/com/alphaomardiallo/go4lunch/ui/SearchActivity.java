@@ -11,12 +11,15 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
+import com.alphaomardiallo.go4lunch.R;
 import com.alphaomardiallo.go4lunch.data.dataSources.Model.autocompletePojo.PredictionsItem;
 import com.alphaomardiallo.go4lunch.data.viewModels.SearchViewModel;
 import com.alphaomardiallo.go4lunch.databinding.ActivitySearchBinding;
 import com.alphaomardiallo.go4lunch.domain.OnClickItemListener;
 import com.alphaomardiallo.go4lunch.ui.adapters.SearchAdapter;
+import com.bumptech.glide.Glide;
 
+import java.util.List;
 import java.util.Objects;
 
 import dagger.hilt.android.AndroidEntryPoint;
@@ -86,7 +89,22 @@ public class SearchActivity extends AppCompatActivity implements OnClickItemList
         binding.recyclerViewSA.setLayoutManager(new LinearLayoutManager(getApplicationContext(), LinearLayoutManager.VERTICAL, false));
         binding.recyclerViewSA.setAdapter(adapter);
 
+        Glide.with(binding.iVLoaderSA)
+                .load(getString(R.string.no_results_gif))
+                .into(binding.iVLoaderSA);
+
         viewModel.getPredictionList().observe(this, adapter::submitList);
+        viewModel.getPredictionList().observe(this, this::removeImageIfListNotEmpty);
+    }
+
+    private void removeImageIfListNotEmpty(List<PredictionsItem> predictionsItems) {
+        if (predictionsItems != null) {
+            if (predictionsItems.size() > 0) {
+                binding.iVLoaderSA.setVisibility(View.INVISIBLE);
+            } else {
+                binding.iVLoaderSA.setVisibility(View.VISIBLE);
+            }
+        }
     }
 
     @Override
