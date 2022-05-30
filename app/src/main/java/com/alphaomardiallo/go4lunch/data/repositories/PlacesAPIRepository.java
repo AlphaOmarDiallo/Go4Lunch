@@ -18,7 +18,7 @@ public interface PlacesAPIRepository {
 
     LiveData<Result> getSelectedRestaurantDetails();
 
-    void fetchDetails(String placeID);
+    void fetchOneNearByRestaurantDetail(String placeID);
 
     void fetchAllDetails (String placeID);
 

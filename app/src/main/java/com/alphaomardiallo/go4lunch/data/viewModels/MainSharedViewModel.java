@@ -14,7 +14,9 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
+import com.alphaomardiallo.go4lunch.data.dataSources.Model.detailsPojo.Result;
 import com.alphaomardiallo.go4lunch.data.dataSources.Model.nearBySearchPojo.ResultsItem;
+import com.alphaomardiallo.go4lunch.data.repositories.AutocompleteRepository;
 import com.alphaomardiallo.go4lunch.data.repositories.LocationRepository;
 import com.alphaomardiallo.go4lunch.data.repositories.PermissionRepository;
 import com.alphaomardiallo.go4lunch.data.repositories.PlacesAPIRepository;
@@ -37,16 +39,18 @@ public class MainSharedViewModel extends ViewModel {
     private final LocationRepository locationRepository;
     private final PlacesAPIRepository placesAPIRepository;
     private final PermissionRepository permissionRepository;
+    private final AutocompleteRepository autocompleteRepository;
     private final MutableLiveData<String> restaurantToFocusOn = new MutableLiveData<>();
     private final LiveData<List<ResultsItem>> restaurants;
     private Location savedLocation;
 
     @Inject
-    public MainSharedViewModel(UserRepositoryImp userRepositoryImp, LocationRepository locationRepository, PlacesAPIRepository placesAPIRepository, PermissionRepository permissionRepository) {
+    public MainSharedViewModel(UserRepositoryImp userRepositoryImp, LocationRepository locationRepository, PlacesAPIRepository placesAPIRepository, PermissionRepository permissionRepository, AutocompleteRepository autocompleteRepository) {
         this.userRepositoryImp = userRepositoryImp;
         this.locationRepository = locationRepository;
         this.placesAPIRepository = placesAPIRepository;
         this.permissionRepository = permissionRepository;
+        this.autocompleteRepository = autocompleteRepository;
         restaurants = placesAPIRepository.getNearBySearchRestaurantList();
     }
 
@@ -122,12 +126,24 @@ public class MainSharedViewModel extends ViewModel {
      * Search result
      */
 
-    public void getIdRestaurantToFocusOn(String id) {
-        restaurantToFocusOn.setValue(id);
+    public void setIdRestaurantToFocusOn(String ID) {
+        restaurantToFocusOn.setValue(ID);
     }
 
     public LiveData<String> getRestaurantToFocusOn() {
         return restaurantToFocusOn;
+    }
+
+    /**
+     * Details about restaurant
+     */
+
+    public LiveData<Result> getPartialRestaurantDetails() {
+        return placesAPIRepository.getSelectedRestaurantDetails();
+    }
+
+    public void fetchPartialRestaurantDetails(String restaurantID) {
+        placesAPIRepository.fetchOneNearByRestaurantDetail(restaurantID);
     }
 
     /**

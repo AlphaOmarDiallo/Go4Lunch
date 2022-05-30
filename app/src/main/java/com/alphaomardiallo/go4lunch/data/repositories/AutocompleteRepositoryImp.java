@@ -34,8 +34,8 @@ public class AutocompleteRepositoryImp implements AutocompleteRepository {
         System.out.println(selectedRestaurant.getValue().getStructuredFormatting().getMainText());
     }
 
-    public LiveData<PredictionsItem> getSelectedRestaurant() {
-        return selectedRestaurant;
+    public PredictionsItem getSelectedRestaurant() {
+        return selectedRestaurant.getValue();
     }
 
     public void deleteSelectedRestaurant() {

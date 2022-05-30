@@ -22,10 +22,10 @@ import dagger.hilt.android.AndroidEntryPoint;
 @AndroidEntryPoint
 public class RestaurantDetails extends AppCompatActivity {
 
+    private static final String KEY_RESTAURANT_PLACE_ID = "id";
     private ActivityRestaurantDetailsBinding binding;
     private RestaurantDetailsViewModel viewModel;
     private Location location;
-
     private String restaurantID;
     private String restaurantPhoneNumber;
     private String restaurantWebsite;
@@ -42,31 +42,30 @@ public class RestaurantDetails extends AppCompatActivity {
 
         location = viewModel.getOfficeLocation();
 
-        startTrackingLocation();
+        observeLocation();
 
-        retrieveInformation();
-
+        retrieveInformationFromIntent();
     }
 
     /**
      * Getting location and restaurant DATA
      */
 
-    private void startTrackingLocation() {
-        viewModel.getLocation(getBaseContext(), this).observe(this, this::updateLocation);
+    private void observeLocation() {
+        viewModel.getLocation(getBaseContext(), this).observe(this, this::updateCurrentLocationAndDistance);
     }
 
-    private void updateLocation(Location location) {
+    private void updateCurrentLocationAndDistance(Location location) {
         this.location = location;
-        Location restaurantLocationUpdate = new Location("Restaurant Location");
+        Location restaurantLocationUpdate = new Location(getString(R.string.restaurant_location));
         restaurantLocationUpdate.setLongitude(restaurantLongitude);
         restaurantLocationUpdate.setLatitude(restaurantLatitude);
-        binding.tvDistanceRestaurantDetails.setText(String.format("%sm", Math.round(this.location.distanceTo(restaurantLocationUpdate))));
+        binding.tvDistanceRestaurantDetails.setText(String.format(getString(R.string.distance_in_meters_d), Math.round(this.location.distanceTo(restaurantLocationUpdate))));
     }
 
-    private void retrieveInformation() {
+    private void retrieveInformationFromIntent() {
         Intent intent = getIntent();
-        viewModel.getAllDetails(intent.getStringExtra("id")).observe(this, this::setupViews);
+        viewModel.getAllDetails(intent.getStringExtra(KEY_RESTAURANT_PLACE_ID)).observe(this, this::setupViews);
     }
 
     /**
@@ -81,13 +80,19 @@ public class RestaurantDetails extends AppCompatActivity {
 
         if (restaurant != null) {
             restaurantID = restaurant.getPlaceId();
-            String restaurantPhoto = "https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference=" + restaurant.getPhotos().get(0).getPhotoReference() + "&key=" + BuildConfig.PLACES_API_KEY;
+            String restaurantPhoto = getString(R.string.restaurantPlaceHolder);
             String restaurantName = restaurant.getName();
             double restaurantRating = restaurant.getRating();
             String restaurantAddress = restaurant.getVicinity();
             boolean restaurantIsOpenNow = restaurant.getOpeningHours().isOpenNow();
             restaurantLatitude = restaurant.getGeometry().getLocation().getLat();
             restaurantLongitude = restaurant.getGeometry().getLocation().getLng();
+
+            try {
+                restaurantPhoto = "https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference=" + restaurant.getPhotos().get(0).getPhotoReference() + "&key=" + BuildConfig.PLACES_API_KEY;
+            } catch (Exception e) {
+                System.out.println(e.getMessage());
+            }
 
             Glide.with(binding.ivRestaurantPhotoDetail)
                     .load(restaurantPhoto)
@@ -105,24 +110,23 @@ public class RestaurantDetails extends AppCompatActivity {
                 binding.tvIsOpenDetails.setText(R.string.closed);
             }
 
-            Location restaurantLocation = new Location("Restaurant Location");
+            Location restaurantLocation = new Location(getString(R.string.restaurant_location));
             restaurantLocation.setLongitude(restaurantLongitude);
             restaurantLocation.setLatitude(restaurantLatitude);
-            binding.tvDistanceRestaurantDetails.setText(String.format("%sm", Math.round(location.distanceTo(restaurantLocation))));
+            binding.tvDistanceRestaurantDetails.setText(String.format(getString(R.string.distance_in_meters_d), Math.round(location.distanceTo(restaurantLocation))));
 
             Glide.with(binding.ivEatingAloneDetail)
                     .asGif()
-                    .load("https://media.giphy.com/media/p1NqIBmDgA2P8Kwz8E/giphy.gif")
+                    .load(getString(R.string.gif_eating_alone))
                     .into(binding.ivEatingAloneDetail);
 
             //Phone number
             if (restaurant.getInternationalPhoneNumber() != null) {
-
                 restaurantPhoneNumber = restaurant.getInternationalPhoneNumber();
                 binding.ibCallDetail.setVisibility(View.VISIBLE);
                 binding.tvCallDetails.setVisibility(View.VISIBLE);
                 binding.ibCallDetail.setOnClickListener(view -> {
-                    String phoneFormatted = String.format("tel:%s", restaurantPhoneNumber);
+                    String phoneFormatted = String.format(getString(R.string.dial_phone_number), restaurantPhoneNumber);
                     Intent callIntent = new Intent(Intent.ACTION_DIAL);
                     callIntent.setData(Uri.parse(phoneFormatted));
                     startActivity(callIntent);
@@ -131,7 +135,6 @@ public class RestaurantDetails extends AppCompatActivity {
 
             // Website settings
             if (restaurant.getWebsite() != null) {
-
                 restaurantWebsite = restaurant.getWebsite();
                 binding.ibWebSiteDetails.setVisibility(View.VISIBLE);
                 binding.tvWebsiteDetails.setVisibility(View.VISIBLE);
@@ -142,7 +145,6 @@ public class RestaurantDetails extends AppCompatActivity {
                 });
             }
         }
-
     }
 
     /**
@@ -152,7 +154,7 @@ public class RestaurantDetails extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
-        viewModel.getDetails(restaurantID).removeObservers(this);
+        viewModel.getAllDetails(restaurantID).removeObservers(this);
         viewModel.getLocation(getBaseContext(), this).removeObservers(this);
     }
 }

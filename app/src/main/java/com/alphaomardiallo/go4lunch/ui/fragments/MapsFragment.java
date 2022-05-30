@@ -21,6 +21,7 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.alphaomardiallo.go4lunch.R;
+import com.alphaomardiallo.go4lunch.data.dataSources.Model.detailsPojo.Result;
 import com.alphaomardiallo.go4lunch.data.dataSources.Model.nearBySearchPojo.ResultsItem;
 import com.alphaomardiallo.go4lunch.data.viewModels.MainSharedViewModel;
 import com.alphaomardiallo.go4lunch.databinding.FragmentMapsBinding;
@@ -36,6 +37,7 @@ import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.material.snackbar.Snackbar;
 
 import java.util.List;
 import java.util.Objects;
@@ -74,20 +76,17 @@ public class MapsFragment extends Fragment implements EasyPermissions.Permission
         @Override
         public void onMapReady(@NonNull GoogleMap googleMap) {
 
-            Log.e(TAG, "onMapReady: called", null);
-
+            // Customise the styling of the base map using a JSON object defined in a raw resource file.
             try {
-                // Customise the styling of the base map using a JSON object defined
-                // in a raw resource file.
                 boolean success = googleMap.setMapStyle(
                         MapStyleOptions.loadRawResourceStyle(
                                 requireContext(), R.raw.map_styling));
 
                 if (!success) {
-                    Log.e(TAG, "Style parsing failed.");
+                    Toast.makeText(requireContext(), getString(R.string.style_parsing_failed), Toast.LENGTH_SHORT).show();
                 }
             } catch (Resources.NotFoundException e) {
-                Log.e(TAG, "Can't find style. Error: ", e);
+                Toast.makeText(requireContext(), getString(R.string.style_parsing_error), Toast.LENGTH_SHORT).show();
             }
 
             map = googleMap;
@@ -102,7 +101,6 @@ public class MapsFragment extends Fragment implements EasyPermissions.Permission
                 if (permission.hasLocationPermissions(requireContext())) {
                     getCurrentLocation(googleMap);
                 } else {
-                    Log.e(TAG, "MAPS FRAGMENT onClick: permission not granted", null);
                     requestPermission();
                 }
             });
@@ -117,24 +115,14 @@ public class MapsFragment extends Fragment implements EasyPermissions.Permission
         }
     };
 
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        Log.e(TAG, "onCreate: called", null);
-    }
-
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
                              @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
         binding = FragmentMapsBinding.inflate(inflater, container, false);
-        Log.e(TAG, "onCreateView: called", null);
-
         viewModel = new ViewModelProvider(requireActivity()).get(MainSharedViewModel.class);
-
         this.onAttach(requireContext());
-        Log.e(TAG, "attached ", null);
 
         return binding.getRoot();
     }
@@ -142,7 +130,6 @@ public class MapsFragment extends Fragment implements EasyPermissions.Permission
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        Log.e(TAG, "onViewCreated: called", null);
 
         SupportMapFragment mapFragment =
                 (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
@@ -153,9 +140,6 @@ public class MapsFragment extends Fragment implements EasyPermissions.Permission
         binding.chipGroup.setVisibility(View.GONE);
 
         requestPermission();
-
-        checkIfRestaurantHasBeenSelected();
-
     }
 
     /**
@@ -185,22 +169,46 @@ public class MapsFragment extends Fragment implements EasyPermissions.Permission
 
     }
 
-    private void checkIfRestaurantHasBeenSelected() {
-        //viewModel.getSelectedRestaurant().observe(requireActivity(), this::focusOnSelectedRestaurant);
-        Log.e(TAG, "checkIfRestaurantHasBeenSelected: accessed", null);
+    private void focusOnSelectedRestaurant(String id) {
+        if (id != null) {
+            Log.e(TAG, "focusOnSelectedRestaurant: CALLED", null);
+            viewModel.fetchPartialRestaurantDetails(id);
+            viewModel.getPartialRestaurantDetails().observe(requireActivity(), this::moveMapAndSetLocationOfSelectedRestaurant);
+        }
     }
 
-    private void focusOnSelectedRestaurant(String id){
-        //PredictionsItem selectedRestaurant = viewModel.getSelectedRestaurant().getValue();
-/*        if (selectedRestaurant != null) {
-            Log.e(TAG, "focusOnSelectedRestaurant: CALLED", null);
-            viewModel.getSelectedRestaurantDetail(selectedRestaurant.getPlaceId());
-            Result restaurant = viewModel.getSelectedRestaurantDetails().getValue();
-            LatLng restaurantLatLng = new LatLng(restaurant.getGeometry().getLocation().getLat(),restaurant.getGeometry().getLocation().getLng());
-            map.moveCamera(CameraUpdateFactory.newLatLngZoom(restaurantLatLng, defaultCameraZoomOverMap));
-        }*/
-        Log.e(TAG, "focusOnSelectedRestaurant: called " + id, null);
-        Toast.makeText(requireContext(), id, Toast.LENGTH_LONG).show();
+    private void moveMapAndSetLocationOfSelectedRestaurant(Result restaurant) {
+        Result selectedRestaurant = restaurant;
+        boolean isAlreadyInTheList = false;
+
+        LatLng restaurantLatLng = new LatLng(restaurant.getGeometry().getLocation().getLat(), restaurant.getGeometry().getLocation().getLng());
+        map.moveCamera(CameraUpdateFactory.newLatLngZoom(restaurantLatLng, defaultCameraZoomOverMap));
+
+        for (ResultsItem item : restaurantList) {
+            if (item.getName().equalsIgnoreCase(selectedRestaurant.getName())) {
+                isAlreadyInTheList = true;
+                break;
+            }
+        }
+
+        if (!isAlreadyInTheList) {
+            map.addMarker(new MarkerOptions()
+                    .title(selectedRestaurant.getName())
+                    .position(restaurantLatLng)
+                    .icon(BitmapDescriptorFactory.fromBitmap(viewModel.resizeMarker(requireContext().getResources(), R.drawable.restaurant))));
+            String snackBarMessage = String.format(getString(R.string.get_info_selected_restaurant), selectedRestaurant.getName());
+            Snackbar.make(binding.map, snackBarMessage, 10000)
+                    .setAction(getString(R.string.get_details), new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            Log.e(TAG, "onClick: " + selectedRestaurant.getPlaceId(), null);
+                            openDetailActivity(selectedRestaurant.getPlaceId());
+                        }
+                    })
+                    .show();
+        }
+
+
     }
 
     /**
@@ -244,7 +252,7 @@ public class MapsFragment extends Fragment implements EasyPermissions.Permission
             assert list1 != null;
             for (ResultsItem resultsItem : list1) {
                 if (Objects.requireNonNull(marker.getTitle()).equalsIgnoreCase(resultsItem.getName())) {
-                    openDetailActivity(resultsItem);
+                    openDetailActivity(resultsItem.getPlaceId());
                 }
             }
         });
@@ -254,9 +262,9 @@ public class MapsFragment extends Fragment implements EasyPermissions.Permission
         googleMap.setOnCameraMoveListener(() -> cameraPosition = googleMap.getCameraPosition());
     }
 
-    private void openDetailActivity(ResultsItem restaurant) {
+    private void openDetailActivity(String restaurantID) {
         Intent intent = new Intent(requireContext(), RestaurantDetails.class);
-        intent.putExtra("id", restaurant.getPlaceId());
+        intent.putExtra("id", restaurantID);
         startActivity(intent);
     }
 

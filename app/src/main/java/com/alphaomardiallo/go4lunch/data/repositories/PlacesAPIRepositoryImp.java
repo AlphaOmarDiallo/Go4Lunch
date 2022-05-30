@@ -37,7 +37,7 @@ public class PlacesAPIRepositoryImp implements PlacesAPIRepository {
     private static final String PLACES_API_KEY = BuildConfig.PLACES_API_KEY;
     private static final String RESTAURANT = "restaurant";
     private static final String RANK_BY = "distance";
-    private static final String FIELDS_RESTAURANT_DETAIL_ACTIVITY = "name,geometry/location";
+    private static final String FIELDS_RESTAURANT_DETAIL_ACTIVITY = "place_id,name,geometry/location,photo,vicinity,opening_hours/open_now,rating";
     private static final String FIELDS_RESTAURANT_DETAIL_ACTIVITY_COMPLETE = "name,photo,vicinity,rating,geometry/location,international_phone_number,opening_hours/open_now,website";
     private static final int MAXPRICE = 2;
     private static final int HANDLING_TIME = 2000;
@@ -207,6 +207,7 @@ public class PlacesAPIRepositoryImp implements PlacesAPIRepository {
         restaurantListLiveData.setValue(restaurantList);
     }
 
+
     /**
      * Places Detail
      */
@@ -223,12 +224,11 @@ public class PlacesAPIRepositoryImp implements PlacesAPIRepository {
     }
 
     @Override
-    public void fetchDetails(String placeID) {
-
-        Call<PlaceDetails> call4 = retrofitDetailsAPI.getPlaceDetails(FIELDS_RESTAURANT_DETAIL_ACTIVITY, placeID, PLACES_API_KEY);
-        call4.enqueue(new Callback<PlaceDetails>() {
+    public void fetchOneNearByRestaurantDetail(String placeID) {
+        Call<PlaceDetails> call5 = retrofitDetailsAPI.getPlaceDetails(FIELDS_RESTAURANT_DETAIL_ACTIVITY, placeID, PLACES_API_KEY);
+        call5.enqueue(new Callback<PlaceDetails>() {
             @Override
-            public void onResponse(@NonNull Call<PlaceDetails> call, @NonNull Response<PlaceDetails> response) {
+            public void onResponse(Call<PlaceDetails> call, Response<PlaceDetails> response) {
                 if (!response.isSuccessful()) {
                     Log.e(TAG, "onResponse: failed " + response.message(), null);
                     return;
@@ -237,15 +237,14 @@ public class PlacesAPIRepositoryImp implements PlacesAPIRepository {
                 if (response.body() != null) {
                     selectedRestaurantDetails.setValue(response.body().getResult());
                 }
+
             }
 
             @Override
-            public void onFailure(@NonNull Call<PlaceDetails> call, @NonNull Throwable t) {
+            public void onFailure(Call<PlaceDetails> call, Throwable t) {
 
             }
         });
-
-        Log.e(TAG, "getDetails: PLACE DETAILS API CALLED", null);
     }
 
     @Override

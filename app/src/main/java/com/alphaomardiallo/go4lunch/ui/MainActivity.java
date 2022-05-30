@@ -79,7 +79,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         if (returnedIntent != null) {
                             String selectedRestaurantID = returnedIntent.getStringExtra(KEY_SELECTED_RESTAURANT_ID);
                             String selectedRestaurantName = returnedIntent.getStringExtra(KEY_SELECTED_RESTAURANT_NAME);
-                            viewModel.getIdRestaurantToFocusOn(selectedRestaurantID);
+                            viewModel.setIdRestaurantToFocusOn(selectedRestaurantID);
                             showSnackBarMessage(String.format(getString(R.string.message_activity_result_ok), selectedRestaurantName));
                         }
                     } else {

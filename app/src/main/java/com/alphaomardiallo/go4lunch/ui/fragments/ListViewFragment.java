@@ -47,11 +47,6 @@ public class ListViewFragment extends Fragment implements OnClickItemListener {
     private final Location location = positionUtils.getOfficeLocationFormat();
     private ListViewAdapter adapter = new ListViewAdapter(new ListViewAdapter.ListDiff(), this, location);
 
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-    }
-
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,

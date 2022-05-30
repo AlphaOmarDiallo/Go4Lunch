@@ -27,11 +27,6 @@ public class RestaurantDetailsViewModel extends ViewModel {
         this.locationRepository = locationRepository;
     }
 
-    public LiveData<Result> getDetails(String placeID) {
-        placesAPIRepository.fetchDetails(placeID);
-        return placesAPIRepository.getDetails();
-    }
-
     public LiveData<Result> getAllDetails(String placeID) {
         placesAPIRepository.fetchAllDetails(placeID);
         return placesAPIRepository.getDetails();
