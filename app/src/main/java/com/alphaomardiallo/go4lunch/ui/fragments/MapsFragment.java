@@ -47,6 +47,7 @@ import pub.devrel.easypermissions.EasyPermissions;
 @AndroidEntryPoint
 public class MapsFragment extends Fragment implements EasyPermissions.PermissionCallbacks {
 
+    private static final int SNACK_BAR_LENGTH_LONG = 10000;
     private static final int REQUEST_PERMISSIONS_LOCATION = 567;
     private static final PermissionUtils permission = new PermissionUtils();
     private final long defaultCameraZoomOverMap = 19;
@@ -192,7 +193,7 @@ public class MapsFragment extends Fragment implements EasyPermissions.Permission
                     .position(restaurantLatLng)
                     .icon(BitmapDescriptorFactory.fromBitmap(viewModel.resizeMarker(requireContext().getResources(), R.drawable.restaurant))));
             String snackBarMessage = String.format(getString(R.string.get_info_selected_restaurant), restaurant.getName());
-            Snackbar.make(binding.map, snackBarMessage, 10000)
+            Snackbar.make(binding.map, snackBarMessage, SNACK_BAR_LENGTH_LONG)
                     .setAction(getString(R.string.get_details), view -> openDetailActivity(restaurant.getPlaceId()))
                     .show();
         }

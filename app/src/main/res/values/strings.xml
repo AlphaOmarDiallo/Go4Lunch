@@ -28,9 +28,12 @@
     <!-- links -->
     <string name="login_and_menu_background">https://images.pexels.com/photos/3184188/pexels-photo-3184188.jpeg?cs=srgb&amp;dl=pexels-fauxels-3184188.jpg&amp;fm=jpg</string>
     <string name="nav_drawer_background">https://images.pexels.com/photos/3184183/pexels-photo-3184183.jpeg?cs=srgb&amp;dl=pexels-fauxels-3184183.jpg&amp;fm=jpg</string>
+    <string name="restaurantPlaceHolder">https://images.pexels.com/photos/3184192/pexels-photo-3184192.jpeg?cs=srgb&amp;dl=pexels-fauxels-3184192.jpg&amp;fm=jpg"</string>
+    <string name="restaurant_photo">https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&amp;photo_reference=%s&amp;key=%s;</string>
     <string name="gif_eating_alone">https://media.giphy.com/media/p1NqIBmDgA2P8Kwz8E/giphy.gif</string>
-    <string name="restaurantPlaceHolder">"https://images.pexels.com/photos/3184192/pexels-photo-3184192.jpeg?cs=srgb&amp;dl=pexels-fauxels-3184192.jpg&amp;fm=jpg"</string>
-    <string name="restaurant_photo">"https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&amp;photo_reference=%s&amp;key=%s;</string>
+    <string name="we_need_your_location_gif">https://media.giphy.com/media/Vh8zf1nIfQRRXksAm1/giphy.gif</string>
+    <string name="fetching_list_gif">https://media.giphy.com/media/0KiLnOipDAnfk5Jgsf/giphy.gif</string>
+    <string name="no_results_gif">https://media.giphy.com/media/MdeHHwPzLpzbEkzl70/giphy.gif</string>
 
     <!--  Keys -->
     <string name="default_web_client_id_google">407532419271-qimb705lnldgpbks9mb0bhoveskv8po6.apps.googleusercontent.com</string>
@@ -99,7 +102,7 @@
     <string name="remove_query" />
     <string name="style_parsing_failed">Style parsing failed</string>
     <string name="style_parsing_error">Style_parsing_error</string>
-    <string name="get_info_selected_restaurant">Selected restaurant: %s</string>
+    <string name="get_info_selected_restaurant">%s added to the map</string>
     <string name="get_details">More info</string>
     <string name="restaurant_location">Restaurant location</string>
     <string name="dial_phone_number">"tel:%s"</string>

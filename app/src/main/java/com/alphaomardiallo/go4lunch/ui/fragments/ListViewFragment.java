@@ -1,14 +1,11 @@
 package com.alphaomardiallo.go4lunch.ui.fragments;
 
-import static android.content.ContentValues.TAG;
-
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.location.Location;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -39,13 +36,16 @@ import dagger.hilt.android.AndroidEntryPoint;
 @AndroidEntryPoint
 public class ListViewFragment extends Fragment implements OnClickItemListener {
 
+    private static final String KEY_RESTAURANT_ID = "id";
+    private static final int SNACK_BAR_LENGTH_LONG = 10000;
+    private static final int HANDLER_LENGTH_LONG = 20000;
+    private static final int SIZE_PICTURE = 100;
     private final Handler handler = new Handler(Looper.getMainLooper());
-
-    private FragmentListViewBinding binding;
-    public MainSharedViewModel viewModel;
-    private List<ResultsItem> restaurantList = new ArrayList<>();
     private final PositionUtils positionUtils = new PositionUtils();
     private final Location location = positionUtils.getOfficeLocationFormat();
+    private FragmentListViewBinding binding;
+    private MainSharedViewModel viewModel;
+    private List<ResultsItem> restaurantList = new ArrayList<>();
     private ListViewAdapter adapter = new ListViewAdapter(new ListViewAdapter.ListDiff(), this, location);
 
     @Nullable
@@ -99,7 +99,6 @@ public class ListViewFragment extends Fragment implements OnClickItemListener {
     }
 
     private void getSearchResult(String restaurantID) {
-        Log.e(TAG, "getSearchResult: called " + restaurantID, null);
         boolean isInList = false;
         int position;
         for (ResultsItem item : restaurantList) {
@@ -112,7 +111,7 @@ public class ListViewFragment extends Fragment implements OnClickItemListener {
         }
 
         if(!isInList){
-            Snackbar.make(binding.listViewFragment, getString(R.string.restaurant_not_in_list), 10000)
+            Snackbar.make(binding.listViewFragment, getString(R.string.restaurant_not_in_list), SNACK_BAR_LENGTH_LONG)
                     .setAction(getString(R.string.get_details), view -> openDetailActivity(restaurantID)).show();
         }
     }
@@ -144,7 +143,7 @@ public class ListViewFragment extends Fragment implements OnClickItemListener {
             binding.tvLoadingMessage.setText(R.string.location_missing);
             Glide.with(binding.ivLoadingGIF)
                     .asGif()
-                    .load("https://media.giphy.com/media/Vh8zf1nIfQRRXksAm1/giphy.gif")
+                    .load(getString(R.string.we_need_your_location_gif))
                     .into(binding.ivLoadingGIF);
             return;
         }
@@ -152,7 +151,7 @@ public class ListViewFragment extends Fragment implements OnClickItemListener {
         if (restaurantList == null || restaurantList.isEmpty()) {
             Glide.with(binding.ivLoadingGIF)
                     .asGif()
-                    .load("https://media.giphy.com/media/0KiLnOipDAnfk5Jgsf/giphy.gif")
+                    .load(getString(R.string.fetching_list_gif))
                     .into(binding.ivLoadingGIF);
 
             binding.tvLoadingMessage.setVisibility(View.VISIBLE);
@@ -168,7 +167,7 @@ public class ListViewFragment extends Fragment implements OnClickItemListener {
         if (list.isEmpty()) {
             Glide.with(binding.ivLoadingGIF)
                     .asGif()
-                    .load("https://media.giphy.com/media/0KiLnOipDAnfk5Jgsf/giphy.gif")
+                    .load(getString(R.string.fetching_list_gif))
                     .into(binding.ivLoadingGIF);
         } else {
             binding.tvLoadingMessage.setVisibility(View.INVISIBLE);
@@ -179,10 +178,10 @@ public class ListViewFragment extends Fragment implements OnClickItemListener {
             binding.tvLoadingMessage.setText(R.string.no_restaurant_in_your_area);
             Glide.with(binding.ivLoadingGIF)
                     .asGif()
-                    .override(100, 100)
-                    .load("https://media.giphy.com/media/MdeHHwPzLpzbEkzl70/giphy.gif")
+                    .override(SIZE_PICTURE, SIZE_PICTURE)
+                    .load(getString(R.string.no_results_gif))
                     .into(binding.ivLoadingGIF);
-        }, 20000);
+        }, HANDLER_LENGTH_LONG);
     }
 
     /**
@@ -191,7 +190,7 @@ public class ListViewFragment extends Fragment implements OnClickItemListener {
 
     private void openDetailActivity(String restaurantID) {
         Intent intent = new Intent(requireContext(), RestaurantDetails.class);
-        intent.putExtra("id", restaurantID);
+        intent.putExtra(KEY_RESTAURANT_ID, restaurantID);
         startActivity(intent);
     }
 
@@ -206,9 +205,6 @@ public class ListViewFragment extends Fragment implements OnClickItemListener {
         if (viewModel.hasPermission(requireContext())) {
             viewModel.getRestaurants().removeObservers(this);
             viewModel.getCurrentLocation().removeObservers(this);
-            //viewModel.stopTrackingLocation();
         }
-
-        Log.e(TAG, "onDestroyView: Destroy", null);
     }
 }
