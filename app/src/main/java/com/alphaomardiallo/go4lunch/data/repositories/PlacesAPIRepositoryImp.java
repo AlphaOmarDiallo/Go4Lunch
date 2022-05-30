@@ -39,7 +39,7 @@ public class PlacesAPIRepositoryImp implements PlacesAPIRepository {
     private static final String BASE_URL = "https://maps.googleapis.com/maps/api/place/";
     private static final int MAXPRICE = 2;
     private static final int HANDLING_TIME = 2000;
-    private static final int OFFSET = 3;
+    private static final int OFFSET = 2;
     private static final boolean STRICTBOUNDS = true;
     private final Handler handler = new Handler(Looper.getMainLooper());
     private final MutableLiveData<List<ResultsItem>> restaurantListLiveData = new MutableLiveData<>();

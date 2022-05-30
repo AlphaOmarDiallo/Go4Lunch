@@ -103,5 +103,6 @@
     <string name="get_details">More info</string>
     <string name="restaurant_location">Restaurant location</string>
     <string name="dial_phone_number">"tel:%s"</string>
+    <string name="restaurant_not_in_list">Selected restaurant not in the list</string>
 
 </resources>

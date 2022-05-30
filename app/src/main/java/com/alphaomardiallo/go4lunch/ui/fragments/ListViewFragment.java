@@ -28,6 +28,7 @@ import com.alphaomardiallo.go4lunch.domain.PositionUtils;
 import com.alphaomardiallo.go4lunch.ui.RestaurantDetails;
 import com.alphaomardiallo.go4lunch.ui.adapters.ListViewAdapter;
 import com.bumptech.glide.Glide;
+import com.google.android.material.snackbar.Snackbar;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -99,6 +100,21 @@ public class ListViewFragment extends Fragment implements OnClickItemListener {
 
     private void getSearchResult(String restaurantID) {
         Log.e(TAG, "getSearchResult: called " + restaurantID, null);
+        boolean isInList = false;
+        int position;
+        for (ResultsItem item : restaurantList) {
+            if (item.getPlaceId().equalsIgnoreCase(restaurantID)) {
+                position = restaurantList.indexOf(item);
+                isInList = true;
+                binding.recyclerView.scrollToPosition(position);
+                break;
+            }
+        }
+
+        if(!isInList){
+            Snackbar.make(binding.listViewFragment, getString(R.string.restaurant_not_in_list), 10000)
+                    .setAction(getString(R.string.get_details), view -> openDetailActivity(restaurantID)).show();
+        }
     }
 
     /**
@@ -116,9 +132,7 @@ public class ListViewFragment extends Fragment implements OnClickItemListener {
     @Override
     public void onClickItem(int position) {
         ResultsItem restaurant = Objects.requireNonNull(viewModel.getRestaurants().getValue()).get(position);
-        Intent intent = new Intent(requireContext(), RestaurantDetails.class);
-        intent.putExtra("id", restaurant.getPlaceId());
-        startActivity(intent);
+        openDetailActivity(restaurant.getPlaceId());
     }
 
     /**
@@ -169,6 +183,16 @@ public class ListViewFragment extends Fragment implements OnClickItemListener {
                     .load("https://media.giphy.com/media/MdeHHwPzLpzbEkzl70/giphy.gif")
                     .into(binding.ivLoadingGIF);
         }, 20000);
+    }
+
+    /**
+     * Open details
+     */
+
+    private void openDetailActivity(String restaurantID) {
+        Intent intent = new Intent(requireContext(), RestaurantDetails.class);
+        intent.putExtra("id", restaurantID);
+        startActivity(intent);
     }
 
     /**
