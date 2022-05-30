@@ -50,7 +50,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private static final String KEY_SELECTED_RESTAURANT_ID = "placeID";
     private static final String KEY_SELECTED_RESTAURANT_NAME = "placeName";
     private static final String KEY_SEARCH_QUERY = "Query";
-    private static final String KEY_LOCATION_STRING  = "Location";
+    private static final String KEY_LOCATION_STRING = "Location";
     private final Handler handler = new Handler(Looper.getMainLooper());
     private final MapsFragment mapsFragment = new MapsFragment();
     private final ListViewFragment listViewFragment = new ListViewFragment();

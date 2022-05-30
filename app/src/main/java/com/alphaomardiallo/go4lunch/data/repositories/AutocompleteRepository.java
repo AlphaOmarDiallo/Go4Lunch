@@ -12,9 +12,6 @@ public interface AutocompleteRepository {
 
     LiveData<List<PredictionsItem>> searchPrediction();
 
-    public void setPlaceToFocusOn(PredictionsItem restaurant);
+    void setPlaceToFocusOn(PredictionsItem restaurant);
 
-    public PredictionsItem getSelectedRestaurant();
-
-    public void deleteSelectedRestaurant();
 }

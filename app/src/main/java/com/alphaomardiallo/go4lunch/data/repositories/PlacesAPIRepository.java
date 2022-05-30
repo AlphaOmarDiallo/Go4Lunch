@@ -20,7 +20,7 @@ public interface PlacesAPIRepository {
 
     void fetchOneNearByRestaurantDetail(String placeID);
 
-    void fetchAllDetails (String placeID);
+    void fetchAllDetails(String placeID);
 
     LiveData<List<PredictionsItem>> autoCompleteSearch(String Query, String location, int radius);
 

@@ -16,7 +16,6 @@ import androidx.lifecycle.ViewModel;
 
 import com.alphaomardiallo.go4lunch.data.dataSources.Model.detailsPojo.Result;
 import com.alphaomardiallo.go4lunch.data.dataSources.Model.nearBySearchPojo.ResultsItem;
-import com.alphaomardiallo.go4lunch.data.repositories.AutocompleteRepository;
 import com.alphaomardiallo.go4lunch.data.repositories.LocationRepository;
 import com.alphaomardiallo.go4lunch.data.repositories.PermissionRepository;
 import com.alphaomardiallo.go4lunch.data.repositories.PlacesAPIRepository;
@@ -39,18 +38,16 @@ public class MainSharedViewModel extends ViewModel {
     private final LocationRepository locationRepository;
     private final PlacesAPIRepository placesAPIRepository;
     private final PermissionRepository permissionRepository;
-    private final AutocompleteRepository autocompleteRepository;
     private final MutableLiveData<String> restaurantToFocusOn = new MutableLiveData<>();
     private final LiveData<List<ResultsItem>> restaurants;
     private Location savedLocation;
 
     @Inject
-    public MainSharedViewModel(UserRepositoryImp userRepositoryImp, LocationRepository locationRepository, PlacesAPIRepository placesAPIRepository, PermissionRepository permissionRepository, AutocompleteRepository autocompleteRepository) {
+    public MainSharedViewModel(UserRepositoryImp userRepositoryImp, LocationRepository locationRepository, PlacesAPIRepository placesAPIRepository, PermissionRepository permissionRepository) {
         this.userRepositoryImp = userRepositoryImp;
         this.locationRepository = locationRepository;
         this.placesAPIRepository = placesAPIRepository;
         this.permissionRepository = permissionRepository;
-        this.autocompleteRepository = autocompleteRepository;
         restaurants = placesAPIRepository.getNearBySearchRestaurantList();
     }
 

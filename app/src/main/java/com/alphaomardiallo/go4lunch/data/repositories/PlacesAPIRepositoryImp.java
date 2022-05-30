@@ -1,10 +1,7 @@
 package com.alphaomardiallo.go4lunch.data.repositories;
 
-import static android.content.ContentValues.TAG;
-
 import android.os.Handler;
 import android.os.Looper;
-import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.LiveData;
@@ -39,9 +36,10 @@ public class PlacesAPIRepositoryImp implements PlacesAPIRepository {
     private static final String RANK_BY = "distance";
     private static final String FIELDS_RESTAURANT_DETAIL_ACTIVITY = "place_id,name,geometry/location,photo,vicinity,opening_hours/open_now,rating";
     private static final String FIELDS_RESTAURANT_DETAIL_ACTIVITY_COMPLETE = "name,photo,vicinity,rating,geometry/location,international_phone_number,opening_hours/open_now,website";
+    private static final String BASE_URL = "https://maps.googleapis.com/maps/api/place/";
     private static final int MAXPRICE = 2;
     private static final int HANDLING_TIME = 2000;
-    private static final int OFFSET = 2;
+    private static final int OFFSET = 3;
     private static final boolean STRICTBOUNDS = true;
     private final Handler handler = new Handler(Looper.getMainLooper());
     private final MutableLiveData<List<ResultsItem>> restaurantListLiveData = new MutableLiveData<>();
@@ -55,7 +53,7 @@ public class PlacesAPIRepositoryImp implements PlacesAPIRepository {
     }
 
     Retrofit retrofit = new Retrofit.Builder()
-            .baseUrl("https://maps.googleapis.com/maps/api/place/")
+            .baseUrl(BASE_URL)
             .addConverterFactory(GsonConverterFactory.create())
             .build();
 
@@ -81,32 +79,25 @@ public class PlacesAPIRepositoryImp implements PlacesAPIRepository {
             public void onResponse(@NonNull Call<PlaceNearBy> call, @NonNull Response<PlaceNearBy> response) {
 
                 if (!response.isSuccessful()) {
-                    Log.e(TAG, "onResponse: failed " + response.message(), null);
+                    System.out.println(response.raw().request().url());
                     return;
                 }
 
                 assert response.body() != null;
-
                 populateList(response.body().getResults());
 
                 if (response.body().getNextPageToken() != null) {
-
                     handler.postDelayed(() -> getNextResultsRadiusMethod(location, radius, response.body().getNextPageToken()), HANDLING_TIME);
-
                 } else {
-
                     noRestaurantInRadius(location);
                 }
             }
 
             @Override
             public void onFailure(@NonNull Call<PlaceNearBy> call, @NonNull Throwable t) {
-
-                Log.e(TAG, "onFailure: " + t.getMessage(), t);
+                System.out.println(t.getMessage());
             }
         });
-
-        Log.e(TAG, "fetchNearBySearchPlaces: API called", null);
     }
 
     //PageToken recall if it is found
@@ -120,7 +111,7 @@ public class PlacesAPIRepositoryImp implements PlacesAPIRepository {
             public void onResponse(@NonNull Call<PlaceNearBy> call, @NonNull Response<PlaceNearBy> response) {
 
                 if (!response.isSuccessful()) {
-                    Log.e(TAG, "onResponse: failed " + response.message(), null);
+                    System.out.println(response.raw().request().url());
                     return;
                 }
 
@@ -135,19 +126,17 @@ public class PlacesAPIRepositoryImp implements PlacesAPIRepository {
                         @Override
                         public void onResponse(@NonNull Call<PlaceNearBy> call, @NonNull Response<PlaceNearBy> response) {
                             if (!response.isSuccessful()) {
-                                Log.e(TAG, "onResponse: failed " + response.message(), null);
+                                System.out.println(response.raw().request().url());
                                 return;
                             }
 
                             assert response.body() != null;
                             populateList(response.body().getResults());
-
                         }
 
                         @Override
                         public void onFailure(@NonNull Call<PlaceNearBy> call, @NonNull Throwable t) {
-
-                            Log.e(TAG, "onFailure: " + t.getMessage(), t);
+                            System.out.println(t.getMessage());
                         }
                     });
                 }
@@ -155,8 +144,7 @@ public class PlacesAPIRepositoryImp implements PlacesAPIRepository {
 
             @Override
             public void onFailure(@NonNull Call<PlaceNearBy> call, @NonNull Throwable t) {
-
-                Log.e(TAG, "onFailure: " + t.getMessage(), null);
+                System.out.println(t.getMessage());
             }
         });
     }
@@ -171,7 +159,7 @@ public class PlacesAPIRepositoryImp implements PlacesAPIRepository {
             public void onResponse(@NonNull Call<PlaceNearBy> call, @NonNull Response<PlaceNearBy> response) {
 
                 if (!response.isSuccessful()) {
-                    Log.e(TAG, "onResponse: failed " + response.message(), null);
+                    System.out.println(response.raw().request().url());
                     return;
                 }
 
@@ -181,7 +169,7 @@ public class PlacesAPIRepositoryImp implements PlacesAPIRepository {
 
             @Override
             public void onFailure(@NonNull Call<PlaceNearBy> call, @NonNull Throwable t) {
-                Log.e(TAG, "onFailure: " + t.getMessage(), null);
+                System.out.println(t.getMessage());
             }
         });
     }
@@ -203,7 +191,6 @@ public class PlacesAPIRepositoryImp implements PlacesAPIRepository {
                 restaurantList.add(newItem);
             }
         }
-
         restaurantListLiveData.setValue(restaurantList);
     }
 
@@ -228,21 +215,20 @@ public class PlacesAPIRepositoryImp implements PlacesAPIRepository {
         Call<PlaceDetails> call5 = retrofitDetailsAPI.getPlaceDetails(FIELDS_RESTAURANT_DETAIL_ACTIVITY, placeID, PLACES_API_KEY);
         call5.enqueue(new Callback<PlaceDetails>() {
             @Override
-            public void onResponse(Call<PlaceDetails> call, Response<PlaceDetails> response) {
+            public void onResponse(@NonNull Call<PlaceDetails> call, @NonNull Response<PlaceDetails> response) {
                 if (!response.isSuccessful()) {
-                    Log.e(TAG, "onResponse: failed " + response.message(), null);
+                    System.out.println(response.raw().request().url());
                     return;
                 }
 
                 if (response.body() != null) {
                     selectedRestaurantDetails.setValue(response.body().getResult());
                 }
-
             }
 
             @Override
-            public void onFailure(Call<PlaceDetails> call, Throwable t) {
-
+            public void onFailure(@NonNull Call<PlaceDetails> call, @NonNull Throwable t) {
+                System.out.println(t.getMessage());
             }
         });
     }
@@ -255,7 +241,7 @@ public class PlacesAPIRepositoryImp implements PlacesAPIRepository {
             @Override
             public void onResponse(@NonNull Call<PlaceDetails> call, @NonNull Response<PlaceDetails> response) {
                 if (!response.isSuccessful()) {
-                    Log.e(TAG, "onResponse: failed " + response.message(), null);
+                    System.out.println(response.raw().request().url());
                     return;
                 }
 
@@ -266,11 +252,10 @@ public class PlacesAPIRepositoryImp implements PlacesAPIRepository {
 
             @Override
             public void onFailure(@NonNull Call<PlaceDetails> call, @NonNull Throwable t) {
-
+                System.out.println(t.getMessage());
             }
         });
 
-        Log.e(TAG, "getDetails: PLACE DETAILS API CALLED", null);
     }
 
     /**
@@ -285,11 +270,8 @@ public class PlacesAPIRepositoryImp implements PlacesAPIRepository {
         call6.enqueue(new Callback<PlaceAutoComplete>() {
             @Override
             public void onResponse(@NonNull Call<PlaceAutoComplete> call, @NonNull Response<PlaceAutoComplete> response) {
-
-                Log.e(TAG, "onResponse: AUTOCOMPLETE API CALLED", null);
-
                 if (!response.isSuccessful()) {
-                    Log.e(TAG, "onResponse: failed " + response.message(), null);
+                    System.out.println(response.raw().request().url());
                     return;
                 }
 
@@ -297,14 +279,12 @@ public class PlacesAPIRepositoryImp implements PlacesAPIRepository {
                     System.out.println(response.raw().request().url());
                     predictionAutoComplete.setValue(response.body().getPredictions());
                 }
-
             }
 
             @Override
             public void onFailure(@NonNull Call<PlaceAutoComplete> call, @NonNull Throwable t) {
-
+                System.out.println(t.getMessage());
             }
-
         });
 
         return predictionAutoComplete;

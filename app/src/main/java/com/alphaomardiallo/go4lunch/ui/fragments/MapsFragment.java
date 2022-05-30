@@ -1,7 +1,6 @@
 package com.alphaomardiallo.go4lunch.ui.fragments;
 
 import static android.Manifest.permission.ACCESS_FINE_LOCATION;
-import static android.content.ContentValues.TAG;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
@@ -9,7 +8,6 @@ import android.content.Intent;
 import android.content.res.Resources;
 import android.location.Location;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -143,7 +141,7 @@ public class MapsFragment extends Fragment implements EasyPermissions.Permission
     }
 
     /**
-     * Getting data from viewModel
+     * Getting data from viewModel and update views accordingly
      */
 
     private void observeData() {
@@ -154,38 +152,33 @@ public class MapsFragment extends Fragment implements EasyPermissions.Permission
     }
 
     private void updateMapWithRestaurants(List<ResultsItem> resultsItemList) {
-        Log.e(TAG, "updateMapWithRestaurants: new list " + resultsItemList.toString(), null);
         restaurantList = resultsItemList;
         addRestaurantMarkersToMap(resultsItemList, map);
     }
 
     private void updateLocation(Location location) {
-
         if (this.isAdded()) {
             this.location = location;
             getCurrentLocation(map);
             viewModel.getRestaurants().observe(requireActivity(), this::updateMapWithRestaurants);
         }
-
     }
 
     private void focusOnSelectedRestaurant(String id) {
         if (id != null) {
-            Log.e(TAG, "focusOnSelectedRestaurant: CALLED", null);
             viewModel.fetchPartialRestaurantDetails(id);
             viewModel.getPartialRestaurantDetails().observe(requireActivity(), this::moveMapAndSetLocationOfSelectedRestaurant);
         }
     }
 
     private void moveMapAndSetLocationOfSelectedRestaurant(Result restaurant) {
-        Result selectedRestaurant = restaurant;
         boolean isAlreadyInTheList = false;
 
         LatLng restaurantLatLng = new LatLng(restaurant.getGeometry().getLocation().getLat(), restaurant.getGeometry().getLocation().getLng());
         map.moveCamera(CameraUpdateFactory.newLatLngZoom(restaurantLatLng, defaultCameraZoomOverMap));
 
         for (ResultsItem item : restaurantList) {
-            if (item.getName().equalsIgnoreCase(selectedRestaurant.getName())) {
+            if (item.getName().equalsIgnoreCase(restaurant.getName())) {
                 isAlreadyInTheList = true;
                 break;
             }
@@ -193,22 +186,14 @@ public class MapsFragment extends Fragment implements EasyPermissions.Permission
 
         if (!isAlreadyInTheList) {
             map.addMarker(new MarkerOptions()
-                    .title(selectedRestaurant.getName())
+                    .title(restaurant.getName())
                     .position(restaurantLatLng)
                     .icon(BitmapDescriptorFactory.fromBitmap(viewModel.resizeMarker(requireContext().getResources(), R.drawable.restaurant))));
-            String snackBarMessage = String.format(getString(R.string.get_info_selected_restaurant), selectedRestaurant.getName());
+            String snackBarMessage = String.format(getString(R.string.get_info_selected_restaurant), restaurant.getName());
             Snackbar.make(binding.map, snackBarMessage, 10000)
-                    .setAction(getString(R.string.get_details), new View.OnClickListener() {
-                        @Override
-                        public void onClick(View view) {
-                            Log.e(TAG, "onClick: " + selectedRestaurant.getPlaceId(), null);
-                            openDetailActivity(selectedRestaurant.getPlaceId());
-                        }
-                    })
+                    .setAction(getString(R.string.get_details), view -> openDetailActivity(restaurant.getPlaceId()))
                     .show();
         }
-
-
     }
 
     /**
