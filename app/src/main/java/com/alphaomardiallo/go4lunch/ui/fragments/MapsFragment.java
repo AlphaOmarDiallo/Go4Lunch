@@ -165,9 +165,11 @@ public class MapsFragment extends Fragment implements EasyPermissions.Permission
     }
 
     private void focusOnSelectedRestaurant(String id) {
-        if (id != null) {
-            viewModel.fetchPartialRestaurantDetails(id);
-            viewModel.getPartialRestaurantDetails().observe(requireActivity(), this::moveMapAndSetLocationOfSelectedRestaurant);
+        if (this.isAdded()){
+            if (id != null) {
+                viewModel.fetchPartialRestaurantDetails(id);
+                viewModel.getPartialRestaurantDetails().observe(requireActivity(), this::moveMapAndSetLocationOfSelectedRestaurant);
+            }
         }
     }
 
@@ -320,6 +322,7 @@ public class MapsFragment extends Fragment implements EasyPermissions.Permission
         super.onDestroyView();
         if (viewModel.hasPermission(requireContext())) {
             viewModel.getRestaurants().removeObservers(this);
+            viewModel.getPartialRestaurantDetails().removeObservers(this);
             binding = null;
         }
         setCameraListener(map);

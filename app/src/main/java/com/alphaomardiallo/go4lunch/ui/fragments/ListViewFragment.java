@@ -69,38 +69,36 @@ public class ListViewFragment extends Fragment implements OnClickItemListener {
         setLoaders();
 
         if (viewModel.hasPermission(requireContext())) {
-            getNearByRestaurants();
+            observeData();
         }
     }
 
     /**
      * Methods getting API's to populate recyclerView
      */
-    public void getNearByRestaurants() {
-
+    public void observeData() {
         if (this.isAdded()) {
-            viewModel.startTrackingLocation(requireContext(), requireActivity());
             viewModel.getCurrentLocation().observe(requireActivity(), this::updateLocation);
+            viewModel.getRestaurantToFocusOn().observe(requireActivity(), this::getSearchResult);
         }
     }
 
-    public void fetchAndObserveData(Location location) {
-
+    public void updateViewsWithParametersLocation(Location location) {
         if (this.isAdded()) {
             viewModel.getRestaurants().observe(requireActivity(), this::setLoadersAfterAPICalls);
-            viewModel.getAllRestaurantList(requireContext(), location);
             viewModel.getRestaurants().observe(requireActivity(), adapter::submitList);
         }
     }
 
     private void updateLocation(Location location) {
-
         setAdapter(location);
-
         if (this.isAdded()) {
-            viewModel.getCurrentLocation().observe(requireActivity(), this::fetchAndObserveData);
+            viewModel.getCurrentLocation().observe(requireActivity(), this::updateViewsWithParametersLocation);
         }
-        Log.e(TAG, "updateLocation: updated location", null);
+    }
+
+    private void getSearchResult(String restaurantID) {
+        Log.e(TAG, "getSearchResult: called " + restaurantID, null);
     }
 
     /**
@@ -184,7 +182,7 @@ public class ListViewFragment extends Fragment implements OnClickItemListener {
         if (viewModel.hasPermission(requireContext())) {
             viewModel.getRestaurants().removeObservers(this);
             viewModel.getCurrentLocation().removeObservers(this);
-            viewModel.stopTrackingLocation();
+            //viewModel.stopTrackingLocation();
         }
 
         Log.e(TAG, "onDestroyView: Destroy", null);
