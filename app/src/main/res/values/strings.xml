@@ -1,4 +1,4 @@
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Preference Titles -->
     <string name="messages_header">Messages</string>
     <string name="sync_header">Sync</string>
@@ -31,7 +31,7 @@
     <string name="restaurantPlaceHolder">https://images.pexels.com/photos/3184192/pexels-photo-3184192.jpeg?cs=srgb&amp;dl=pexels-fauxels-3184192.jpg&amp;fm=jpg"</string>
     <string name="restaurant_photo">https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&amp;photo_reference=%s&amp;key=%s;</string>
     <string name="gif_eating_alone">https://media.giphy.com/media/p1NqIBmDgA2P8Kwz8E/giphy.gif</string>
-    <string name="we_need_your_location_gif">https://media.giphy.com/media/Vh8zf1nIfQRRXksAm1/giphy.gif</string>
+    <string name="we_need_your_location_gif" tools:ignore="Typos">https://media.giphy.com/media/Vh8zf1nIfQRRXksAm1/giphy.gif</string>
     <string name="fetching_list_gif">https://media.giphy.com/media/0KiLnOipDAnfk5Jgsf/giphy.gif</string>
     <string name="no_results_gif">https://media.giphy.com/media/MdeHHwPzLpzbEkzl70/giphy.gif</string>
 
