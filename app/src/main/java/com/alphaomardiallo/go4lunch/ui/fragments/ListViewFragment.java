@@ -69,22 +69,27 @@ public class ListViewFragment extends Fragment implements OnClickItemListener {
         super.onViewCreated(view, savedInstanceState);
         setLoaders();
 
-        if (viewModel.hasPermission(requireContext())) {
-            observeData();
-        }
+        observePermission();
     }
 
     /**
      * Methods getting API's to populate recyclerView
      */
-    public void observeData() {
-        if (this.isAdded()) {
-            viewModel.getCurrentLocation().observe(requireActivity(), this::updateLocation);
-            viewModel.getRestaurantToFocusOn().observe(requireActivity(), this::getSearchResult);
+
+    private void observePermission() {
+        viewModel.observePermissionState().observe(requireActivity(), this::observeData);
+    }
+
+    private void observeData(boolean hasPermission) {
+        if (hasPermission) {
+            if (this.isAdded()) {
+                viewModel.getCurrentLocation().observe(requireActivity(), this::updateLocation);
+                viewModel.getRestaurantToFocusOn().observe(requireActivity(), this::getSearchResult);
+            }
         }
     }
 
-    public void updateViewsWithParametersLocation(Location location) {
+    private void updateViewsWithParametersLocation(Location location) {
         if (this.isAdded()) {
             viewModel.getRestaurants().observe(requireActivity(), this::setLoadersAfterAPICalls);
             viewModel.getRestaurants().observe(requireActivity(), adapter::submitList);
@@ -205,6 +210,7 @@ public class ListViewFragment extends Fragment implements OnClickItemListener {
         if (viewModel.hasPermission(requireContext())) {
             viewModel.getRestaurants().removeObservers(this);
             viewModel.getCurrentLocation().removeObservers(this);
+            viewModel.observePermissionState().removeObservers(this);
         }
     }
 }

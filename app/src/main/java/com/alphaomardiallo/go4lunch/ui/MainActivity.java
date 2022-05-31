@@ -1,5 +1,8 @@
 package com.alphaomardiallo.go4lunch.ui;
 
+import static android.Manifest.permission.ACCESS_FINE_LOCATION;
+
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.location.Location;
@@ -27,6 +30,7 @@ import androidx.lifecycle.ViewModelProvider;
 import com.alphaomardiallo.go4lunch.R;
 import com.alphaomardiallo.go4lunch.data.viewModels.MainSharedViewModel;
 import com.alphaomardiallo.go4lunch.databinding.ActivityMainBinding;
+import com.alphaomardiallo.go4lunch.domain.PermissionUtils;
 import com.alphaomardiallo.go4lunch.ui.fragments.ListViewFragment;
 import com.alphaomardiallo.go4lunch.ui.fragments.MapsFragment;
 import com.alphaomardiallo.go4lunch.ui.fragments.WorkmatesFragment;
@@ -44,14 +48,18 @@ import java.util.List;
 import java.util.Objects;
 
 import dagger.hilt.android.AndroidEntryPoint;
+import pub.devrel.easypermissions.AppSettingsDialog;
+import pub.devrel.easypermissions.EasyPermissions;
 
 @AndroidEntryPoint
-public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
+public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, EasyPermissions.PermissionCallbacks{
 
+    private static final int REQUEST_PERMISSIONS_LOCATION = 567;
     private static final String KEY_SELECTED_RESTAURANT_ID = "placeID";
     private static final String KEY_SELECTED_RESTAURANT_NAME = "placeName";
     private static final String KEY_SEARCH_QUERY = "Query";
     private static final String KEY_LOCATION_STRING = "Location";
+    private static final PermissionUtils permission = new PermissionUtils();
     private final Handler handler = new Handler(Looper.getMainLooper());
     private final MapsFragment mapsFragment = new MapsFragment();
     private final ListViewFragment listViewFragment = new ListViewFragment();
@@ -108,7 +116,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         setupNavDrawer();
 
-        observeLocation();
+        observePermissions();
 
         handler.postDelayed(this::checkIfUserIsSignedIn, 1000);
     }
@@ -311,6 +319,59 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             }
             handler.postDelayed(this::checkIfUserIsSignedIn, 1000);
         }
+    }
+
+    /**
+     * Permission handling
+     */
+
+    private void observePermissions() {
+        viewModel.liveDataHasPermission(this).observe(this, this::setupAppAccordingToPermissions);
+    }
+
+    private void setupAppAccordingToPermissions(Boolean hasPermissions) {
+        if(hasPermissions) {
+            viewModel.permissionSet(true);
+            observeLocation();
+        } else {
+            viewModel.permissionSet(false);
+            requestPermission();
+        }
+    }
+
+    public void requestPermission() {
+        if (permission.hasLocationPermissions(this)) {
+            return;
+        }
+
+        EasyPermissions.requestPermissions(
+                this,
+                "This app needs location permission to function properly",
+                REQUEST_PERMISSIONS_LOCATION,
+                ACCESS_FINE_LOCATION,
+                Manifest.permission.ACCESS_COARSE_LOCATION
+        );
+    }
+
+    @Override
+    public void onPermissionsGranted(int requestCode, @NonNull List<String> perms) {
+        viewModel.permissionSet(true);
+        observeLocation();
+    }
+
+    @Override
+    public void onPermissionsDenied(int requestCode, @NonNull List<String> perms) {
+        if (EasyPermissions.somePermissionPermanentlyDenied(this, perms)) {
+            new AppSettingsDialog.Builder(this).build().show();
+        } else {
+            requestPermission();
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        EasyPermissions.onRequestPermissionsResult(requestCode, permissions, grantResults, this);
     }
 
     /**

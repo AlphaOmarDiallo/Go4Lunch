@@ -1,13 +1,13 @@
 package com.alphaomardiallo.go4lunch.ui.fragments;
 
-import static android.Manifest.permission.ACCESS_FINE_LOCATION;
+import static android.content.ContentValues.TAG;
 
-import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.location.Location;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -40,14 +40,11 @@ import java.util.List;
 import java.util.Objects;
 
 import dagger.hilt.android.AndroidEntryPoint;
-import pub.devrel.easypermissions.AppSettingsDialog;
-import pub.devrel.easypermissions.EasyPermissions;
 
 @AndroidEntryPoint
-public class MapsFragment extends Fragment implements EasyPermissions.PermissionCallbacks {
+public class MapsFragment extends Fragment /*implements EasyPermissions.PermissionCallbacks*/ {
 
     private static final int SNACK_BAR_LENGTH_LONG = 10000;
-    private static final int REQUEST_PERMISSIONS_LOCATION = 567;
     private static final PermissionUtils permission = new PermissionUtils();
     private final long defaultCameraZoomOverMap = 19;
     private FragmentMapsBinding binding;
@@ -95,8 +92,6 @@ public class MapsFragment extends Fragment implements EasyPermissions.Permission
             binding.fabMyLocation.setOnClickListener(view1 -> {
                 if (permission.hasLocationPermissions(requireContext())) {
                     getCurrentLocation(googleMap);
-                } else {
-                    requestPermission();
                 }
             });
 
@@ -134,15 +129,20 @@ public class MapsFragment extends Fragment implements EasyPermissions.Permission
 
         binding.chipGroup.setVisibility(View.GONE);
 
-        requestPermission();
+        observePermission();
     }
 
     /**
      * Getting data from viewModel and update views accordingly
      */
 
-    private void observeData() {
-        if (viewModel.hasPermission(requireContext())) {
+    private void observePermission() {
+        viewModel.observePermissionState().observe(requireActivity(), this::observeData);
+    }
+
+    private void observeData(Boolean hasPermission) {
+        Log.e(TAG, "observeData: here " + hasPermission, null);
+        if (hasPermission) {
             viewModel.getCurrentLocation().observe(requireActivity(), this::updateLocation);
             viewModel.getRestaurantToFocusOn().observe(requireActivity(), this::focusOnSelectedRestaurant);
         }
@@ -154,8 +154,11 @@ public class MapsFragment extends Fragment implements EasyPermissions.Permission
     }
 
     private void updateLocation(Location location) {
+        Log.e(TAG, "updateLocation: here", null);
         if (this.isAdded()) {
             this.location = location;
+            enableMyLocation(map);
+            binding.fabMyLocation.setOnClickListener(view1 -> getCurrentLocation(map));
             getCurrentLocation(map);
             viewModel.getRestaurants().observe(requireActivity(), this::updateMapWithRestaurants);
         }
@@ -266,47 +269,6 @@ public class MapsFragment extends Fragment implements EasyPermissions.Permission
     }
 
     /**
-     * Permission handling
-     */
-
-    public void requestPermission() {
-        if (permission.hasLocationPermissions(requireContext())) {
-            observeData();
-            return;
-        }
-
-        EasyPermissions.requestPermissions(
-                this,
-                "This app needs location permission to function properly",
-                REQUEST_PERMISSIONS_LOCATION,
-                ACCESS_FINE_LOCATION,
-                Manifest.permission.ACCESS_COARSE_LOCATION
-        );
-    }
-
-    @Override
-    public void onPermissionsGranted(int requestCode, @NonNull List<String> perms) {
-        enableMyLocation(map);
-        observeData();
-    }
-
-    @Override
-    public void onPermissionsDenied(int requestCode, @NonNull List<String> perms) {
-        if (EasyPermissions.somePermissionPermanentlyDenied(this, perms)) {
-            new AppSettingsDialog.Builder(this).build().show();
-        } else {
-            requestPermission();
-        }
-    }
-
-    @SuppressWarnings("deprecation")
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        EasyPermissions.onRequestPermissionsResult(requestCode, permissions, grantResults, this);
-    }
-
-    /**
      * LifeCycle
      */
 
@@ -316,7 +278,7 @@ public class MapsFragment extends Fragment implements EasyPermissions.Permission
         if (viewModel.hasPermission(requireContext())) {
             viewModel.getRestaurants().removeObservers(this);
             viewModel.getPartialRestaurantDetails().removeObservers(this);
-            binding = null;
+            viewModel.observePermissionState().removeObservers(this);
         }
     }
 

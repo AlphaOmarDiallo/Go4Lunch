@@ -41,6 +41,7 @@ public class MainSharedViewModel extends ViewModel {
     private final MutableLiveData<String> restaurantToFocusOn = new MutableLiveData<>();
     private final LiveData<List<ResultsItem>> restaurants;
     private Location savedLocation;
+    private MutableLiveData<Boolean> hasPermissions = new MutableLiveData<>();
 
     @Inject
     public MainSharedViewModel(UserRepositoryImp userRepositoryImp, LocationRepository locationRepository, PlacesAPIRepository placesAPIRepository, PermissionRepository permissionRepository) {
@@ -149,6 +150,18 @@ public class MainSharedViewModel extends ViewModel {
 
     public Boolean hasPermission(Context context) {
         return permissionRepository.hasLocationPermissions(context);
+    }
+
+    public void permissionSet(boolean hasPermission) {
+        hasPermissions.setValue(hasPermission);
+    }
+
+    public LiveData<Boolean> observePermissionState() {
+        return hasPermissions;
+    }
+
+    public LiveData<Boolean> liveDataHasPermission(Context context) {
+        return permissionRepository.liveDataHasLocationPermission(context);
     }
 
     /**
