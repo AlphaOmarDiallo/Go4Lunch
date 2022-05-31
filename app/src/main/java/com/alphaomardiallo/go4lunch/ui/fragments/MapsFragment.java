@@ -162,7 +162,7 @@ public class MapsFragment extends Fragment implements EasyPermissions.Permission
     }
 
     private void focusOnSelectedRestaurant(String id) {
-        if (this.isAdded()){
+        if (this.isAdded()) {
             if (id != null) {
                 viewModel.fetchPartialRestaurantDetails(id);
                 viewModel.getPartialRestaurantDetails().observe(requireActivity(), this::moveMapAndSetLocationOfSelectedRestaurant);

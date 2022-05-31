@@ -9,7 +9,7 @@ import javax.inject.Inject;
 
 import pub.devrel.easypermissions.EasyPermissions;
 
-public class PermissionRepositoryImp implements PermissionRepository{
+public class PermissionRepositoryImp implements PermissionRepository {
 
     @Inject
     public PermissionRepositoryImp() {

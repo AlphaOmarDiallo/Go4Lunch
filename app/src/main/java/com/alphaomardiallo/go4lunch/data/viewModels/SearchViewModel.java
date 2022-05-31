@@ -33,11 +33,11 @@ public class SearchViewModel extends ViewModel {
     }
 
     public LiveData<List<PredictionsItem>> searchAutoComplete(String query, String location) {
-        autocompleteRepository.updatePredictionList(placesAPIRepository.autoCompleteSearch(query,location, locationRepository.getRadius()).getValue());
-        return placesAPIRepository.autoCompleteSearch(query,location, locationRepository.getRadius());
+        autocompleteRepository.updatePredictionList(placesAPIRepository.autoCompleteSearch(query, location, locationRepository.getRadius()).getValue());
+        return placesAPIRepository.autoCompleteSearch(query, location, locationRepository.getRadius());
     }
 
-    public void setRestaurantToFocusOn(PredictionsItem predictionsItem){
+    public void setRestaurantToFocusOn(PredictionsItem predictionsItem) {
         autocompleteRepository.setPlaceToFocusOn(predictionsItem);
     }
 }

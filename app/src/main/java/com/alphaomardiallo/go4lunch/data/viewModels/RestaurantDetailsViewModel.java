@@ -32,7 +32,7 @@ public class RestaurantDetailsViewModel extends ViewModel {
         return placesAPIRepository.getDetails();
     }
 
-    public LiveData<Location> getLocation(Context context, Activity activity){
+    public LiveData<Location> getLocation(Context context, Activity activity) {
         locationRepository.startLocationRequest(context, activity);
         return locationRepository.getCurrentLocation();
     }

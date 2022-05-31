@@ -19,7 +19,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" >
+        app:layout_constraintTop_toTopOf="parent">
 
     </androidx.recyclerview.widget.RecyclerView>
 
@@ -38,7 +38,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center|top"
         android:layout_marginTop="50dp"
-        android:text="Fetching near by restaurant list"
+        android:text="@string/fetching_near_by_restaurant_list"
         android:textSize="24sp"
         android:textStyle="bold" />
 

@@ -12,6 +12,6 @@ import dagger.hilt.android.components.ViewModelComponent;
 @Module
 public abstract class LocationModule {
     @Binds
-    public abstract LocationRepository bindLocationRepository (LocationRepositoryImp imp);
+    public abstract LocationRepository bindLocationRepository(LocationRepositoryImp imp);
 
 }

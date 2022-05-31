@@ -12,5 +12,5 @@ import dagger.hilt.android.components.ViewModelComponent;
 @Module
 public abstract class PermissionModule {
     @Binds
-    public abstract PermissionRepository permissionRepository (PermissionRepositoryImp imp);
+    public abstract PermissionRepository permissionRepository(PermissionRepositoryImp imp);
 }

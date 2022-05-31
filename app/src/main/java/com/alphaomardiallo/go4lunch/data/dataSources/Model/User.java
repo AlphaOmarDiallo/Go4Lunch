@@ -8,7 +8,8 @@ public class User {
     private String username;
     @Nullable
     private String urlPicture;
-    @Nullable String bookingOfTheDay;
+    @Nullable
+    String bookingOfTheDay;
 
     public User(String userId, String userName, @Nullable String userPicture) {
         this.uid = userId;

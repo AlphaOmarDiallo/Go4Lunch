@@ -50,7 +50,6 @@ public class SearchActivity extends AppCompatActivity implements OnClickItemList
         showSoftKeyboard(binding.searchViewSA);
 
         setupResultsInRecyclerView();
-
     }
 
     public void getIntentAndData() {

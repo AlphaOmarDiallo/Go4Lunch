@@ -12,5 +12,5 @@ import dagger.hilt.android.components.ViewModelComponent;
 @Module
 public abstract class PlacesAPIModule {
     @Binds
-    public abstract PlacesAPIRepository bindAPIRepository (PlacesAPIRepositoryImp imp);
+    public abstract PlacesAPIRepository bindAPIRepository(PlacesAPIRepositoryImp imp);
 }

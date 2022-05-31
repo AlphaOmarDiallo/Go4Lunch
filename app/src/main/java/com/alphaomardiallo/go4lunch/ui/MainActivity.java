@@ -6,6 +6,7 @@ import android.location.Location;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -109,8 +110,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         observeLocation();
 
-        binding.ibLauchAutoComplete.setVisibility(View.INVISIBLE);
-
         handler.postDelayed(this::checkIfUserIsSignedIn, 1000);
     }
 
@@ -190,6 +189,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         searchView = (SearchView) menu.findItem(R.id.searchActivity).getActionView();
         searchView.setBackgroundColor(getResources().getColor(R.color.white));
+        searchView.setGravity(Gravity.START);
         searchView.setIconifiedByDefault(false);
         searchView.setQueryHint(getString(R.string.search_query_hint));
         searchView.getOverlay();

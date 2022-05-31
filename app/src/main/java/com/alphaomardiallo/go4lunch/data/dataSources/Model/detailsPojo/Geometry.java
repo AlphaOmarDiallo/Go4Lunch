@@ -2,19 +2,19 @@ package com.alphaomardiallo.go4lunch.data.dataSources.Model.detailsPojo;
 
 import com.google.gson.annotations.SerializedName;
 
-public class Geometry{
+public class Geometry {
 
-	@SerializedName("viewport")
-	private Viewport viewport;
+    @SerializedName("viewport")
+    private Viewport viewport;
 
-	@SerializedName("location")
-	private Location location;
+    @SerializedName("location")
+    private Location location;
 
-	public Viewport getViewport(){
-		return viewport;
-	}
+    public Viewport getViewport() {
+        return viewport;
+    }
 
-	public Location getLocation(){
-		return location;
-	}
+    public Location getLocation() {
+        return location;
+    }
 }

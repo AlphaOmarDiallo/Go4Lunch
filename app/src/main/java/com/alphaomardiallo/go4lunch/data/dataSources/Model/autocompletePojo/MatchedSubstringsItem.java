@@ -2,19 +2,19 @@ package com.alphaomardiallo.go4lunch.data.dataSources.Model.autocompletePojo;
 
 import com.google.gson.annotations.SerializedName;
 
-public class MatchedSubstringsItem{
+public class MatchedSubstringsItem {
 
-	@SerializedName("offset")
-	private int offset;
+    @SerializedName("offset")
+    private int offset;
 
-	@SerializedName("length")
-	private int length;
+    @SerializedName("length")
+    private int length;
 
-	public int getOffset(){
-		return offset;
-	}
+    public int getOffset() {
+        return offset;
+    }
 
-	public int getLength(){
-		return length;
-	}
+    public int getLength() {
+        return length;
+    }
 }

@@ -110,7 +110,7 @@ public class ListViewFragment extends Fragment implements OnClickItemListener {
             }
         }
 
-        if(!isInList){
+        if (!isInList) {
             Snackbar.make(binding.listViewFragment, getString(R.string.restaurant_not_in_list), SNACK_BAR_LENGTH_LONG)
                     .setAction(getString(R.string.get_details), view -> openDetailActivity(restaurantID)).show();
         }

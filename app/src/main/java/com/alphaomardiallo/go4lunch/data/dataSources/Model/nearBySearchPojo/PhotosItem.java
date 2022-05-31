@@ -1,35 +1,36 @@
 package com.alphaomardiallo.go4lunch.data.dataSources.Model.nearBySearchPojo;
 
 import java.util.List;
+
 import com.google.gson.annotations.SerializedName;
 
-public class PhotosItem{
+public class PhotosItem {
 
-	@SerializedName("photo_reference")
-	private String photoReference;
+    @SerializedName("photo_reference")
+    private String photoReference;
 
-	@SerializedName("width")
-	private int width;
+    @SerializedName("width")
+    private int width;
 
-	@SerializedName("html_attributions")
-	private List<String> htmlAttributions;
+    @SerializedName("html_attributions")
+    private List<String> htmlAttributions;
 
-	@SerializedName("height")
-	private int height;
+    @SerializedName("height")
+    private int height;
 
-	public String getPhotoReference(){
-		return photoReference;
-	}
+    public String getPhotoReference() {
+        return photoReference;
+    }
 
-	public int getWidth(){
-		return width;
-	}
+    public int getWidth() {
+        return width;
+    }
 
-	public List<String> getHtmlAttributions(){
-		return htmlAttributions;
-	}
+    public List<String> getHtmlAttributions() {
+        return htmlAttributions;
+    }
 
-	public int getHeight(){
-		return height;
-	}
+    public int getHeight() {
+        return height;
+    }
 }
