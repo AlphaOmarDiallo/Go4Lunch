@@ -6,14 +6,16 @@ public class User {
 
     private String uid;
     private String username;
+    private String userEmail;
     @Nullable
     private String urlPicture;
     @Nullable
-    String bookingOfTheDay;
+    Boolean bookingOfTheDay;
 
-    public User(String userId, String userName, @Nullable String userPicture) {
+    public User(String userId, String userName, String userEmail, @Nullable String userPicture) {
         this.uid = userId;
         this.username = userName;
+        this.userEmail = userEmail;
         this.urlPicture = userPicture;
         this.bookingOfTheDay = null;
     }
@@ -33,8 +35,12 @@ public class User {
         return urlPicture;
     }
 
+    public String getUserEmail() {
+        return userEmail;
+    }
+
     @Nullable
-    public String getBookingOfTheDay() {
+    public Boolean getBookingOfTheDay() {
         return bookingOfTheDay;
     }
 
@@ -48,11 +54,15 @@ public class User {
         this.username = username;
     }
 
+    public void setUserEmail(String userEmail) {
+        this.userEmail = userEmail;
+    }
+
     public void setUrlPicture(@Nullable String urlPicture) {
         this.urlPicture = urlPicture;
     }
 
-    public void setBookingOfTheDay(@Nullable String bookingOfTheDay) {
+    public void setBookingOfTheDay(@Nullable Boolean bookingOfTheDay) {
         this.bookingOfTheDay = bookingOfTheDay;
     }
 }

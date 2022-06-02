@@ -68,6 +68,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private ActionBarDrawerToggle toggle;
     private Location currentLocation;
     private SearchView searchView;
+    private View headerView;
     private MainSharedViewModel viewModel;
 
     /**
@@ -305,8 +306,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private void onSignInResult(FirebaseAuthUIAuthenticationResult result) {
         IdpResponse response = result.getIdpResponse();
         if (result.getResultCode() == RESULT_OK) {
-            showSnackBarMessage(getString(R.string.connection_succeed));
+            viewModel.createUserInDataBase();
             setupNavigationHeader();
+            showSnackBarMessage(getString(R.string.connection_succeed));
         } else {
             if (response == null) {
                 showSnackBarMessage(getString(R.string.error_authentication_canceled));

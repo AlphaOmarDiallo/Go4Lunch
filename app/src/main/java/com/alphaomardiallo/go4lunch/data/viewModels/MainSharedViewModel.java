@@ -14,6 +14,7 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
+import com.alphaomardiallo.go4lunch.data.dataSources.Model.User;
 import com.alphaomardiallo.go4lunch.data.dataSources.Model.detailsPojo.Result;
 import com.alphaomardiallo.go4lunch.data.dataSources.Model.nearBySearchPojo.ResultsItem;
 import com.alphaomardiallo.go4lunch.data.repositories.LocationRepository;
@@ -173,6 +174,18 @@ public class MainSharedViewModel extends ViewModel {
         int width = 100;
         Bitmap icon = BitmapFactory.decodeResource(resources, drawable);
         return Bitmap.createScaledBitmap(icon, width, height, false);
+    }
+
+    /**
+     * Firebase Firestore
+     */
+
+    public void createUserInDataBase() {
+        userRepositoryImp.createUser();
+    }
+
+    public Task<User> getUserData(){
+        return userRepositoryImp.getUserData().continueWith(task -> task.getResult().toObject(User.class));
     }
 
 }
