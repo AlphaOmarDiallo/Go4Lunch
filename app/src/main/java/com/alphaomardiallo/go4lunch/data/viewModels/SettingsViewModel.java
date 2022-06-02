@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel;
 import com.alphaomardiallo.go4lunch.data.repositories.UserRepositoryImp;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentSnapshot;
 
 import javax.inject.Inject;
 
@@ -32,5 +33,13 @@ public class SettingsViewModel extends ViewModel {
 
     public Task<Void> deleteUser(Context context) {
         return userRepositoryImp.deleteUser(context);
+    }
+
+    public Task<DocumentSnapshot> getUserData() {
+        return userRepositoryImp.getUserData();
+    }
+
+    public void deleteUserFromFirestore() {
+        userRepositoryImp.deleteUserFromFirestore();
     }
 }

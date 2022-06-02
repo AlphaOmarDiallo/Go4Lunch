@@ -38,6 +38,7 @@ public class SettingsActivity extends AppCompatActivity {
         }
         setupToolBar();
         setupUI();
+        viewModel.getUserData();
     }
 
     public static class SettingsFragment extends PreferenceFragmentCompat {
@@ -76,6 +77,7 @@ public class SettingsActivity extends AppCompatActivity {
         builder.setPositiveButton(R.string.OK, (dialog, id) -> {
             viewModel.signOut(SettingsActivity.this);
             viewModel.deleteUser(SettingsActivity.this);
+            viewModel.deleteUserFromFirestore();
             finish();
         });
         builder.setNegativeButton(R.string.cancel, (dialog, id) -> dialog.cancel());

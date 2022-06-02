@@ -143,8 +143,10 @@ public class MapsFragment extends Fragment /*implements EasyPermissions.Permissi
     private void observeData(Boolean hasPermission) {
         Log.e(TAG, "observeData: here " + hasPermission, null);
         if (hasPermission) {
-            viewModel.getCurrentLocation().observe(requireActivity(), this::updateLocation);
-            viewModel.getRestaurantToFocusOn().observe(requireActivity(), this::focusOnSelectedRestaurant);
+            if (this.isAdded()) {
+                viewModel.getCurrentLocation().observe(requireActivity(), this::updateLocation);
+                viewModel.getRestaurantToFocusOn().observe(requireActivity(), this::focusOnSelectedRestaurant);
+            }
         }
     }
 

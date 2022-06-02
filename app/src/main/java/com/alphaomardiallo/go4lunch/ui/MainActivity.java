@@ -1,6 +1,7 @@
 package com.alphaomardiallo.go4lunch.ui;
 
 import static android.Manifest.permission.ACCESS_FINE_LOCATION;
+import static android.content.ContentValues.TAG;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
@@ -9,6 +10,7 @@ import android.location.Location;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -68,7 +70,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private ActionBarDrawerToggle toggle;
     private Location currentLocation;
     private SearchView searchView;
-    private View headerView;
     private MainSharedViewModel viewModel;
 
     /**
@@ -105,6 +106,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Log.e(TAG, "onCreate: Called");
         super.onCreate(savedInstanceState);
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         View view = binding.getRoot();
@@ -119,7 +121,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         observePermissions();
 
-        handler.postDelayed(this::checkIfUserIsSignedIn, 1000);
     }
 
     /**
@@ -288,7 +289,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         List<AuthUI.IdpConfig> providers = Arrays.asList(
                 new AuthUI.IdpConfig.GoogleBuilder().build(),
-                //Unstable twitter login, follow matter here: https://github.com/firebase/firebase-js-sdk/issues/4256
+                // Unstable twitter login, follow matter here: https://github.com/firebase/firebase-js-sdk/issues/4256
                 new AuthUI.IdpConfig.TwitterBuilder().build(),
                 new AuthUI.IdpConfig.FacebookBuilder().build(),
                 new AuthUI.IdpConfig.EmailBuilder().build());
@@ -382,7 +383,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     @Override
     protected void onResume() {
+        Log.e(TAG, "onResume: called");
         super.onResume();
+
+        handler.postDelayed(this::checkIfUserIsSignedIn, 1000);
+
         if (searchView != null) {
             searchView.setQuery(getString(R.string.remove_query), false);
         }

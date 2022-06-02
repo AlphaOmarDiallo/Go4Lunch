@@ -1,6 +1,9 @@
 package com.alphaomardiallo.go4lunch.data.repositories;
 
+import static android.content.ContentValues.TAG;
+
 import android.content.Context;
+import android.util.Log;
 
 import androidx.annotation.Nullable;
 
@@ -98,6 +101,7 @@ public class UserRepositoryImp implements UserRepository {
     public Task<DocumentSnapshot> getUserData() {
         assert this.getCurrentUser() != null;
         String uid = this.getCurrentUser().getUid();
+        Log.e(TAG, "getUserData: " + this.getCurrentUserID(), null);
         return this.getUserCollection().document(uid).get();
     }
 
