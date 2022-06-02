@@ -40,7 +40,6 @@ public class User {
 
     //SETTERS
 
-
     public void setUid(String uid) {
         this.uid = uid;
     }
