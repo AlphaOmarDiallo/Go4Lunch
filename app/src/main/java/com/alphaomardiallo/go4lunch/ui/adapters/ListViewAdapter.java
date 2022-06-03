@@ -28,9 +28,9 @@ import java.util.Locale;
 
 public class ListViewAdapter extends ListAdapter<ResultsItem, ListViewAdapter.ListViewHolder> {
 
-    public ItemRestaurantBinding binding;
-    OnClickItemListener onClickItemListener;
-    Location location;
+    private ItemRestaurantBinding binding;
+    private OnClickItemListener onClickItemListener;
+    private Location location;
 
     public ListViewAdapter(@NonNull DiffUtil.ItemCallback<ResultsItem> diffCallback, OnClickItemListener onClickItemListener, Location location) {
         super(diffCallback);

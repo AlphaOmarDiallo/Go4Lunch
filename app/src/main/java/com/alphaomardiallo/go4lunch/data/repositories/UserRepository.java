@@ -23,6 +23,8 @@ public interface UserRepository {
 
     Task<Void> deleteUser(Context context);
 
+    void getDataBaseInstance();
+
     CollectionReference getUserCollection();
 
     void createUser();

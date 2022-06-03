@@ -44,11 +44,10 @@ public class WorkmatesFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        if (viewModel.hasPermission(requireContext())) {
             if (this.isAdded()) {
-                viewModel.startTrackingLocation(requireContext(), requireActivity());
+                viewModel.getDataBaseInstance();
+                viewModel.getAllUsersFromDatabase();
             }
-        }
     }
 
     /**

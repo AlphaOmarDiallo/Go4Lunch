@@ -5,16 +5,20 @@ import static android.content.ContentValues.TAG;
 import android.content.Context;
 import android.util.Log;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.alphaomardiallo.go4lunch.data.dataSources.Model.User;
 import com.firebase.ui.auth.AuthUI;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import javax.inject.Inject;
 
@@ -23,6 +27,7 @@ public class UserRepositoryImp implements UserRepository {
     private static final String COLLECTION_NAME = "users";
     private static final String HAS_A_BOOKING = "hasABooking";
     private static volatile UserRepository instance;
+    private FirebaseFirestore database;
 
     @Inject
     public UserRepositoryImp() {
@@ -68,6 +73,11 @@ public class UserRepositoryImp implements UserRepository {
      * FIREBASE RELATED METHODS
      */
 
+    public void getDataBaseInstance() {
+        database = FirebaseFirestore.getInstance();
+        Log.i(TAG, "getInstance: FireBase " + database);
+    }
+
     //Get the collection reference
     public CollectionReference getUserCollection() {
         return FirebaseFirestore.getInstance().collection(COLLECTION_NAME);
@@ -103,6 +113,24 @@ public class UserRepositoryImp implements UserRepository {
         String uid = this.getCurrentUser().getUid();
         Log.e(TAG, "getUserData: " + this.getCurrentUserID(), null);
         return this.getUserCollection().document(uid).get();
+    }
+
+    //Get ll users from FireStore
+    public void getAllUsersFromDataBase() {
+        database.collection(COLLECTION_NAME)
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+                            for (QueryDocumentSnapshot document : task.getResult()) {
+                                Log.d(TAG, document.getId() + " " + document.getData());
+                            }
+                        } else {
+                            Log.e(TAG, "onComplete: Error getting document " + task.getException(), null);
+                        }
+                    }
+                });
     }
 
     // Update User status about booking of the day

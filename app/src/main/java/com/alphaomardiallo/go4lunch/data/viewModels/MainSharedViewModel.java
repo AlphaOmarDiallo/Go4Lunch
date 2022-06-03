@@ -188,4 +188,12 @@ public class MainSharedViewModel extends ViewModel {
         return userRepositoryImp.getUserData().continueWith(task -> task.getResult().toObject(User.class));
     }
 
+    public void getDataBaseInstance(){
+        userRepositoryImp.getDataBaseInstance();
+    }
+
+    public void getAllUsersFromDatabase() {
+        userRepositoryImp.getAllUsersFromDataBase();
+    }
+
 }

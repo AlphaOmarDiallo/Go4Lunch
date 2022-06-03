@@ -3,7 +3,11 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#00BCD4"
     tools:context=".ui.fragments.WorkmatesFragment">
 
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvWorkmates"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/whiteSmoke" />
 </FrameLayout>
