@@ -196,4 +196,8 @@ public class MainSharedViewModel extends ViewModel {
         userRepositoryImp.getAllUsersFromDataBase();
     }
 
+    public LiveData<List<User>> observeUserList() {
+        return userRepositoryImp.getAllUsers();
+    }
+
 }

@@ -12,6 +12,9 @@ public class User {
     @Nullable
     Boolean bookingOfTheDay;
 
+    public User() {
+    }
+
     public User(String userId, String userName, String userEmail, @Nullable String userPicture) {
         this.uid = userId;
         this.username = userName;
@@ -65,4 +68,5 @@ public class User {
     public void setBookingOfTheDay(@Nullable Boolean bookingOfTheDay) {
         this.bookingOfTheDay = bookingOfTheDay;
     }
+
 }

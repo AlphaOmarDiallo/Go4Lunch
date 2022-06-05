@@ -5,20 +5,23 @@ import static android.content.ContentValues.TAG;
 import android.content.Context;
 import android.util.Log;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
 
 import com.alphaomardiallo.go4lunch.data.dataSources.Model.User;
 import com.firebase.ui.auth.AuthUI;
-import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QuerySnapshot;
+
+import java.util.List;
 
 import javax.inject.Inject;
 
@@ -28,6 +31,7 @@ public class UserRepositoryImp implements UserRepository {
     private static final String HAS_A_BOOKING = "hasABooking";
     private static volatile UserRepository instance;
     private FirebaseFirestore database;
+    private MutableLiveData<List<User>> allUsers = new MutableLiveData<>();
 
     @Inject
     public UserRepositoryImp() {
@@ -106,6 +110,10 @@ public class UserRepositoryImp implements UserRepository {
         }
     }
 
+    //Get updated list of users
+    public LiveData<List<User>> getAllUsers() {
+        return allUsers;
+    }
 
     // Get User Data from Firestore
     public Task<DocumentSnapshot> getUserData() {
@@ -117,18 +125,38 @@ public class UserRepositoryImp implements UserRepository {
 
     //Get ll users from FireStore
     public void getAllUsersFromDataBase() {
-        database.collection(COLLECTION_NAME)
+        /*database.collection(COLLECTION_NAME)
                 .get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
                         if (task.isSuccessful()) {
-                            for (QueryDocumentSnapshot document : task.getResult()) {
-                                Log.d(TAG, document.getId() + " " + document.getData());
-                            }
+                            List<User> tempList = task.getResult().toObjects(User.class);
+                            allUsers.setValue(tempList);
+                            Log.d(TAG, "onComplete: full list " + tempList);
                         } else {
                             Log.e(TAG, "onComplete: Error getting document " + task.getException(), null);
                         }
+                    }
+                });*/
+
+        database.collection(COLLECTION_NAME)
+                .addSnapshotListener(new EventListener<QuerySnapshot>() {
+                    @Override
+                    public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
+                        if (error != null) {
+                            Log.w(TAG, "Listen fail ",  error);
+                            return;
+                        }
+
+                        if (value != null){
+                            List<User> temList = value.toObjects(User.class);
+                            allUsers.setValue(temList);
+                            Log.d(TAG, "onEvent: all user " + allUsers.getValue());
+                        } else {
+                            Log.d(TAG, "onEvent: all user is null");
+                        }
+
                     }
                 });
     }

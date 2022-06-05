@@ -1,5 +1,7 @@
 package com.alphaomardiallo.go4lunch.ui.adapters;
 
+import android.annotation.SuppressLint;
+import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,12 +26,14 @@ public class WorkmatesAdapter extends ListAdapter<User, WorkmatesAdapter.Workmat
 
     private ItemWorkmatesBinding binding;
     private OnClickItemListener onClickItemListener;
+    private static Context context;
     private List<Booking> bookingList;
 
-    protected WorkmatesAdapter(@NonNull DiffUtil.ItemCallback<User> diffCallback, OnClickItemListener onClickItemListener, List<Booking> bookingList) {
+    public WorkmatesAdapter(@NonNull DiffUtil.ItemCallback<User> diffCallback, OnClickItemListener onClickItemListener, List<Booking> bookingList, Context context) {
         super(diffCallback);
         this.onClickItemListener = onClickItemListener;
         this.bookingList = bookingList;
+        this.context = context;
     }
 
 
@@ -73,13 +77,25 @@ public class WorkmatesAdapter extends ListAdapter<User, WorkmatesAdapter.Workmat
             workmateLunchStatus = itemView.findViewById(R.id.tvWorkmateRestaurantChoice);
         }
 
+        @SuppressLint("StringFormatMatches")
         public void bind(User user, OnClickItemListener onClickItemListener, List<Booking> bookingList) {
+            //ImageView
             if (user.getUrlPicture() != null) {
                 Glide.with(workmateAvatar)
                         .load(user.getUrlPicture())
                         .circleCrop()
                         .into(workmateAvatar);
+            } else {
+                Glide.with(workmateAvatar)
+                        .load(context.getString(R.string.fake_avatar))
+                        .circleCrop()
+                        .into(workmateAvatar);
             }
+
+            //TextView
+            String hasNotDecided = context.getString(R.string.workmate_has_not_selected_a_restaurant);
+            workmateLunchStatus.setText(String.format(hasNotDecided, user.getUsername()));
+
         }
     }
 }

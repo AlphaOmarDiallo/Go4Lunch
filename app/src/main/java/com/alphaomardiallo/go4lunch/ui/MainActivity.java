@@ -121,6 +121,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         observePermissions();
 
+        observeUsers();
+
     }
 
     /**
@@ -173,6 +175,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 return true;
         }
         return false;
+    }
+
+    /**
+     * Observing users
+     */
+
+    private void observeUsers() {
+        viewModel.getDataBaseInstance();
+        viewModel.getAllUsersFromDatabase();
     }
 
     /**

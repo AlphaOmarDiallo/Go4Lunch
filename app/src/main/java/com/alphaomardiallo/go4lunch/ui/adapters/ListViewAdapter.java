@@ -100,7 +100,6 @@ public class ListViewAdapter extends ListAdapter<ResultsItem, ListViewAdapter.Li
             restaurantDistance.setText(restaurant.getGeometry().getLocation().toString());
             restaurantNumberOfWorkmates.setText(getNumberOfWorkmates());
             restaurantRating.setRating(getRating(restaurant.getRating()));
-            //restaurantDistance.setText(getDistance("48.86501071160738, 2.3467211059168793", restaurant.getGeometry().getLocation().getLat(), restaurant.getGeometry().getLocation().getLng()));
             Location restaurantLocation = new Location("restaurant");
             restaurantLocation.setLatitude(restaurant.getGeometry().getLocation().getLat());
             restaurantLocation.setLongitude(restaurant.getGeometry().getLocation().getLng());

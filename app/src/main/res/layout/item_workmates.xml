@@ -4,12 +4,13 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginBottom="1dp">
+    android:layout_marginBottom="1dp"
+    android:background="@color/white">
 
     <ImageView
         android:id="@+id/ivWorkmateAvatar"
-        android:layout_width="100dp"
-        android:layout_height="100dp"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:layout_marginBottom="8dp"
@@ -24,7 +25,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
-        android:textSize="20sp"
+        android:singleLine="false"
+        android:textSize="14sp"
         app:layout_constraintBottom_toBottomOf="@+id/ivWorkmateAvatar"
         app:layout_constraintStart_toEndOf="@+id/ivWorkmateAvatar"
         app:layout_constraintTop_toTopOf="@+id/ivWorkmateAvatar"

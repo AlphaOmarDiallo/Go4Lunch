@@ -3,11 +3,15 @@ package com.alphaomardiallo.go4lunch.data.repositories;
 import android.content.Context;
 
 import androidx.annotation.Nullable;
+import androidx.lifecycle.LiveData;
 
+import com.alphaomardiallo.go4lunch.data.dataSources.Model.User;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
+
+import java.util.List;
 
 public interface UserRepository {
 
@@ -22,6 +26,8 @@ public interface UserRepository {
     Task<Void> signOut(Context context);
 
     Task<Void> deleteUser(Context context);
+
+    LiveData<List<User>> getAllUsers();
 
     void getDataBaseInstance();
 
