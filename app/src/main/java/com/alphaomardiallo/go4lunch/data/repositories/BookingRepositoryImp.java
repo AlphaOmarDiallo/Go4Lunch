@@ -43,6 +43,7 @@ public class BookingRepositoryImp implements BookingRepository {
     public void createBookingAndAddInDatabase(@NonNull Booking bookingToSave) {
         //Create a booking
         Map<String, Object> booking = new HashMap<>();
+        booking.put("bookingID", null);
         booking.put("bookingDate", FieldValue.serverTimestamp());
         booking.put("bookedRestaurantID", bookingToSave.getBookedRestaurantID());
         booking.put("userWhoBooked", bookingToSave.getUserWhoBooked());
@@ -53,6 +54,9 @@ public class BookingRepositoryImp implements BookingRepository {
                     @Override
                     public void onSuccess(DocumentReference documentReference) {
                         Log.d(TAG, "onSuccess: document added " + documentReference);
+                        database.collection(COLLECTION_NAME)
+                                .document(documentReference.getId())
+                                .update("bookingID", documentReference.getId());
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {

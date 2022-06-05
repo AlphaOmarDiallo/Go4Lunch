@@ -1,10 +1,13 @@
 package com.alphaomardiallo.go4lunch.data.dataSources.Model;
 
+import androidx.annotation.Nullable;
+
 import java.util.Date;
 
 public class Booking {
 
-    private long bookingID;
+    @Nullable
+    private String bookingID;
     private Date bookingDate;
     private String bookedRestaurantID;
     private String userWhoBooked;
@@ -19,7 +22,7 @@ public class Booking {
 
     //Getters
 
-    public long getBookingID() {
+    public String getBookingID() {
         return bookingID;
     }
 
@@ -37,7 +40,7 @@ public class Booking {
 
     //Setters
 
-    public void setBookingID(long bookingID) {
+    public void setBookingID(String bookingID) {
         this.bookingID = bookingID;
     }
 
