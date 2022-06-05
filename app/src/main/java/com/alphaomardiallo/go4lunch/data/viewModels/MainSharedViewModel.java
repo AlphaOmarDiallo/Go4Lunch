@@ -14,9 +14,11 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
+import com.alphaomardiallo.go4lunch.data.dataSources.Model.Booking;
 import com.alphaomardiallo.go4lunch.data.dataSources.Model.User;
 import com.alphaomardiallo.go4lunch.data.dataSources.Model.detailsPojo.Result;
 import com.alphaomardiallo.go4lunch.data.dataSources.Model.nearBySearchPojo.ResultsItem;
+import com.alphaomardiallo.go4lunch.data.repositories.BookingRepository;
 import com.alphaomardiallo.go4lunch.data.repositories.LocationRepository;
 import com.alphaomardiallo.go4lunch.data.repositories.PermissionRepository;
 import com.alphaomardiallo.go4lunch.data.repositories.PlacesAPIRepository;
@@ -39,18 +41,22 @@ public class MainSharedViewModel extends ViewModel {
     private final LocationRepository locationRepository;
     private final PlacesAPIRepository placesAPIRepository;
     private final PermissionRepository permissionRepository;
+    private final BookingRepository bookingRepository;
+    private final MutableLiveData<Booking> allBookings = new MutableLiveData<>();
     private final MutableLiveData<String> restaurantToFocusOn = new MutableLiveData<>();
     private final LiveData<List<ResultsItem>> restaurants;
     private Location savedLocation;
     private MutableLiveData<Boolean> hasPermissions = new MutableLiveData<>();
 
     @Inject
-    public MainSharedViewModel(UserRepositoryImp userRepositoryImp, LocationRepository locationRepository, PlacesAPIRepository placesAPIRepository, PermissionRepository permissionRepository) {
+    public MainSharedViewModel(UserRepositoryImp userRepositoryImp, LocationRepository locationRepository, PlacesAPIRepository placesAPIRepository, PermissionRepository permissionRepository, BookingRepository bookingRepository) {
         this.userRepositoryImp = userRepositoryImp;
         this.locationRepository = locationRepository;
         this.placesAPIRepository = placesAPIRepository;
         this.permissionRepository = permissionRepository;
+        this.bookingRepository = bookingRepository;
         restaurants = placesAPIRepository.getNearBySearchRestaurantList();
+
     }
 
     /**
@@ -180,6 +186,12 @@ public class MainSharedViewModel extends ViewModel {
      * Firebase Firestore
      */
 
+    // ============================= user ======================================
+
+    public void getDataBaseInstanceUser(){
+        userRepositoryImp.getDataBaseInstance();
+    }
+
     public void createUserInDataBase() {
         userRepositoryImp.createUser();
     }
@@ -188,16 +200,22 @@ public class MainSharedViewModel extends ViewModel {
         return userRepositoryImp.getUserData().continueWith(task -> task.getResult().toObject(User.class));
     }
 
-    public void getDataBaseInstance(){
-        userRepositoryImp.getDataBaseInstance();
-    }
-
     public void getAllUsersFromDatabase() {
         userRepositoryImp.getAllUsersFromDataBase();
     }
 
     public LiveData<List<User>> observeUserList() {
         return userRepositoryImp.getAllUsers();
+    }
+
+    // ============================== booking =============================================
+
+    public void getDatabaseInstanceBooking() {
+        bookingRepository.getInstance();
+    }
+
+    public void createABooking(Booking bookingToSave) {
+        bookingRepository.createBookingAndAddInDatabase(bookingToSave);
     }
 
 }

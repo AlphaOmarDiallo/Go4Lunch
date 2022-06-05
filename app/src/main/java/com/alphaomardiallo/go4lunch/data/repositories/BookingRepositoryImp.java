@@ -6,6 +6,7 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
 import com.alphaomardiallo.go4lunch.data.dataSources.Model.Booking;
@@ -63,24 +64,6 @@ public class BookingRepositoryImp implements BookingRepository {
                 });
     }
 
-    public void deleteBookingInDatabase(String bookingID) {
-        database.collection(COLLECTION_NAME).document(bookingID)
-                .delete()
-                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                    @Override
-                    public void onSuccess(Void unused) {
-                        System.out.println("document has been deleted");
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Log.w(TAG, "onFailure: Error deleting document " + bookingID, e);
-                    }
-                });
-
-    }
-
     public void getAllBookingsFromDataBase() {
         database.collection(COLLECTION_NAME)
                 .addSnapshotListener(new EventListener<QuerySnapshot>() {
@@ -101,6 +84,46 @@ public class BookingRepositoryImp implements BookingRepository {
 
                     }
                 });
+    }
+
+    @Override
+    public LiveData<List<Booking>> getAllBookings() {
+        return allBookings;
+    }
+
+    public void updateBooking(String bookingID, String restaurantID) {
+        database.collection(COLLECTION_NAME).document(bookingID)
+                .update("restaurantID", restaurantID)
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void unused) {
+                        Log.d(TAG, "onSuccess: DocumentSnapshot successfully updated");
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.w(TAG, "onFailure: Error updating document", e);
+                    }
+                });
+    }
+
+    public void deleteBookingInDatabase(String bookingID) {
+        database.collection(COLLECTION_NAME).document(bookingID)
+                .delete()
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void unused) {
+                        System.out.println("document has been deleted");
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.w(TAG, "onFailure: Error deleting document " + bookingID, e);
+                    }
+                });
+
     }
 
 

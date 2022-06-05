@@ -1,8 +1,11 @@
 package com.alphaomardiallo.go4lunch.data.repositories;
 
 import androidx.annotation.NonNull;
+import androidx.lifecycle.LiveData;
 
 import com.alphaomardiallo.go4lunch.data.dataSources.Model.Booking;
+
+import java.util.List;
 
 public interface BookingRepository {
 
@@ -12,6 +15,10 @@ public interface BookingRepository {
 
     void deleteBookingInDatabase(String bookingID);
 
+    void updateBooking(String bookingID, String restaurantID);
+
     void getAllBookingsFromDataBase();
+
+    LiveData<List<Booking>> getAllBookings();
 
 }

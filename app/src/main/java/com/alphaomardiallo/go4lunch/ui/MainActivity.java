@@ -182,7 +182,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
      */
 
     private void observeUsers() {
-        viewModel.getDataBaseInstance();
+        viewModel.getDataBaseInstanceUser();
         viewModel.getAllUsersFromDatabase();
     }
 
