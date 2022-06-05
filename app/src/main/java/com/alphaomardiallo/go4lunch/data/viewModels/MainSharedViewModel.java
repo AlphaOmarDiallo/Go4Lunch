@@ -214,8 +214,19 @@ public class MainSharedViewModel extends ViewModel {
         bookingRepository.getInstance();
     }
 
-    public void createABooking(Booking bookingToSave) {
+    public void createBooking(Booking bookingToSave) {
         bookingRepository.createBookingAndAddInDatabase(bookingToSave);
     }
 
+    public void updateBooking(String bookingID, String restaurantID) {
+        bookingRepository.updateBooking(bookingID, restaurantID);
+    }
+
+    public void deleteBooking(String bookingID) {
+        bookingRepository.deleteBookingInDatabase(bookingID);
+    }
+
+    public LiveData<List<Booking>> getAllBookings() {
+        return bookingRepository.getAllBookings();
+    }
 }
