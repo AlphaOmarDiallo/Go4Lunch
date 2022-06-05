@@ -125,21 +125,6 @@ public class UserRepositoryImp implements UserRepository {
 
     //Get ll users from FireStore
     public void getAllUsersFromDataBase() {
-        /*database.collection(COLLECTION_NAME)
-                .get()
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        if (task.isSuccessful()) {
-                            List<User> tempList = task.getResult().toObjects(User.class);
-                            allUsers.setValue(tempList);
-                            Log.d(TAG, "onComplete: full list " + tempList);
-                        } else {
-                            Log.e(TAG, "onComplete: Error getting document " + task.getException(), null);
-                        }
-                    }
-                });*/
-
         database.collection(COLLECTION_NAME)
                 .addSnapshotListener(new EventListener<QuerySnapshot>() {
                     @Override

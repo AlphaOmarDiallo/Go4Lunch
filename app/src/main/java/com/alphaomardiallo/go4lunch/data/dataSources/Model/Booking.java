@@ -9,6 +9,9 @@ public class Booking {
     private String bookedRestaurantID;
     private User userWhoBooked;
 
+    public Booking() {
+    }
+
     public Booking(long bookingID, Date bookingDate, String bookedRestaurantID, User userWhoBooked) {
         this.bookingID = bookingID;
         this.bookingDate = bookingDate;

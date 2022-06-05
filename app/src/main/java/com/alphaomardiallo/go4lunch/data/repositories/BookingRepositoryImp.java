@@ -5,18 +5,21 @@ import static android.content.ContentValues.TAG;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.lifecycle.MutableLiveData;
 
 import com.alphaomardiallo.go4lunch.data.dataSources.Model.Booking;
-import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.EventListener;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.inject.Inject;
@@ -25,6 +28,7 @@ public class BookingRepositoryImp implements BookingRepository {
 
     private static final String COLLECTION_NAME = "booking";
     private FirebaseFirestore database;
+    private MutableLiveData<List<Booking>> allBookings = new MutableLiveData<>();
 
     @Inject
     public BookingRepositoryImp() {
@@ -39,7 +43,7 @@ public class BookingRepositoryImp implements BookingRepository {
         //Create a booking
         Map<String, Object> booking = new HashMap<>();
         booking.put("bookingID", bookingToSave.getBookingID());
-        booking.put("bookingDate", bookingToSave.getBookingDate());
+        booking.put("bookingDate", FieldValue.serverTimestamp());
         booking.put("restaurantID", bookingToSave.getBookedRestaurantID());
         booking.put("userWhoBooked", bookingToSave.getUserWhoBooked());
 
@@ -48,7 +52,7 @@ public class BookingRepositoryImp implements BookingRepository {
                 .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
                     @Override
                     public void onSuccess(DocumentReference documentReference) {
-                        Log.d(TAG, "onSuccess: ocument added " + documentReference);
+                        Log.d(TAG, "onSuccess: document added " + documentReference);
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
@@ -59,19 +63,42 @@ public class BookingRepositoryImp implements BookingRepository {
                 });
     }
 
+    public void deleteBookingInDatabase(String bookingID) {
+        database.collection(COLLECTION_NAME).document(bookingID)
+                .delete()
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void unused) {
+                        System.out.println("document has been deleted");
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.w(TAG, "onFailure: Error deleting document " + bookingID, e);
+                    }
+                });
+
+    }
+
     public void getAllBookingsFromDataBase() {
         database.collection(COLLECTION_NAME)
-                .get()
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                .addSnapshotListener(new EventListener<QuerySnapshot>() {
                     @Override
-                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        if (task.isSuccessful()) {
-                            for (QueryDocumentSnapshot document : task.getResult()) {
-                                Log.d(TAG, document.getId() + " " + document.getData());
-                            }
-                        } else {
-                            Log.e(TAG, "onComplete: Error getting document " + task.getException(), null);
+                    public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
+                        if (error != null) {
+                            Log.w(TAG, "Listen fail ", error);
+                            return;
                         }
+
+                        if (value != null) {
+                            List<Booking> temList = value.toObjects(Booking.class);
+                            allBookings.setValue(temList);
+                            Log.d(TAG, "onEvent: all user " + allBookings.getValue());
+                        } else {
+                            Log.d(TAG, "onEvent: all user is null");
+                        }
+
                     }
                 });
     }

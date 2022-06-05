@@ -10,6 +10,8 @@ public interface BookingRepository {
 
     void createBookingAndAddInDatabase(@NonNull Booking bookingToSave);
 
+    void deleteBookingInDatabase(String bookingID);
+
     void getAllBookingsFromDataBase();
 
 }
