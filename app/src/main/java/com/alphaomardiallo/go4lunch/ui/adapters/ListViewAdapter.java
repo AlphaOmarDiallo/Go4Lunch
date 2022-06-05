@@ -105,10 +105,15 @@ public class ListViewAdapter extends ListAdapter<ResultsItem, ListViewAdapter.Li
             restaurantLocation.setLongitude(restaurant.getGeometry().getLocation().getLng());
             restaurantDistance.setText(String.format("%sm", Math.round(location.distanceTo(restaurantLocation))));
 
-            Glide.with(restaurantPhoto)
-                    .load("https://maps.googleapis.com/maps/api/place/photo?maxwidth=100&photo_reference=" + restaurant.getPhotos().get(0).getPhotoReference() + "&key=" + BuildConfig.PLACES_API_KEY)
-                    .placeholder(R.drawable.hungry_droid)
-                    .into(restaurantPhoto);
+            if (restaurantPhoto != null) {
+                Glide.with(restaurantPhoto)
+                        .load("https://maps.googleapis.com/maps/api/place/photo?maxwidth=100&photo_reference=" + restaurant.getPhotos().get(0).getPhotoReference() + "&key=" + BuildConfig.PLACES_API_KEY)
+                        .placeholder(R.drawable.hungry_droid)
+                        .into(restaurantPhoto);
+            } else {
+                restaurantPhoto.setImageResource(R.drawable.hungry_droid);
+            }
+
             card.setOnClickListener(view -> onClickItemListener.onClickItem(getAbsoluteAdapterPosition()));
         }
 

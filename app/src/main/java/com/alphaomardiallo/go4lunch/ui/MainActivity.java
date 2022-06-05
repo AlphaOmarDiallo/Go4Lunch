@@ -123,6 +123,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         observeUsers();
 
+        observeBookings();
+
     }
 
     /**
@@ -184,6 +186,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private void observeUsers() {
         viewModel.getDataBaseInstanceUser();
         viewModel.getAllUsersFromDatabase();
+    }
+
+    /**
+     * Observing bookings
+     */
+
+    private void observeBookings(){
+        viewModel.getDatabaseInstanceBooking();
+        viewModel.observeBookingsFromDataBase();
     }
 
     /**

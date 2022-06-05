@@ -7,14 +7,12 @@ public class Booking {
     private long bookingID;
     private Date bookingDate;
     private String bookedRestaurantID;
-    private User userWhoBooked;
+    private String userWhoBooked;
 
     public Booking() {
     }
 
-    public Booking(long bookingID, Date bookingDate, String bookedRestaurantID, User userWhoBooked) {
-        this.bookingID = bookingID;
-        this.bookingDate = bookingDate;
+    public Booking(String bookedRestaurantID, String userWhoBooked) {
         this.bookedRestaurantID = bookedRestaurantID;
         this.userWhoBooked = userWhoBooked;
     }
@@ -33,7 +31,7 @@ public class Booking {
         return bookedRestaurantID;
     }
 
-    public User getUserWhoBooked() {
+    public String getUserWhoBooked() {
         return userWhoBooked;
     }
 
@@ -51,7 +49,7 @@ public class Booking {
         this.bookedRestaurantID = bookedRestaurantID;
     }
 
-    public void setUserWhoBooked(User userWhoBooked) {
+    public void setUserWhoBooked(String userWhoBooked) {
         this.userWhoBooked = userWhoBooked;
     }
 }

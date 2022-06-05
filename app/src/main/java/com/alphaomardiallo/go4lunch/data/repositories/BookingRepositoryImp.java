@@ -43,9 +43,8 @@ public class BookingRepositoryImp implements BookingRepository {
     public void createBookingAndAddInDatabase(@NonNull Booking bookingToSave) {
         //Create a booking
         Map<String, Object> booking = new HashMap<>();
-        booking.put("bookingID", bookingToSave.getBookingID());
         booking.put("bookingDate", FieldValue.serverTimestamp());
-        booking.put("restaurantID", bookingToSave.getBookedRestaurantID());
+        booking.put("bookedRestaurantID", bookingToSave.getBookedRestaurantID());
         booking.put("userWhoBooked", bookingToSave.getUserWhoBooked());
 
         database.collection(COLLECTION_NAME)
@@ -59,7 +58,7 @@ public class BookingRepositoryImp implements BookingRepository {
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
-                        Log.e(TAG, "onFailure: Error adding document " + e, null);
+                        Log.e(TAG, "onFailure: Error adding document " + e.getMessage(), null);
                     }
                 });
     }
@@ -77,7 +76,7 @@ public class BookingRepositoryImp implements BookingRepository {
                         if (value != null) {
                             List<Booking> temList = value.toObjects(Booking.class);
                             allBookings.setValue(temList);
-                            Log.d(TAG, "onEvent: all user " + allBookings.getValue());
+                            Log.d(TAG, "onEvent: all bookings " + allBookings.getValue());
                         } else {
                             Log.d(TAG, "onEvent: all user is null");
                         }

@@ -1,9 +1,12 @@
 package com.alphaomardiallo.go4lunch.ui;
 
+import static android.content.ContentValues.TAG;
+
 import android.content.Intent;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 
 import androidx.annotation.Nullable;
@@ -12,10 +15,13 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.alphaomardiallo.go4lunch.BuildConfig;
 import com.alphaomardiallo.go4lunch.R;
+import com.alphaomardiallo.go4lunch.data.dataSources.Model.Booking;
 import com.alphaomardiallo.go4lunch.data.dataSources.Model.detailsPojo.Result;
 import com.alphaomardiallo.go4lunch.data.viewModels.RestaurantDetailsViewModel;
 import com.alphaomardiallo.go4lunch.databinding.ActivityRestaurantDetailsBinding;
 import com.bumptech.glide.Glide;
+
+import java.util.List;
 
 import dagger.hilt.android.AndroidEntryPoint;
 
@@ -31,6 +37,8 @@ public class RestaurantDetails extends AppCompatActivity {
     private String restaurantWebsite;
     private double restaurantLatitude;
     private double restaurantLongitude;
+    private List<Booking> allBookings;
+    private Intent intent;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,6 +53,10 @@ public class RestaurantDetails extends AppCompatActivity {
         observeLocation();
 
         retrieveInformationFromIntent();
+
+        observeAllBookings();
+
+        setupFAB();
     }
 
     /**
@@ -64,8 +76,26 @@ public class RestaurantDetails extends AppCompatActivity {
     }
 
     private void retrieveInformationFromIntent() {
-        Intent intent = getIntent();
+        intent = getIntent();
         viewModel.getAllDetails(intent.getStringExtra(KEY_RESTAURANT_PLACE_ID)).observe(this, this::setupViews);
+    }
+
+    /**
+     * Booking related methods
+     */
+
+    private void observeAllBookings() {
+        viewModel.getDatabaseInstanceBooking();
+        viewModel.observeBookingsFromDataBase();
+        viewModel.getAllBookings().observe(this, this::updateBookingList);
+    }
+
+    private void updateBookingList(List<Booking> allBookings){
+        this.allBookings = allBookings;
+    }
+
+    private void createBooking(Booking bookingToCreate) {
+        viewModel.createBooking(bookingToCreate);
     }
 
     /**
@@ -145,6 +175,29 @@ public class RestaurantDetails extends AppCompatActivity {
                 });
             }
         }
+    }
+
+    /**
+     * Booking FAB setup
+     */
+
+    private void setupFAB() {
+        binding.fabSelectRestaurant.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Booking booking = bookingToCreate();
+                createBooking(booking);
+            }
+        });
+    }
+
+    private void setupFABColor() {
+        //TODO FAB color
+    }
+
+    private Booking bookingToCreate() {
+        Log.e(TAG, "bookingToCreate: " + intent.getStringExtra(KEY_RESTAURANT_PLACE_ID) + viewModel.getCurrentUser().getUid(), null);
+        return new Booking(intent.getStringExtra(KEY_RESTAURANT_PLACE_ID), viewModel.getCurrentUser().getUid());
     }
 
     /**

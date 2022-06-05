@@ -226,6 +226,10 @@ public class MainSharedViewModel extends ViewModel {
         bookingRepository.deleteBookingInDatabase(bookingID);
     }
 
+    public void observeBookingsFromDataBase() {
+        bookingRepository.getAllBookingsFromDataBase();
+    }
+
     public LiveData<List<Booking>> getAllBookings() {
         return bookingRepository.getAllBookings();
     }
