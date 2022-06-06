@@ -79,6 +79,19 @@ public class WorkmatesAdapter extends ListAdapter<User, WorkmatesAdapter.Workmat
 
         @SuppressLint("StringFormatMatches")
         public void bind(User user, OnClickItemListener onClickItemListener, List<Booking> bookingList) {
+            // Checking for a booking
+
+            boolean hasABooking = false;
+            Booking userBooking = null;
+
+            for (Booking booking : bookingList){
+                if (booking.getUserWhoBooked().equalsIgnoreCase(user.getUid())) {
+                    hasABooking = true;
+                    userBooking = booking;
+                    break;
+                }
+            }
+
             //ImageView
             if (user.getUrlPicture() != null) {
                 Glide.with(workmateAvatar)
@@ -93,8 +106,12 @@ public class WorkmatesAdapter extends ListAdapter<User, WorkmatesAdapter.Workmat
             }
 
             //TextView
-            String hasNotDecided = context.getString(R.string.workmate_has_not_selected_a_restaurant);
-            workmateLunchStatus.setText(String.format(hasNotDecided, user.getUsername()));
+
+            if (hasABooking == false){
+                workmateLunchStatus.setText(String.format(context.getString(R.string.workmate_has_not_selected_a_restaurant), user.getUsername()));
+            } else {
+                workmateLunchStatus.setText(String.format(context.getString(R.string.workmate_has_selected_a_restaurant), user.getUsername(), userBooking.getBookedRestaurantID()));
+            }
 
         }
     }

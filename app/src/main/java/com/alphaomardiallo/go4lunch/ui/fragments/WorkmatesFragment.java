@@ -16,6 +16,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.alphaomardiallo.go4lunch.R;
 import com.alphaomardiallo.go4lunch.data.dataSources.Model.Booking;
+import com.alphaomardiallo.go4lunch.data.dataSources.Model.User;
 import com.alphaomardiallo.go4lunch.data.viewModels.MainSharedViewModel;
 import com.alphaomardiallo.go4lunch.databinding.FragmentWorkmatesBinding;
 import com.alphaomardiallo.go4lunch.domain.OnClickItemListener;
@@ -32,6 +33,7 @@ public class WorkmatesFragment extends Fragment implements OnClickItemListener {
     FragmentWorkmatesBinding binding;
     MainSharedViewModel viewModel;
     private List<Booking> allBookings = new ArrayList<>();
+    private List<User> allUsers = new ArrayList<>();
     private WorkmatesAdapter adapter;
 
     @Override
@@ -49,9 +51,6 @@ public class WorkmatesFragment extends Fragment implements OnClickItemListener {
         binding.rvWorkmates.setHasFixedSize(true);
         binding.rvWorkmates.setLayoutManager(new LinearLayoutManager(view.getContext(), LinearLayoutManager.VERTICAL, false));
 
-        adapter = new WorkmatesAdapter(new WorkmatesAdapter.ListDiff(), this, allBookings, requireContext());
-        binding.rvWorkmates.setAdapter(adapter);
-
         return binding.getRoot();
     }
 
@@ -59,8 +58,17 @@ public class WorkmatesFragment extends Fragment implements OnClickItemListener {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        observeUserList();
+        observeBookingList();
 
+    }
+
+    /**
+     * Set adapter
+     */
+
+    private void setAdapter(){
+        adapter = new WorkmatesAdapter(new WorkmatesAdapter.ListDiff(), this, allBookings, requireContext());
+        binding.rvWorkmates.setAdapter(adapter);
     }
 
     /**
@@ -69,8 +77,29 @@ public class WorkmatesFragment extends Fragment implements OnClickItemListener {
 
     private void observeUserList() {
         if (this.isAdded()) {
+            viewModel.observeUserList().observe(requireActivity(), this::updateUserList);
             viewModel.observeUserList().observe(requireActivity(), adapter::submitList);
         }
+    }
+
+    private void updateUserList(List<User> list) {
+        allUsers = list;
+    }
+
+    /**
+     * Observing booking and updating list
+     */
+    private void observeBookingList() {
+        if (this.isAdded()){
+            viewModel.getAllBookings().observe(requireActivity(), this::updateBookingList);
+        }
+    }
+
+    private void updateBookingList(List<Booking> list){
+        allBookings = list;
+        setAdapter();
+        observeUserList();
+        Log.i(TAG, "updateBookingList: " + list);
     }
 
     /**

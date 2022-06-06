@@ -28,6 +28,11 @@ import javax.inject.Inject;
 public class BookingRepositoryImp implements BookingRepository {
 
     private static final String COLLECTION_NAME = "booking";
+    private static final String BOOKING_ID = "bookingID";
+    private static final String BOOKING_DATE = "bookingDate";
+    private static final String BOOKING_RESTAURANT_ID = "bookedRestaurantID";
+    private static final String BOOKING_USER_ID = "userWhoBooked";
+
     private FirebaseFirestore database;
     private MutableLiveData<List<Booking>> allBookings = new MutableLiveData<>();
 
@@ -43,10 +48,10 @@ public class BookingRepositoryImp implements BookingRepository {
     public void createBookingAndAddInDatabase(@NonNull Booking bookingToSave) {
         //Create a booking
         Map<String, Object> booking = new HashMap<>();
-        booking.put("bookingID", null);
-        booking.put("bookingDate", FieldValue.serverTimestamp());
-        booking.put("bookedRestaurantID", bookingToSave.getBookedRestaurantID());
-        booking.put("userWhoBooked", bookingToSave.getUserWhoBooked());
+        booking.put(BOOKING_ID, null);
+        booking.put(BOOKING_DATE, FieldValue.serverTimestamp());
+        booking.put(BOOKING_RESTAURANT_ID, bookingToSave.getBookedRestaurantID());
+        booking.put(BOOKING_USER_ID, bookingToSave.getUserWhoBooked());
 
         database.collection(COLLECTION_NAME)
                 .add(booking)
@@ -56,7 +61,7 @@ public class BookingRepositoryImp implements BookingRepository {
                         Log.d(TAG, "onSuccess: document added " + documentReference);
                         database.collection(COLLECTION_NAME)
                                 .document(documentReference.getId())
-                                .update("bookingID", documentReference.getId());
+                                .update(BOOKING_ID, documentReference.getId());
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
