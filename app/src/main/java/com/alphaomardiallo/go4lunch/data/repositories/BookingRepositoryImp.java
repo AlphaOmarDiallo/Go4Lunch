@@ -31,6 +31,7 @@ public class BookingRepositoryImp implements BookingRepository {
     private static final String BOOKING_ID = "bookingID";
     private static final String BOOKING_DATE = "bookingDate";
     private static final String BOOKING_RESTAURANT_ID = "bookedRestaurantID";
+    private static final String BOOKING_RESTAURANT_NAME = "bookedRestaurantName";
     private static final String BOOKING_USER_ID = "userWhoBooked";
 
     private FirebaseFirestore database;
@@ -51,6 +52,7 @@ public class BookingRepositoryImp implements BookingRepository {
         booking.put(BOOKING_ID, null);
         booking.put(BOOKING_DATE, FieldValue.serverTimestamp());
         booking.put(BOOKING_RESTAURANT_ID, bookingToSave.getBookedRestaurantID());
+        booking.put(BOOKING_RESTAURANT_NAME, bookingToSave.getBookedRestaurantName());
         booking.put(BOOKING_USER_ID, bookingToSave.getUserWhoBooked());
 
         database.collection(COLLECTION_NAME)

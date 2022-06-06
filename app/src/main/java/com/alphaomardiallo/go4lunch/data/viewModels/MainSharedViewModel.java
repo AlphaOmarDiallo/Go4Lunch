@@ -27,6 +27,7 @@ import com.alphaomardiallo.go4lunch.data.repositories.UserRepositoryImp;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseUser;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -42,7 +43,8 @@ public class MainSharedViewModel extends ViewModel {
     private final PlacesAPIRepository placesAPIRepository;
     private final PermissionRepository permissionRepository;
     private final BookingRepository bookingRepository;
-    private final MutableLiveData<Booking> allBookings = new MutableLiveData<>();
+    private final MutableLiveData<List<User>> allUsers = new MutableLiveData<>();
+    private final MutableLiveData<List<Booking>> allBookings = new MutableLiveData<>();
     private final MutableLiveData<String> restaurantToFocusOn = new MutableLiveData<>();
     private final LiveData<List<ResultsItem>> restaurants;
     private Location savedLocation;
@@ -187,8 +189,7 @@ public class MainSharedViewModel extends ViewModel {
      */
 
     // ============================= user ======================================
-
-    public void getDataBaseInstanceUser(){
+    public void getDataBaseInstanceUser() {
         userRepositoryImp.getDataBaseInstance();
     }
 
@@ -196,7 +197,7 @@ public class MainSharedViewModel extends ViewModel {
         userRepositoryImp.createUser();
     }
 
-    public Task<User> getUserData(){
+    public Task<User> getUserData() {
         return userRepositoryImp.getUserData().continueWith(task -> task.getResult().toObject(User.class));
     }
 
@@ -205,7 +206,28 @@ public class MainSharedViewModel extends ViewModel {
     }
 
     public LiveData<List<User>> observeUserList() {
-        return userRepositoryImp.getAllUsers();
+        allUsers.setValue(userRepositoryImp.getAllUsers().getValue());
+        return allUsers;
+    }
+
+    public void sortList(List<User> list) {
+        List<User> listToSort = list;
+        allBookings.setValue(bookingRepository.getAllBookings().getValue());
+
+        List<User> listUserWithBooking = new ArrayList<>();
+
+        for (User user : listToSort) {
+            for (Booking booking : allBookings.getValue()) {
+                if (user.getUid().equalsIgnoreCase(booking.getUserWhoBooked())) {
+                    listUserWithBooking.add(user);
+                }
+            }
+        }
+
+        listToSort.removeAll(listUserWithBooking);
+        listUserWithBooking.addAll(listToSort);
+
+        allUsers.setValue(listUserWithBooking);
     }
 
     // ============================== booking =============================================

@@ -35,6 +35,7 @@ public class RestaurantDetails extends AppCompatActivity {
     private String restaurantID;
     private String restaurantPhoneNumber;
     private String restaurantWebsite;
+    private String restaurantName;
     private double restaurantLatitude;
     private double restaurantLongitude;
     private List<Booking> allBookings;
@@ -111,7 +112,7 @@ public class RestaurantDetails extends AppCompatActivity {
         if (restaurant != null) {
             restaurantID = restaurant.getPlaceId();
             String restaurantPhoto = getString(R.string.restaurantPlaceHolder);
-            String restaurantName = restaurant.getName();
+            restaurantName = restaurant.getName();
             double restaurantRating = restaurant.getRating();
             String restaurantAddress = restaurant.getVicinity();
             boolean restaurantIsOpenNow = restaurant.getOpeningHours().isOpenNow();
@@ -197,7 +198,7 @@ public class RestaurantDetails extends AppCompatActivity {
 
     private Booking bookingToCreate() {
         Log.e(TAG, "bookingToCreate: " + intent.getStringExtra(KEY_RESTAURANT_PLACE_ID) + viewModel.getCurrentUser().getUid(), null);
-        return new Booking(intent.getStringExtra(KEY_RESTAURANT_PLACE_ID), viewModel.getCurrentUser().getUid());
+        return new Booking(intent.getStringExtra(KEY_RESTAURANT_PLACE_ID), restaurantName, viewModel.getCurrentUser().getUid());
     }
 
     /**

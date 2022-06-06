@@ -10,13 +10,15 @@ public class Booking {
     private String bookingID;
     private Date bookingDate;
     private String bookedRestaurantID;
+    private String bookedRestaurantName;
     private String userWhoBooked;
 
     public Booking() {
     }
 
-    public Booking(String bookedRestaurantID, String userWhoBooked) {
+    public Booking(String bookedRestaurantID, String bookedRestaurantName, String userWhoBooked) {
         this.bookedRestaurantID = bookedRestaurantID;
+        this.bookedRestaurantName = bookedRestaurantName;
         this.userWhoBooked = userWhoBooked;
     }
 
@@ -32,6 +34,10 @@ public class Booking {
 
     public String getBookedRestaurantID() {
         return bookedRestaurantID;
+    }
+
+    public String getBookedRestaurantName() {
+        return bookedRestaurantName;
     }
 
     public String getUserWhoBooked() {
@@ -50,6 +56,10 @@ public class Booking {
 
     public void setBookedRestaurantID(String bookedRestaurantID) {
         this.bookedRestaurantID = bookedRestaurantID;
+    }
+
+    public void setBookedRestaurantName(String bookedRestaurantName) {
+        this.bookedRestaurantName = bookedRestaurantName;
     }
 
     public void setUserWhoBooked(String userWhoBooked) {

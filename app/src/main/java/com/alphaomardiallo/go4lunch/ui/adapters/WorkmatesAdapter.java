@@ -2,6 +2,8 @@ package com.alphaomardiallo.go4lunch.ui.adapters;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.graphics.Color;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -51,6 +53,8 @@ public class WorkmatesAdapter extends ListAdapter<User, WorkmatesAdapter.Workmat
 
     public static class ListDiff extends DiffUtil.ItemCallback<User> {
 
+        private static final String TAG = "LISTDIFF";
+
         @Override
         public boolean areItemsTheSame(@NonNull User oldItem, @NonNull User newItem) {
             return oldItem.getUid().equalsIgnoreCase(newItem.getUid());
@@ -58,15 +62,16 @@ public class WorkmatesAdapter extends ListAdapter<User, WorkmatesAdapter.Workmat
 
         @Override
         public boolean areContentsTheSame(@NonNull User oldItem, @NonNull User newItem) {
+            Log.e(TAG, "areContentsTheSame: " + oldItem + newItem, null );
             return oldItem.getUrlPicture().equalsIgnoreCase(newItem.getUrlPicture()) &&
                     oldItem.getUsername().equalsIgnoreCase(newItem.getUsername()) &&
-                    oldItem.getUserEmail().equalsIgnoreCase(newItem.getUserEmail()) &&
-                    oldItem.getBookingOfTheDay().equals(newItem.getBookingOfTheDay());
+                    oldItem.getUserEmail().equalsIgnoreCase(newItem.getUserEmail());
         }
     }
 
 
     public static class WorkmatesViewHolder extends RecyclerView.ViewHolder {
+
         ImageView workmateAvatar;
         TextView workmateLunchStatus;
 
@@ -111,6 +116,8 @@ public class WorkmatesAdapter extends ListAdapter<User, WorkmatesAdapter.Workmat
                 workmateLunchStatus.setText(String.format(context.getString(R.string.workmate_has_not_selected_a_restaurant), user.getUsername()));
             } else {
                 workmateLunchStatus.setText(String.format(context.getString(R.string.workmate_has_selected_a_restaurant), user.getUsername(), userBooking.getBookedRestaurantID()));
+                workmateLunchStatus.setTextColor(Color.BLACK);
+
             }
 
         }
