@@ -1,12 +1,9 @@
 package com.alphaomardiallo.go4lunch.ui;
 
-import static android.content.ContentValues.TAG;
-
 import android.content.Intent;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 
 import androidx.annotation.Nullable;
@@ -197,7 +194,6 @@ public class RestaurantDetails extends AppCompatActivity {
     }
 
     private Booking bookingToCreate() {
-        Log.e(TAG, "bookingToCreate: " + intent.getStringExtra(KEY_RESTAURANT_PLACE_ID) + viewModel.getCurrentUser().getUid(), null);
         return new Booking(intent.getStringExtra(KEY_RESTAURANT_PLACE_ID), restaurantName, viewModel.getCurrentUser().getUid());
     }
 

@@ -2,6 +2,7 @@ package com.alphaomardiallo.go4lunch.ui.fragments;
 
 import static android.content.ContentValues.TAG;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -18,7 +19,8 @@ import com.alphaomardiallo.go4lunch.R;
 import com.alphaomardiallo.go4lunch.data.dataSources.Model.Booking;
 import com.alphaomardiallo.go4lunch.data.viewModels.MainSharedViewModel;
 import com.alphaomardiallo.go4lunch.databinding.FragmentWorkmatesBinding;
-import com.alphaomardiallo.go4lunch.domain.OnClickItemListener;
+import com.alphaomardiallo.go4lunch.domain.OnClickWormkmateListener;
+import com.alphaomardiallo.go4lunch.ui.RestaurantDetails;
 import com.alphaomardiallo.go4lunch.ui.adapters.WorkmatesAdapter;
 
 import java.util.ArrayList;
@@ -27,10 +29,11 @@ import java.util.List;
 import dagger.hilt.android.AndroidEntryPoint;
 
 @AndroidEntryPoint
-public class WorkmatesFragment extends Fragment implements OnClickItemListener {
+public class WorkmatesFragment extends Fragment implements OnClickWormkmateListener {
 
-    FragmentWorkmatesBinding binding;
-    MainSharedViewModel viewModel;
+    private static final String KEY_RESTAURANT_ID = "id";
+    private FragmentWorkmatesBinding binding;
+    private MainSharedViewModel viewModel;
     private List<Booking> allBookings = new ArrayList<>();
     private WorkmatesAdapter adapter;
 
@@ -95,6 +98,21 @@ public class WorkmatesFragment extends Fragment implements OnClickItemListener {
     }
 
     /**
+     * Item click
+     */
+
+    @Override
+    public void onClickItem(String restaurantID) {
+        openDetailActivity(restaurantID);
+    }
+
+    private void openDetailActivity(String restaurantID) {
+        Intent intent = new Intent(requireContext(), RestaurantDetails.class);
+        intent.putExtra(KEY_RESTAURANT_ID, restaurantID);
+        startActivity(intent);
+    }
+
+    /**
      * LifeCycle
      */
 
@@ -107,10 +125,5 @@ public class WorkmatesFragment extends Fragment implements OnClickItemListener {
         }
 
         Log.e(TAG, "onDestroyView: Destroy", null);
-    }
-
-    @Override
-    public void onClickItem(int position) {
-        Log.d(TAG, "onClickItem: do something here");
     }
 }

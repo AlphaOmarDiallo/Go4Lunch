@@ -11,6 +11,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
@@ -19,7 +20,7 @@ import com.alphaomardiallo.go4lunch.R;
 import com.alphaomardiallo.go4lunch.data.dataSources.Model.Booking;
 import com.alphaomardiallo.go4lunch.data.dataSources.Model.User;
 import com.alphaomardiallo.go4lunch.databinding.ItemWorkmatesBinding;
-import com.alphaomardiallo.go4lunch.domain.OnClickItemListener;
+import com.alphaomardiallo.go4lunch.domain.OnClickWormkmateListener;
 import com.bumptech.glide.Glide;
 
 import java.util.List;
@@ -27,11 +28,11 @@ import java.util.List;
 public class WorkmatesAdapter extends ListAdapter<User, WorkmatesAdapter.WorkmatesViewHolder> {
 
     private ItemWorkmatesBinding binding;
-    private OnClickItemListener onClickItemListener;
+    private OnClickWormkmateListener onClickItemListener;
     private static Context context;
     private List<Booking> bookingList;
 
-    public WorkmatesAdapter(@NonNull DiffUtil.ItemCallback<User> diffCallback, OnClickItemListener onClickItemListener, List<Booking> bookingList, Context context) {
+    public WorkmatesAdapter(@NonNull DiffUtil.ItemCallback<User> diffCallback, OnClickWormkmateListener onClickItemListener, List<Booking> bookingList, Context context) {
         super(diffCallback);
         this.onClickItemListener = onClickItemListener;
         this.bookingList = bookingList;
@@ -62,7 +63,7 @@ public class WorkmatesAdapter extends ListAdapter<User, WorkmatesAdapter.Workmat
 
         @Override
         public boolean areContentsTheSame(@NonNull User oldItem, @NonNull User newItem) {
-            Log.e(TAG, "areContentsTheSame: " + oldItem + newItem, null );
+            Log.e(TAG, "areContentsTheSame: " + oldItem + newItem, null);
             return oldItem.getUrlPicture().equalsIgnoreCase(newItem.getUrlPicture()) &&
                     oldItem.getUsername().equalsIgnoreCase(newItem.getUsername()) &&
                     oldItem.getUserEmail().equalsIgnoreCase(newItem.getUserEmail());
@@ -72,24 +73,26 @@ public class WorkmatesAdapter extends ListAdapter<User, WorkmatesAdapter.Workmat
 
     public static class WorkmatesViewHolder extends RecyclerView.ViewHolder {
 
+        ConstraintLayout item;
         ImageView workmateAvatar;
         TextView workmateLunchStatus;
 
         public WorkmatesViewHolder(@NonNull View itemView) {
             super(itemView);
 
+            item = itemView.findViewById(R.id.itemWorkmate);
             workmateAvatar = itemView.findViewById(R.id.ivWorkmateAvatar);
             workmateLunchStatus = itemView.findViewById(R.id.tvWorkmateRestaurantChoice);
         }
 
         @SuppressLint("StringFormatMatches")
-        public void bind(User user, OnClickItemListener onClickItemListener, List<Booking> bookingList) {
+        public void bind(User user, OnClickWormkmateListener onClickItemListener, List<Booking> bookingList) {
             // Checking for a booking
 
             boolean hasABooking = false;
             Booking userBooking = null;
 
-            for (Booking booking : bookingList){
+            for (Booking booking : bookingList) {
                 if (booking.getUserWhoBooked().equalsIgnoreCase(user.getUid())) {
                     hasABooking = true;
                     userBooking = booking;
@@ -112,13 +115,23 @@ public class WorkmatesAdapter extends ListAdapter<User, WorkmatesAdapter.Workmat
 
             //TextView
 
-            if (hasABooking == false){
+            if (hasABooking == false) {
                 workmateLunchStatus.setText(String.format(context.getString(R.string.workmate_has_not_selected_a_restaurant), user.getUsername()));
             } else {
                 workmateLunchStatus.setText(String.format(context.getString(R.string.workmate_has_selected_a_restaurant), user.getUsername(), userBooking.getBookedRestaurantID()));
                 workmateLunchStatus.setTextColor(Color.BLACK);
-
             }
+
+            if (hasABooking == true) {
+                Booking finalUserBooking = userBooking;
+                item.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onClickItemListener.onClickItem(finalUserBooking.getBookedRestaurantID());
+                    }
+                });
+            }
+
 
         }
     }
