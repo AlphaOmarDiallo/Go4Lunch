@@ -179,14 +179,14 @@ public class ListViewFragment extends Fragment implements OnClickItemListener {
             binding.ivLoadingGIF.setVisibility(View.INVISIBLE);
         }
 
-        handler.postDelayed(() -> {
+/*        handler.postDelayed(() -> {
             binding.tvLoadingMessage.setText(R.string.no_restaurant_in_your_area);
             Glide.with(binding.ivLoadingGIF)
                     .asGif()
                     .override(SIZE_PICTURE, SIZE_PICTURE)
                     .load(getString(R.string.no_results_gif))
                     .into(binding.ivLoadingGIF);
-        }, HANDLER_LENGTH_LONG);
+        }, HANDLER_LENGTH_LONG);*/
     }
 
     /**

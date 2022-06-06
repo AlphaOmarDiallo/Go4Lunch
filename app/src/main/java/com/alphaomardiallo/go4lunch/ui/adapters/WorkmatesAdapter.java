@@ -24,26 +24,26 @@ import com.alphaomardiallo.go4lunch.domain.OnClickWormkmateListener;
 import com.bumptech.glide.Glide;
 
 import java.util.List;
+import java.util.Objects;
 
 public class WorkmatesAdapter extends ListAdapter<User, WorkmatesAdapter.WorkmatesViewHolder> {
 
-    private ItemWorkmatesBinding binding;
-    private OnClickWormkmateListener onClickItemListener;
+    private final OnClickWormkmateListener onClickItemListener;
     private static Context context;
-    private List<Booking> bookingList;
+    private final List<Booking> bookingList;
 
     public WorkmatesAdapter(@NonNull DiffUtil.ItemCallback<User> diffCallback, OnClickWormkmateListener onClickItemListener, List<Booking> bookingList, Context context) {
         super(diffCallback);
         this.onClickItemListener = onClickItemListener;
         this.bookingList = bookingList;
-        this.context = context;
+        WorkmatesAdapter.context = context;
     }
 
 
     @NonNull
     @Override
     public WorkmatesViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        binding = ItemWorkmatesBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false);
+        com.alphaomardiallo.go4lunch.databinding.ItemWorkmatesBinding binding = ItemWorkmatesBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false);
         return new WorkmatesViewHolder(binding.getRoot());
     }
 
@@ -64,12 +64,11 @@ public class WorkmatesAdapter extends ListAdapter<User, WorkmatesAdapter.Workmat
         @Override
         public boolean areContentsTheSame(@NonNull User oldItem, @NonNull User newItem) {
             Log.e(TAG, "areContentsTheSame: " + oldItem + newItem, null);
-            return oldItem.getUrlPicture().equalsIgnoreCase(newItem.getUrlPicture()) &&
+            return Objects.requireNonNull(oldItem.getUrlPicture()).equalsIgnoreCase(newItem.getUrlPicture()) &&
                     oldItem.getUsername().equalsIgnoreCase(newItem.getUsername()) &&
                     oldItem.getUserEmail().equalsIgnoreCase(newItem.getUserEmail());
         }
     }
-
 
     public static class WorkmatesViewHolder extends RecyclerView.ViewHolder {
 
@@ -115,24 +114,17 @@ public class WorkmatesAdapter extends ListAdapter<User, WorkmatesAdapter.Workmat
 
             //TextView
 
-            if (hasABooking == false) {
+            if (!hasABooking) {
                 workmateLunchStatus.setText(String.format(context.getString(R.string.workmate_has_not_selected_a_restaurant), user.getUsername()));
             } else {
-                workmateLunchStatus.setText(String.format(context.getString(R.string.workmate_has_selected_a_restaurant), user.getUsername(), userBooking.getBookedRestaurantID()));
+                workmateLunchStatus.setText(String.format(context.getString(R.string.workmate_has_selected_a_restaurant), user.getUsername(), userBooking.getBookedRestaurantName()));
                 workmateLunchStatus.setTextColor(Color.BLACK);
             }
 
-            if (hasABooking == true) {
+            if (hasABooking) {
                 Booking finalUserBooking = userBooking;
-                item.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        onClickItemListener.onClickItem(finalUserBooking.getBookedRestaurantID());
-                    }
-                });
+                item.setOnClickListener(view -> onClickItemListener.onClickItem(finalUserBooking.getBookedRestaurantID()));
             }
-
-
         }
     }
 }
