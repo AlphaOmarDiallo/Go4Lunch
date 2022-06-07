@@ -98,7 +98,7 @@ public class SettingsActivity extends AppCompatActivity {
     private void setupUI(User user) {
         if (user.getUrlPicture() != null) {
             Glide.with(getApplicationContext())
-                    .load(viewModel.getCurrentUser().getPhotoUrl())
+                    .load(user.getUrlPicture())
                     .circleCrop()
                     .into(binding.iVUserPictureSettings);
         } else {

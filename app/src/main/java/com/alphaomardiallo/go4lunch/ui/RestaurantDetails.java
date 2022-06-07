@@ -9,6 +9,7 @@ import android.view.View;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.alphaomardiallo.go4lunch.BuildConfig;
 import com.alphaomardiallo.go4lunch.R;
@@ -16,6 +17,8 @@ import com.alphaomardiallo.go4lunch.data.dataSources.Model.Booking;
 import com.alphaomardiallo.go4lunch.data.dataSources.Model.detailsPojo.Result;
 import com.alphaomardiallo.go4lunch.data.viewModels.RestaurantDetailsViewModel;
 import com.alphaomardiallo.go4lunch.databinding.ActivityRestaurantDetailsBinding;
+import com.alphaomardiallo.go4lunch.ui.adapters.WorkmatesAdapter;
+import com.alphaomardiallo.go4lunch.ui.adapters.WorkmatesJoiningAdapter;
 import com.bumptech.glide.Glide;
 
 import java.util.List;
@@ -37,6 +40,7 @@ public class RestaurantDetails extends AppCompatActivity {
     private double restaurantLongitude;
     private List<Booking> allBookings;
     private Intent intent;
+    private WorkmatesJoiningAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,7 +50,7 @@ public class RestaurantDetails extends AppCompatActivity {
         viewModel = new ViewModelProvider(this).get(RestaurantDetailsViewModel.class);
         setContentView(view);
 
-        location = viewModel.getOfficeLocation();
+        recyclerViewSetup();
 
         observeLocation();
 
@@ -58,10 +62,22 @@ public class RestaurantDetails extends AppCompatActivity {
     }
 
     /**
+     * RecycleView settings
+     */
+
+    private void recyclerViewSetup() {
+        adapter = new WorkmatesJoiningAdapter(new WorkmatesAdapter.ListDiff(), this);
+        binding.rvWorkmatesDetails.setHasFixedSize(true);
+        binding.rvWorkmatesDetails.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
+        binding.rvWorkmatesDetails.setAdapter(adapter);
+    }
+
+    /**
      * Getting location and restaurant DATA
      */
 
     private void observeLocation() {
+        location = viewModel.getOfficeLocation();
         viewModel.getLocation(getBaseContext(), this).observe(this, this::updateCurrentLocationAndDistance);
     }
 
