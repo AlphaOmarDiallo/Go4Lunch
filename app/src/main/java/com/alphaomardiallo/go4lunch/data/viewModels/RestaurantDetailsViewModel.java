@@ -71,6 +71,21 @@ public class RestaurantDetailsViewModel extends ViewModel {
         bookingRepository.getInstance();
     }
 
+    public Booking checkIfUserHasBooking() {
+        Booking hasBooking = null;
+        List<Booking> bookings = bookingRepository.getAllBookings().getValue();
+        String userID = userRepository.getCurrentUserID();
+
+        for (Booking booking : bookings) {
+            if (booking.getUserWhoBooked().equalsIgnoreCase(userID)) {
+                hasBooking = booking;
+                break;
+            }
+        }
+
+        return hasBooking;
+    }
+
     public void createBooking(Booking bookingToSave) {
         bookingRepository.createBookingAndAddInDatabase(bookingToSave);
     }

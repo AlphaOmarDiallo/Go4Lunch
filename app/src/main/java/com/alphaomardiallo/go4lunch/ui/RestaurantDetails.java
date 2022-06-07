@@ -1,9 +1,11 @@
 package com.alphaomardiallo.go4lunch.ui;
 
 import android.content.Intent;
+import android.content.res.ColorStateList;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 
 import androidx.annotation.Nullable;
@@ -50,15 +52,16 @@ public class RestaurantDetails extends AppCompatActivity {
         viewModel = new ViewModelProvider(this).get(RestaurantDetailsViewModel.class);
         setContentView(view);
 
+        retrieveInformationFromIntent();
+
         recyclerViewSetup();
 
         observeLocation();
 
-        retrieveInformationFromIntent();
-
         observeAllBookings();
 
         setupFAB();
+
     }
 
     /**
@@ -91,7 +94,8 @@ public class RestaurantDetails extends AppCompatActivity {
 
     private void retrieveInformationFromIntent() {
         intent = getIntent();
-        viewModel.getAllDetails(intent.getStringExtra(KEY_RESTAURANT_PLACE_ID)).observe(this, this::setupViews);
+        restaurantID = intent.getStringExtra(KEY_RESTAURANT_PLACE_ID);
+        viewModel.getAllDetails(restaurantID).observe(this, this::setupViews);
     }
 
     /**
@@ -104,8 +108,10 @@ public class RestaurantDetails extends AppCompatActivity {
         viewModel.getAllBookings().observe(this, this::updateBookingList);
     }
 
-    private void updateBookingList(List<Booking> allBookings){
+    private void updateBookingList(List<Booking> allBookings) {
         this.allBookings = allBookings;
+        setupFABColor();
+        System.out.println("updateBookingList");
     }
 
     private void createBooking(Booking bookingToCreate) {
@@ -123,7 +129,7 @@ public class RestaurantDetails extends AppCompatActivity {
         binding.tvWebsiteDetails.setVisibility(View.INVISIBLE);
 
         if (restaurant != null) {
-            restaurantID = restaurant.getPlaceId();
+            System.out.println(restaurantID);
             String restaurantPhoto = getString(R.string.restaurantPlaceHolder);
             restaurantName = restaurant.getName();
             double restaurantRating = restaurant.getRating();
@@ -196,17 +202,45 @@ public class RestaurantDetails extends AppCompatActivity {
      */
 
     private void setupFAB() {
+
         binding.fabSelectRestaurant.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Booking booking = bookingToCreate();
-                createBooking(booking);
+                Booking bookingToCheck = viewModel.checkIfUserHasBooking();
+
+                if (bookingToCheck == null) {
+                    System.out.println("create");
+                    Booking booking = bookingToCreate();
+                    createBooking(booking);
+                } else {
+                    System.out.println(restaurantID);
+                    if (bookingToCheck.getBookedRestaurantID().equalsIgnoreCase(restaurantID)) {
+                        System.out.println("delete");
+                    } else {
+                        System.out.println("update");
+                    }
+                }
+
+                setupFABColor();
+
             }
         });
     }
 
     private void setupFABColor() {
-        //TODO FAB color
+        Booking hasBooking = viewModel.checkIfUserHasBooking();
+        if (hasBooking == null) {
+            binding.fabSelectRestaurant.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.white)));
+            Log.e("setupFABColor", "null", null);
+        } else if (hasBooking != null) {
+            if (hasBooking.getBookedRestaurantID().equalsIgnoreCase(restaurantID)) {
+                binding.fabSelectRestaurant.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.teal_700)));
+                Log.e("setupFABColor", "booking at this place", null);
+            } else {
+                binding.fabSelectRestaurant.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.white)));
+                Log.e("setupFABColor", "booking somewhere else", null);
+            }
+        }
     }
 
     private Booking bookingToCreate() {
