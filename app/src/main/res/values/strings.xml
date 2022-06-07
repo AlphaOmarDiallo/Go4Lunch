@@ -35,7 +35,7 @@
     <string name="fetching_list_gif">https://media.giphy.com/media/0KiLnOipDAnfk5Jgsf/giphy.gif</string>
     <string name="no_results_gif">https://media.giphy.com/media/MdeHHwPzLpzbEkzl70/giphy.gif</string>
     <string name="user_does_not_have_picture">https://images.pexels.com/photos/3179911/pexels-photo-3179911.jpeg?auto=compress&amp;cs=tinysrgb&amp;w=1260&amp;h=750&amp;dpr=2</string>
-    <string name="fake_avatar">https://i.pravatar.cc/100</string>
+    <string name="fake_avatar">https://cdn.pixabay.com/photo/2016/08/08/09/17/avatar-1577909_1280.png</string>
 
     <!--  Keys -->
     <string name="default_web_client_id_google">407532419271-qimb705lnldgpbks9mb0bhoveskv8po6.apps.googleusercontent.com</string>

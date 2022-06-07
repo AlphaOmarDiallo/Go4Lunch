@@ -24,7 +24,6 @@ import com.alphaomardiallo.go4lunch.domain.OnClickWormkmateListener;
 import com.bumptech.glide.Glide;
 
 import java.util.List;
-import java.util.Objects;
 
 public class WorkmatesAdapter extends ListAdapter<User, WorkmatesAdapter.WorkmatesViewHolder> {
 
@@ -64,7 +63,7 @@ public class WorkmatesAdapter extends ListAdapter<User, WorkmatesAdapter.Workmat
         @Override
         public boolean areContentsTheSame(@NonNull User oldItem, @NonNull User newItem) {
             Log.e(TAG, "areContentsTheSame: " + oldItem + newItem, null);
-            return Objects.requireNonNull(oldItem.getUrlPicture()).equalsIgnoreCase(newItem.getUrlPicture()) &&
+            return /*Objects.requireNonNull(oldItem.getUrlPicture()).equalsIgnoreCase(newItem.getUrlPicture()) &&*/
                     oldItem.getUsername().equalsIgnoreCase(newItem.getUsername()) &&
                     oldItem.getUserEmail().equalsIgnoreCase(newItem.getUserEmail());
         }
@@ -83,6 +82,8 @@ public class WorkmatesAdapter extends ListAdapter<User, WorkmatesAdapter.Workmat
             workmateAvatar = itemView.findViewById(R.id.ivWorkmateAvatar);
             workmateLunchStatus = itemView.findViewById(R.id.tvWorkmateRestaurantChoice);
         }
+
+
 
         @SuppressLint("StringFormatMatches")
         public void bind(User user, OnClickWormkmateListener onClickItemListener, List<Booking> bookingList) {
@@ -127,4 +128,5 @@ public class WorkmatesAdapter extends ListAdapter<User, WorkmatesAdapter.Workmat
             }
         }
     }
+
 }

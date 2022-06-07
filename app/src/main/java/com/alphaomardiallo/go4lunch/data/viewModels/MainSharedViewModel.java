@@ -27,7 +27,8 @@ import com.alphaomardiallo.go4lunch.data.repositories.UserRepositoryImp;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseUser;
 
-import java.util.ArrayList;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.List;
 import java.util.Objects;
 
@@ -210,25 +211,6 @@ public class MainSharedViewModel extends ViewModel {
         return allUsers;
     }
 
-    public void sortList(List<User> list) {
-        List<User> listToSort = list;
-        allBookings.setValue(bookingRepository.getAllBookings().getValue());
-
-        List<User> listUserWithBooking = new ArrayList<>();
-
-        for (User user : listToSort) {
-            for (Booking booking : allBookings.getValue()) {
-                if (user.getUid().equalsIgnoreCase(booking.getUserWhoBooked())) {
-                    listUserWithBooking.add(user);
-                }
-            }
-        }
-
-        listToSort.removeAll(listUserWithBooking);
-        listUserWithBooking.addAll(listToSort);
-
-        allUsers.setValue(listUserWithBooking);
-    }
 
     // ============================== booking =============================================
 
@@ -248,11 +230,29 @@ public class MainSharedViewModel extends ViewModel {
         bookingRepository.deleteBookingInDatabase(bookingID);
     }
 
+    public void deleteBookingFromPreviousDays() {
+        bookingRepository.deleteBookingsFromPreviousDays();
+    }
+
     public void observeBookingsFromDataBase() {
         bookingRepository.getAllBookingsFromDataBase();
     }
 
     public LiveData<List<Booking>> getAllBookings() {
         return bookingRepository.getAllBookings();
+    }
+
+    private void deleteBookingsFromPreviousDays() {
+        List<Booking> allBookings = bookingRepository.getAllBookings().getValue();
+
+        Calendar c = Calendar.getInstance();
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        String strDate = sdf.format(c.getTime());
+        Log.d("Date","DATE : " + strDate);
+
+        for (Booking booking : allBookings) {
+            System.out.println(booking.getBookingDate().toString());
+        }
+
     }
 }

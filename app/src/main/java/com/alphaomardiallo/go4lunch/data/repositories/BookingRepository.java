@@ -21,4 +21,6 @@ public interface BookingRepository {
 
     LiveData<List<Booking>> getAllBookings();
 
+    void deleteBookingsFromPreviousDays();
+
 }

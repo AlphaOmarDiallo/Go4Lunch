@@ -19,6 +19,10 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QuerySnapshot;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -85,8 +89,8 @@ public class BookingRepositoryImp implements BookingRepository {
                         }
 
                         if (value != null) {
-                            List<Booking> temList = value.toObjects(Booking.class);
-                            allBookings.setValue(temList);
+                            List<Booking> tempList = value.toObjects(Booking.class);
+                            allBookings.setValue(tempList);
                             Log.d(TAG, "onEvent: all bookings " + allBookings.getValue());
                         } else {
                             Log.d(TAG, "onEvent: all user is null");
@@ -134,6 +138,19 @@ public class BookingRepositoryImp implements BookingRepository {
                     }
                 });
 
+    }
+
+    public void deleteBookingsFromPreviousDays() {
+        for (Booking booking : allBookings.getValue()) {
+            long dateMilli = booking.getBookingDate().getTime();
+            DateFormat simple = new SimpleDateFormat("dd MMM yyyy");
+            Date result = new Date(dateMilli);
+            Date today = new Date(Calendar.getInstance().getTimeInMillis());
+            if (simple.format(result).compareTo(simple.format(today)) != 0) {
+                deleteBookingInDatabase(booking.getBookingID());
+                Log.e(TAG, "deleteBookingsFromPreviousDays: deleted " + booking.getBookingID(), null);
+            }
+        }
     }
 
 

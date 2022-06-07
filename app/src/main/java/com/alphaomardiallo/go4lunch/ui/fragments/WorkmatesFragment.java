@@ -86,6 +86,7 @@ public class WorkmatesFragment extends Fragment implements OnClickWormkmateListe
      */
     private void observeBookingList() {
         if (this.isAdded()) {
+            viewModel.deleteBookingFromPreviousDays();
             viewModel.getAllBookings().observe(requireActivity(), this::updateBookingList);
         }
     }
@@ -95,6 +96,7 @@ public class WorkmatesFragment extends Fragment implements OnClickWormkmateListe
         setAdapter();
         observeUserList();
         Log.i(TAG, "updateBookingList: " + list);
+
     }
 
     /**
