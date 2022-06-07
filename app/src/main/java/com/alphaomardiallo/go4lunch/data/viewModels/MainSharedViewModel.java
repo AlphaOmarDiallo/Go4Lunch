@@ -28,6 +28,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseUser;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Objects;
@@ -207,8 +208,33 @@ public class MainSharedViewModel extends ViewModel {
     }
 
     public LiveData<List<User>> observeUserList() {
-        allUsers.setValue(userRepositoryImp.getAllUsers().getValue());
+        sortUserList();
         return allUsers;
+    }
+
+    private void sortUserList() {
+        List<User> users = userRepositoryImp.getAllUsers().getValue();
+        List<Booking> bookings = bookingRepository.getAllBookings().getValue();
+
+        List<User> tempList = new ArrayList<>();
+
+        for (User user : users) {
+            boolean hasBooking = false;
+            for (Booking booking : bookings) {
+                if (booking.getUserWhoBooked().equalsIgnoreCase(user.getUid())) {
+                    hasBooking = true;
+                    break;
+                }
+            }
+
+            if(hasBooking == true) {
+                tempList.add(0, user);
+            } else {
+                tempList.add(tempList.size(), user);
+            }
+        }
+
+        allUsers.setValue(tempList);
     }
 
 
