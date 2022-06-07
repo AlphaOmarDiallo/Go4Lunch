@@ -60,10 +60,17 @@ public class SettingsActivity extends AppCompatActivity {
     }
 
     private void setupUI() {
-        Glide.with(getApplicationContext())
-                .load(viewModel.getCurrentUser().getPhotoUrl())
-                .circleCrop()
-                .into(binding.iVUserPictureSettings);
+        if (viewModel.getCurrentUser().getPhotoUrl() != null) {
+            Glide.with(getApplicationContext())
+                    .load(viewModel.getCurrentUser().getPhotoUrl())
+                    .circleCrop()
+                    .into(binding.iVUserPictureSettings);
+        } else {
+            Glide.with(getApplicationContext())
+                    .load(getString(R.string.fake_avatar))
+                    .circleCrop()
+                    .into(binding.iVUserPictureSettings);
+        }
 
         binding.tVUserNameSettings.setText(viewModel.getCurrentUser().getDisplayName());
         binding.tVUserPEmailSettings.setText(viewModel.getCurrentUser().getEmail());

@@ -27,9 +27,7 @@ import com.alphaomardiallo.go4lunch.data.repositories.UserRepositoryImp;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseUser;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
 import java.util.Objects;
 
@@ -46,11 +44,10 @@ public class MainSharedViewModel extends ViewModel {
     private final PermissionRepository permissionRepository;
     private final BookingRepository bookingRepository;
     private final MutableLiveData<List<User>> allUsers = new MutableLiveData<>();
-    private final MutableLiveData<List<Booking>> allBookings = new MutableLiveData<>();
     private final MutableLiveData<String> restaurantToFocusOn = new MutableLiveData<>();
     private final LiveData<List<ResultsItem>> restaurants;
     private Location savedLocation;
-    private MutableLiveData<Boolean> hasPermissions = new MutableLiveData<>();
+    private final MutableLiveData<Boolean> hasPermissions = new MutableLiveData<>();
 
     @Inject
     public MainSharedViewModel(UserRepositoryImp userRepositoryImp, LocationRepository locationRepository, PlacesAPIRepository placesAPIRepository, PermissionRepository permissionRepository, BookingRepository bookingRepository) {
@@ -199,9 +196,7 @@ public class MainSharedViewModel extends ViewModel {
         userRepositoryImp.createUser();
     }
 
-    public Task<User> getUserData() {
-        return userRepositoryImp.getUserData().continueWith(task -> task.getResult().toObject(User.class));
-    }
+    //TODO method to get user data from dataBase
 
     public void getAllUsersFromDatabase() {
         userRepositoryImp.getAllUsersFromDataBase();
@@ -218,16 +213,16 @@ public class MainSharedViewModel extends ViewModel {
 
         List<User> tempList = new ArrayList<>();
 
-        for (User user : users) {
+        for (User user : Objects.requireNonNull(users)) {
             boolean hasBooking = false;
-            for (Booking booking : bookings) {
+            for (Booking booking : Objects.requireNonNull(bookings)) {
                 if (booking.getUserWhoBooked().equalsIgnoreCase(user.getUid())) {
                     hasBooking = true;
                     break;
                 }
             }
 
-            if(hasBooking == true) {
+            if (hasBooking) {
                 tempList.add(0, user);
             } else {
                 tempList.add(tempList.size(), user);
@@ -244,18 +239,6 @@ public class MainSharedViewModel extends ViewModel {
         bookingRepository.getInstance();
     }
 
-    public void createBooking(Booking bookingToSave) {
-        bookingRepository.createBookingAndAddInDatabase(bookingToSave);
-    }
-
-    public void updateBooking(String bookingID, String restaurantID) {
-        bookingRepository.updateBooking(bookingID, restaurantID);
-    }
-
-    public void deleteBooking(String bookingID) {
-        bookingRepository.deleteBookingInDatabase(bookingID);
-    }
-
     public void deleteBookingFromPreviousDays() {
         bookingRepository.deleteBookingsFromPreviousDays();
     }
@@ -268,17 +251,4 @@ public class MainSharedViewModel extends ViewModel {
         return bookingRepository.getAllBookings();
     }
 
-    private void deleteBookingsFromPreviousDays() {
-        List<Booking> allBookings = bookingRepository.getAllBookings().getValue();
-
-        Calendar c = Calendar.getInstance();
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-        String strDate = sdf.format(c.getTime());
-        Log.d("Date","DATE : " + strDate);
-
-        for (Booking booking : allBookings) {
-            System.out.println(booking.getBookingDate().toString());
-        }
-
-    }
 }

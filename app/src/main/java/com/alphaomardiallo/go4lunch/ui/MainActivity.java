@@ -296,10 +296,18 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         Glide.with(this)
                 .load(getString(R.string.nav_drawer_background))
                 .into(background);
-        Glide.with(this)
-                .load(viewModel.getCurrentUser().getPhotoUrl())
-                .circleCrop()
-                .into(userAvatar);
+        if(viewModel.getCurrentUser().getPhotoUrl() != null) {
+            Glide.with(this)
+                    .load(viewModel.getCurrentUser().getPhotoUrl())
+                    .circleCrop()
+                    .into(userAvatar);
+        } else {
+            Glide.with(this)
+                    .load(getString(R.string.fake_avatar))
+                    .circleCrop()
+                    .into(userAvatar);
+        }
+
         userName.setText(viewModel.getCurrentUser().getDisplayName());
         userEmail.setText(viewModel.getCurrentUser().getEmail());
     }
