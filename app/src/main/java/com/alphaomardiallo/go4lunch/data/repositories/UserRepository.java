@@ -41,5 +41,7 @@ public interface UserRepository {
 
     void deleteUserFromFirestore();
 
+    void getAllUsersFromDataBase();
+
 
 }

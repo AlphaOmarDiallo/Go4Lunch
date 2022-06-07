@@ -18,6 +18,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import com.alphaomardiallo.go4lunch.BuildConfig;
 import com.alphaomardiallo.go4lunch.R;
 import com.alphaomardiallo.go4lunch.data.dataSources.Model.Booking;
+import com.alphaomardiallo.go4lunch.data.dataSources.Model.User;
 import com.alphaomardiallo.go4lunch.data.dataSources.Model.detailsPojo.Result;
 import com.alphaomardiallo.go4lunch.data.viewModels.RestaurantDetailsViewModel;
 import com.alphaomardiallo.go4lunch.databinding.ActivityRestaurantDetailsBinding;
@@ -25,6 +26,7 @@ import com.alphaomardiallo.go4lunch.ui.adapters.WorkmatesAdapter;
 import com.alphaomardiallo.go4lunch.ui.adapters.WorkmatesJoiningAdapter;
 import com.bumptech.glide.Glide;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import dagger.hilt.android.AndroidEntryPoint;
@@ -44,7 +46,7 @@ public class RestaurantDetails extends AppCompatActivity {
     private double restaurantLongitude;
     private List<Booking> allBookings;
     private Intent intent;
-    private WorkmatesJoiningAdapter adapter;
+    private final WorkmatesJoiningAdapter adapter = new WorkmatesJoiningAdapter(new WorkmatesAdapter.ListDiff(), this);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,18 +66,10 @@ public class RestaurantDetails extends AppCompatActivity {
 
         setupFAB();
 
+        observeUsersDiningIn();
+
     }
 
-    /**
-     * RecycleView settings
-     */
-
-    private void recyclerViewSetup() {
-        adapter = new WorkmatesJoiningAdapter(new WorkmatesAdapter.ListDiff(), this);
-        binding.rvWorkmatesDetails.setHasFixedSize(true);
-        binding.rvWorkmatesDetails.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
-        binding.rvWorkmatesDetails.setAdapter(adapter);
-    }
 
     /**
      * Getting location and restaurant DATA
@@ -112,8 +106,9 @@ public class RestaurantDetails extends AppCompatActivity {
 
     private void updateBookingList(List<Booking> allBookings) {
         this.allBookings = allBookings;
+        viewModel.getDataBaseInstanceUser();
+        viewModel.getAllUsers().observe(this, this::setUserJoiningList);
         setupFABColor();
-        System.out.println("updateBookingList");
     }
 
     private void createBooking(Booking bookingToCreate) {
@@ -205,29 +200,26 @@ public class RestaurantDetails extends AppCompatActivity {
 
     private void setupFAB() {
 
-        binding.fabSelectRestaurant.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Booking bookingToCheck = viewModel.checkIfUserHasBooking();
+        binding.fabSelectRestaurant.setOnClickListener(view -> {
+            Booking bookingToCheck = viewModel.checkIfUserHasBooking();
 
-                if (bookingToCheck == null) {
-                    System.out.println("create");
-                    Booking booking = bookingToCreate();
-                    createBooking(booking);
+            if (bookingToCheck == null) {
+                System.out.println("create");
+                Booking booking = bookingToCreate();
+                createBooking(booking);
+            } else {
+                System.out.println(restaurantID);
+                if (bookingToCheck.getBookedRestaurantID().equalsIgnoreCase(restaurantID)) {
+                    System.out.println("delete");
+                    deleteBookingAlertDialog(bookingToCheck.getBookingID());
                 } else {
-                    System.out.println(restaurantID);
-                    if (bookingToCheck.getBookedRestaurantID().equalsIgnoreCase(restaurantID)) {
-                        System.out.println("delete");
-                        deleteBookingAlertDialog(bookingToCheck.getBookingID());
-                    } else {
-                        System.out.println("update");
-                        updateBookingAlertDialog(bookingToCheck.getBookingID(), restaurantID, restaurantName);
-                    }
+                    System.out.println("update");
+                    updateBookingAlertDialog(bookingToCheck.getBookingID(), restaurantID, restaurantName);
                 }
-
-                setupFABColor();
-
             }
+
+            setupFABColor();
+
         });
     }
 
@@ -236,7 +228,7 @@ public class RestaurantDetails extends AppCompatActivity {
         if (hasBooking == null) {
             binding.fabSelectRestaurant.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.white)));
             Log.e("setupFABColor", "null", null);
-        } else if (hasBooking != null) {
+        } else {
             if (hasBooking.getBookedRestaurantID().equalsIgnoreCase(restaurantID)) {
                 binding.fabSelectRestaurant.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.teal_700)));
                 Log.e("setupFABColor", "booking at this place", null);
@@ -285,6 +277,47 @@ public class RestaurantDetails extends AppCompatActivity {
 // Create the AlertDialog
         AlertDialog dialog = builder.create();
         dialog.show();
+    }
+
+    /**
+     * RecycleView settings
+     */
+
+    private void recyclerViewSetup() {
+        binding.rvWorkmatesDetails.setHasFixedSize(true);
+        binding.rvWorkmatesDetails.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
+        binding.rvWorkmatesDetails.setAdapter(adapter);
+    }
+
+    private void setUserJoiningList(List<User> list) {
+        List<User> userJoining = new ArrayList<>();
+
+        for (User user : list) {
+            for (Booking booking : allBookings) {
+                if (booking.getUserWhoBooked().equalsIgnoreCase(user.getUid())
+                        && booking.getBookedRestaurantID().equalsIgnoreCase(restaurantID)
+                        && !user.getUid().equalsIgnoreCase(viewModel.getCurrentUser().getUid()
+                )) {
+                    userJoining.add(user);
+                    break;
+                }
+            }
+        }
+
+        viewModel.setListUserWhoBookedThisRestaurant(userJoining);
+    }
+
+    private void observeUsersDiningIn() {
+        viewModel.getUserWhoBookedThatRestaurant().observe(this, adapter::submitList);
+        viewModel.getUserWhoBookedThatRestaurant().observe(this, this::setupLoader);
+    }
+
+    private void setupLoader(List<User> list) {
+        if (list.size() == 0) {
+            binding.ivEatingAloneDetail.setVisibility(View.VISIBLE);
+        } else {
+            binding.ivEatingAloneDetail.setVisibility(View.INVISIBLE);
+        }
     }
 
     /**

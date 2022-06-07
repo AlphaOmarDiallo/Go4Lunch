@@ -5,9 +5,11 @@ import android.content.Context;
 import android.location.Location;
 
 import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 import com.alphaomardiallo.go4lunch.data.dataSources.Model.Booking;
+import com.alphaomardiallo.go4lunch.data.dataSources.Model.User;
 import com.alphaomardiallo.go4lunch.data.dataSources.Model.detailsPojo.Result;
 import com.alphaomardiallo.go4lunch.data.repositories.BookingRepository;
 import com.alphaomardiallo.go4lunch.data.repositories.LocationRepository;
@@ -28,6 +30,7 @@ public class RestaurantDetailsViewModel extends ViewModel {
     private final LocationRepository locationRepository;
     private final BookingRepository bookingRepository;
     private final UserRepository userRepository;
+    private MutableLiveData<List<User>> userDiningCurrentRestaurant = new MutableLiveData<>();
 
     @Inject
     public RestaurantDetailsViewModel(PlacesAPIRepository placesAPIRepository, LocationRepository locationRepository, BookingRepository bookingRepository, UserRepository userRepository) {
@@ -63,6 +66,11 @@ public class RestaurantDetailsViewModel extends ViewModel {
 
     public void getDataBaseInstanceUser() {
         userRepository.getDataBaseInstance();
+    }
+
+    public LiveData<List<User>> getAllUsers(){
+        userRepository.getAllUsersFromDataBase();
+        return userRepository.getAllUsers();
     }
 
     // booking
@@ -106,4 +114,11 @@ public class RestaurantDetailsViewModel extends ViewModel {
         return bookingRepository.getAllBookings();
     }
 
+    public void setListUserWhoBookedThisRestaurant (List<User> list) {
+        userDiningCurrentRestaurant.setValue(list);
+    }
+
+    public LiveData<List<User>> getUserWhoBookedThatRestaurant() {
+        return userDiningCurrentRestaurant;
+    }
 }
