@@ -15,7 +15,7 @@ public interface BookingRepository {
 
     void deleteBookingInDatabase(String bookingID);
 
-    void updateBooking(String bookingID, String restaurantID);
+    void updateBooking(String bookingID, String restaurantID, String restaurantName);
 
     void getAllBookingsFromDataBase();
 

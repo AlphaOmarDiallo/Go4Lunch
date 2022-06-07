@@ -115,5 +115,11 @@
     <string name="workmate_has_selected_a_restaurant">%s is eating at %s</string>
     <string name="nothing_to_see_here">Nothing to see here</string>
     <string name="is_joining">%s is joining!</string>
+    <string name="update_booking">Do you want to update your booking?</string>
+    <string name="update_booking_title">You already have a booking today</string>
+    <string name="updated_booking">Your booking has been updated successfully</string>
+    <string name="deleted_booking">Your booking has been deleted successfully</string>
+    <string name="delete_booking">Do you want to delete your booking?</string>
+    <string name="delete_booking_title">You already have a booking at that restaurant</string>
 
 </resources>

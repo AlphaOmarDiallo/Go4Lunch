@@ -105,9 +105,14 @@ public class BookingRepositoryImp implements BookingRepository {
         return allBookings;
     }
 
-    public void updateBooking(String bookingID, String restaurantID) {
+    public void updateBooking(String bookingID, String restaurantID, String restaurantName) {
+
+        Map<String, Object> updates = new HashMap<>();
+        updates.put(BOOKING_RESTAURANT_ID, restaurantID);
+        updates.put(BOOKING_RESTAURANT_NAME, restaurantName);
+
         database.collection(COLLECTION_NAME).document(bookingID)
-                .update("restaurantID", restaurantID)
+                .update(updates)
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void unused) {

@@ -90,8 +90,8 @@ public class RestaurantDetailsViewModel extends ViewModel {
         bookingRepository.createBookingAndAddInDatabase(bookingToSave);
     }
 
-    public void updateBooking(String bookingID, String restaurantID) {
-        bookingRepository.updateBooking(bookingID, restaurantID);
+    public void updateBooking(String bookingID, String restaurantID, String restaurantName) {
+        bookingRepository.updateBooking(bookingID, restaurantID, restaurantName);
     }
 
     public void deleteBooking(String bookingID) {

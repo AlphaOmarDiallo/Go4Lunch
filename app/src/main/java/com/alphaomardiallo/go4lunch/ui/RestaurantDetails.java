@@ -1,5 +1,6 @@
 package com.alphaomardiallo.go4lunch.ui;
 
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.location.Location;
@@ -7,6 +8,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -216,8 +218,10 @@ public class RestaurantDetails extends AppCompatActivity {
                     System.out.println(restaurantID);
                     if (bookingToCheck.getBookedRestaurantID().equalsIgnoreCase(restaurantID)) {
                         System.out.println("delete");
+                        deleteBookingAlertDialog(bookingToCheck.getBookingID());
                     } else {
                         System.out.println("update");
+                        updateBookingAlertDialog(bookingToCheck.getBookingID(), restaurantID, restaurantName);
                     }
                 }
 
@@ -245,6 +249,42 @@ public class RestaurantDetails extends AppCompatActivity {
 
     private Booking bookingToCreate() {
         return new Booking(intent.getStringExtra(KEY_RESTAURANT_PLACE_ID), restaurantName, viewModel.getCurrentUser().getUid());
+    }
+
+    private void updateBookingAlertDialog(String bookingID, String restaurantID, String restaurantName) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(RestaurantDetails.this);
+// Add the buttons
+        builder.setPositiveButton(R.string.OK, (dialog, id) -> {
+            viewModel.updateBooking(bookingID, restaurantID, restaurantName);
+            Toast.makeText(this, R.string.updated_booking, Toast.LENGTH_SHORT).show();
+        });
+        builder.setNegativeButton(R.string.cancel, (dialog, id) -> dialog.cancel());
+// Set other dialog properties
+        builder.setCancelable(true);
+        builder.setMessage(R.string.update_booking)
+                .setTitle(R.string.update_booking_title);
+
+// Create the AlertDialog
+        AlertDialog dialog = builder.create();
+        dialog.show();
+    }
+
+    private void deleteBookingAlertDialog(String bookingID) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(RestaurantDetails.this);
+// Add the buttons
+        builder.setPositiveButton(R.string.OK, (dialog, id) -> {
+            viewModel.deleteBooking(bookingID);
+            Toast.makeText(this, R.string.deleted_booking, Toast.LENGTH_SHORT).show();
+        });
+        builder.setNegativeButton(R.string.cancel, (dialog, id) -> dialog.cancel());
+// Set other dialog properties
+        builder.setCancelable(true);
+        builder.setMessage(R.string.delete_booking)
+                .setTitle(R.string.delete_booking_title);
+
+// Create the AlertDialog
+        AlertDialog dialog = builder.create();
+        dialog.show();
     }
 
     /**
