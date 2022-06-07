@@ -53,13 +53,16 @@ public class RestaurantDetailsViewModel extends ViewModel {
 
     /**
      * Firebase Firestore
-     * @return
      */
 
     // user
 
     public FirebaseUser getCurrentUser() {
         return userRepository.getCurrentUser();
+    }
+
+    public void getDataBaseInstanceUser() {
+        userRepository.getDataBaseInstance();
     }
 
     // booking
