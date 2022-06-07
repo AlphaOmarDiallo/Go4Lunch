@@ -1,6 +1,7 @@
 package com.alphaomardiallo.go4lunch.ui;
 
 import android.app.AlertDialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 
@@ -9,6 +10,7 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.preference.PreferenceFragmentCompat;
 
 import com.alphaomardiallo.go4lunch.R;
+import com.alphaomardiallo.go4lunch.data.dataSources.Model.User;
 import com.alphaomardiallo.go4lunch.data.viewModels.SettingsViewModel;
 import com.alphaomardiallo.go4lunch.databinding.SettingsActivityBinding;
 import com.bumptech.glide.Glide;
@@ -20,8 +22,9 @@ import dagger.hilt.android.AndroidEntryPoint;
 @AndroidEntryPoint
 public class SettingsActivity extends AppCompatActivity {
 
+    private static final String USER_ID = "userID";
     private SettingsActivityBinding binding;
-    public SettingsViewModel viewModel;
+    private SettingsViewModel viewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,16 +33,41 @@ public class SettingsActivity extends AppCompatActivity {
         View view = binding.getRoot();
         viewModel = new ViewModelProvider(this).get(SettingsViewModel.class);
         setContentView(view);
+
         if (savedInstanceState == null) {
             getSupportFragmentManager()
                     .beginTransaction()
                     .replace(R.id.settings, new SettingsFragment())
                     .commit();
         }
+
+        getUserData();
+
         setupToolBar();
-        setupUI();
-        viewModel.getUserData();
     }
+
+    /**
+     * Managing user data
+     */
+
+    private void getUserData() {
+        Intent intent = getIntent();
+        String userID = intent.getStringExtra(USER_ID);
+
+        if (userID != null) {
+            observeCurrentUser(userID);
+        }
+    }
+
+    private void observeCurrentUser(String userID) {
+        viewModel.getDataBaseInstanceUser();
+        viewModel.getCurrentUserDataFromFireStore(userID);
+        viewModel.observeCurrentUserFromFireStore().observe(this, this::setupUI);
+    }
+
+    /**
+     * Setting up preferences fragment
+     */
 
     public static class SettingsFragment extends PreferenceFragmentCompat {
         @Override
@@ -47,6 +75,10 @@ public class SettingsActivity extends AppCompatActivity {
             setPreferencesFromResource(R.xml.root_preferences, rootKey);
         }
     }
+
+    /**
+     * Toolbar Setup
+     */
 
     private void setupToolBar() {
         setSupportActionBar(binding.toolbarSettings);
@@ -59,8 +91,12 @@ public class SettingsActivity extends AppCompatActivity {
         binding.toolbarSettings.setNavigationOnClickListener(view -> finish());
     }
 
-    private void setupUI() {
-        if (viewModel.getCurrentUser().getPhotoUrl() != null) {
+    /**
+     * UI setup
+     */
+
+    private void setupUI(User user) {
+        if (user.getUrlPicture() != null) {
             Glide.with(getApplicationContext())
                     .load(viewModel.getCurrentUser().getPhotoUrl())
                     .circleCrop()
@@ -72,11 +108,16 @@ public class SettingsActivity extends AppCompatActivity {
                     .into(binding.iVUserPictureSettings);
         }
 
-        binding.tVUserNameSettings.setText(viewModel.getCurrentUser().getDisplayName());
-        binding.tVUserPEmailSettings.setText(viewModel.getCurrentUser().getEmail());
+        binding.tVUserNameSettings.setText(user.getUsername());
+
+        binding.tVUserPEmailSettings.setText(user.getUserEmail());
 
         binding.buttonDeleteAccount.setOnClickListener(view -> accountDeletionAlertDialog());
     }
+
+    /**
+     * Delete account setup
+     */
 
     private void accountDeletionAlertDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(SettingsActivity.this);

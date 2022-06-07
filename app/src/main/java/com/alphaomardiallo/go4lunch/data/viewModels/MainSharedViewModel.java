@@ -232,6 +232,14 @@ public class MainSharedViewModel extends ViewModel {
         allUsers.setValue(tempList);
     }
 
+    public void getCurrentUserDataFromFireStore(String userID) {
+        userRepositoryImp.getUserDataFromDataBase(userID);
+    }
+
+    public LiveData<User> observeCurrentUser() {
+        return userRepositoryImp.observeCurrentUser();
+    }
+
 
     // ============================== booking =============================================
 

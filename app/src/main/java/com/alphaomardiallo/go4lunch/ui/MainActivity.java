@@ -30,6 +30,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.alphaomardiallo.go4lunch.R;
+import com.alphaomardiallo.go4lunch.data.dataSources.Model.User;
 import com.alphaomardiallo.go4lunch.data.viewModels.MainSharedViewModel;
 import com.alphaomardiallo.go4lunch.databinding.ActivityMainBinding;
 import com.alphaomardiallo.go4lunch.domain.PermissionUtils;
@@ -54,7 +55,7 @@ import pub.devrel.easypermissions.AppSettingsDialog;
 import pub.devrel.easypermissions.EasyPermissions;
 
 @AndroidEntryPoint
-public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, EasyPermissions.PermissionCallbacks{
+public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, EasyPermissions.PermissionCallbacks {
 
     private static final int REQUEST_PERMISSIONS_LOCATION = 567;
     private static final String KEY_SELECTED_RESTAURANT_ID = "placeID";
@@ -62,10 +63,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private static final String KEY_SEARCH_QUERY = "Query";
     private static final String KEY_LOCATION_STRING = "Location";
     private static final PermissionUtils permission = new PermissionUtils();
+    private static final String USER_ID = "userID";
     private final Handler handler = new Handler(Looper.getMainLooper());
     private final MapsFragment mapsFragment = new MapsFragment();
     private final ListViewFragment listViewFragment = new ListViewFragment();
     private final WorkmatesFragment workmatesFragment = new WorkmatesFragment();
+    private User currentUser;
     private ActivityMainBinding binding;
     private ActionBarDrawerToggle toggle;
     private Location currentLocation;
@@ -121,8 +124,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         observePermissions();
 
-        observeUsers();
-
         observeBookings();
 
     }
@@ -144,7 +145,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         if (viewModel.isCurrentUserNotLoggedIn()) {
             createSignInIntent();
         } else {
-            setupNavigationHeader();
+            observeUsers();
         }
     }
 
@@ -186,13 +187,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private void observeUsers() {
         viewModel.getDataBaseInstanceUser();
         viewModel.getAllUsersFromDatabase();
+        viewModel.getCurrentUserDataFromFireStore(viewModel.getCurrentUser().getUid());
+        viewModel.observeCurrentUser().observe(this, this::setupNavigationHeader);
     }
 
     /**
      * Observing bookings
      */
 
-    private void observeBookings(){
+    private void observeBookings() {
         viewModel.getDatabaseInstanceBooking();
         viewModel.observeBookingsFromDataBase();
     }
@@ -275,6 +278,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     break;
                 case R.id.settingsNavDrawer:
                     Intent settingIntent = new Intent(this, SettingsActivity.class);
+                    settingIntent.putExtra(USER_ID, currentUser.getUid());
                     startActivity(settingIntent);
                     break;
                 case R.id.logoutNavDrawer:
@@ -285,7 +289,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         });
     }
 
-    private void setupNavigationHeader() {
+    private void setupNavigationHeader(User user) {
+        currentUser = user;
+
         NavigationView navigationView = findViewById(R.id.navigationView);
         View headerView = navigationView.getHeaderView(0);
         ImageView background = headerView.findViewById(R.id.iVBackgroundHeaderMenu);
@@ -296,7 +302,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         Glide.with(this)
                 .load(getString(R.string.nav_drawer_background))
                 .into(background);
-        if(viewModel.getCurrentUser().getPhotoUrl() != null) {
+        if (user.getUrlPicture() != null) {
             Glide.with(this)
                     .load(viewModel.getCurrentUser().getPhotoUrl())
                     .circleCrop()
@@ -308,8 +314,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     .into(userAvatar);
         }
 
-        userName.setText(viewModel.getCurrentUser().getDisplayName());
-        userEmail.setText(viewModel.getCurrentUser().getEmail());
+        userName.setText(user.getUsername());
+        userEmail.setText(user.getUserEmail());
     }
 
     /**
@@ -338,7 +344,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         IdpResponse response = result.getIdpResponse();
         if (result.getResultCode() == RESULT_OK) {
             viewModel.createUserInDataBase();
-            setupNavigationHeader();
+            observeUsers();
             showSnackBarMessage(getString(R.string.connection_succeed));
         } else {
             if (response == null) {
@@ -363,7 +369,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     private void setupAppAccordingToPermissions(Boolean hasPermissions) {
-        if(hasPermissions) {
+        if (hasPermissions) {
             viewModel.permissionSet(true);
             observeLocation();
         } else {

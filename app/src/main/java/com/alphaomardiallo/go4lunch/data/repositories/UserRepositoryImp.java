@@ -15,11 +15,9 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.FirebaseFirestoreException;
-import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.List;
 
@@ -31,7 +29,8 @@ public class UserRepositoryImp implements UserRepository {
     private static final String HAS_A_BOOKING = "hasABooking";
     private static volatile UserRepository instance;
     private FirebaseFirestore database;
-    private MutableLiveData<List<User>> allUsers = new MutableLiveData<>();
+    private final MutableLiveData<List<User>> allUsers = new MutableLiveData<>();
+    private final MutableLiveData<User> user = new MutableLiveData<>();
 
     @Inject
     public UserRepositoryImp() {
@@ -126,23 +125,20 @@ public class UserRepositoryImp implements UserRepository {
     //Get ll users from FireStore
     public void getAllUsersFromDataBase() {
         database.collection(COLLECTION_NAME)
-                .addSnapshotListener(new EventListener<QuerySnapshot>() {
-                    @Override
-                    public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
-                        if (error != null) {
-                            Log.w(TAG, "Listen fail ",  error);
-                            return;
-                        }
-
-                        if (value != null){
-                            List<User> temList = value.toObjects(User.class);
-                            allUsers.setValue(temList);
-                            Log.d(TAG, "onEvent: all user " + allUsers.getValue());
-                        } else {
-                            Log.d(TAG, "onEvent: all user is null");
-                        }
-
+                .addSnapshotListener((value, error) -> {
+                    if (error != null) {
+                        Log.w(TAG, "Listen fail ",  error);
+                        return;
                     }
+
+                    if (value != null){
+                        List<User> temList = value.toObjects(User.class);
+                        allUsers.setValue(temList);
+                        Log.d(TAG, "onEvent: all user " + allUsers.getValue());
+                    } else {
+                        Log.d(TAG, "onEvent: all user is null");
+                    }
+
                 });
     }
 
@@ -161,5 +157,28 @@ public class UserRepositoryImp implements UserRepository {
         if(userID != null) {
             this.getUserCollection().document(userID).delete();
         }
+    }
+
+    //Get user data
+    public void getUserDataFromDataBase(String userID) {
+        DocumentReference docRef = database.collection(COLLECTION_NAME).document(userID);
+
+        docRef.addSnapshotListener((value, error) -> {
+            if (error != null) {
+                Log.w(TAG, "onEvent: Listen failed", error);
+                return;
+            }
+
+            if (value != null && value.exists()) {
+                user.setValue(value.toObject(User.class));
+            } else {
+                Log.d(TAG, "onEvent: data is null");
+            }
+
+        });
+    }
+
+    public LiveData<User> observeCurrentUser() {
+        return user;
     }
 }
