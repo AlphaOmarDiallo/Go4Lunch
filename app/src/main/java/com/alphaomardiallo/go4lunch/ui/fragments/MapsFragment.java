@@ -19,6 +19,7 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.alphaomardiallo.go4lunch.R;
+import com.alphaomardiallo.go4lunch.data.dataSources.Model.Booking;
 import com.alphaomardiallo.go4lunch.data.dataSources.Model.detailsPojo.Result;
 import com.alphaomardiallo.go4lunch.data.dataSources.Model.nearBySearchPojo.ResultsItem;
 import com.alphaomardiallo.go4lunch.data.viewModels.MainSharedViewModel;
@@ -48,8 +49,9 @@ public class MapsFragment extends Fragment /*implements EasyPermissions.Permissi
     private static final PermissionUtils permission = new PermissionUtils();
     private final long defaultCameraZoomOverMap = 19;
     private FragmentMapsBinding binding;
-    public MainSharedViewModel viewModel;
+    private MainSharedViewModel viewModel;
     private List<ResultsItem> restaurantList;
+    private List<Booking> bookingList;
     private GoogleMap map;
     private Location location;
     private final PositionUtils positionUtils = new PositionUtils();
@@ -136,6 +138,15 @@ public class MapsFragment extends Fragment /*implements EasyPermissions.Permissi
      * Getting data from viewModel and update views accordingly
      */
 
+    private void observeBookings() {
+        viewModel.getAllBookings().observe(requireActivity(), this::setBookingList);
+    }
+
+    private void setBookingList(List<Booking> list){
+        bookingList = list;
+        Log.e(TAG, "setBookingList: " + bookingList,null );
+    }
+
     private void observePermission() {
         viewModel.observePermissionState().observe(requireActivity(), this::observeData);
     }
@@ -144,6 +155,7 @@ public class MapsFragment extends Fragment /*implements EasyPermissions.Permissi
         Log.e(TAG, "observeData: here " + hasPermission, null);
         if (hasPermission) {
             if (this.isAdded()) {
+                observeBookings();
                 viewModel.getCurrentLocation().observe(requireActivity(), this::updateLocation);
                 viewModel.getRestaurantToFocusOn().observe(requireActivity(), this::focusOnSelectedRestaurant);
             }
@@ -226,13 +238,33 @@ public class MapsFragment extends Fragment /*implements EasyPermissions.Permissi
     private void addRestaurantMarkersToMap(List<ResultsItem> list, GoogleMap googleMap) {
         for (ResultsItem resultsItem : list) {
 
+            boolean hasBooking = false;
+
             LatLng coordinates = new LatLng(resultsItem.getGeometry().getLocation().getLat(), resultsItem.getGeometry().getLocation().getLng());
 
-            googleMap.addMarker(new MarkerOptions()
-                    .position(coordinates)
-                    .title(resultsItem.getName())
-                    .icon(BitmapDescriptorFactory.fromBitmap(viewModel.resizeMarker(requireContext().getResources(), R.drawable.restaurant)))
-            );
+            if (bookingList != null && bookingList.size() > 0) {
+
+
+                for (Booking booking : bookingList) {
+                    if (booking.getBookedRestaurantID().equalsIgnoreCase(resultsItem.getPlaceId())) {
+                        hasBooking = true;
+                        break;
+                    }
+                }
+            }
+            if (hasBooking) {
+                googleMap.addMarker(new MarkerOptions()
+                        .position(coordinates)
+                        .title(resultsItem.getName())
+                        .icon(BitmapDescriptorFactory.fromBitmap(viewModel.resizeMarker(requireContext().getResources(), R.drawable.booked_restaurant)))
+                );
+            } else {
+                googleMap.addMarker(new MarkerOptions()
+                        .position(coordinates)
+                        .title(resultsItem.getName())
+                        .icon(BitmapDescriptorFactory.fromBitmap(viewModel.resizeMarker(requireContext().getResources(), R.drawable.restaurant)))
+                );
+            }
         }
 
         googleMap.setOnInfoWindowClickListener(marker -> {
