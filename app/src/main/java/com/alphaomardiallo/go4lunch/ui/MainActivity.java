@@ -273,8 +273,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         binding.navigationView.setNavigationItemSelectedListener(item -> {
             switch (item.getItemId()) {
                 case R.id.yourLunchNavDrawer:
-                    //TODO implement your lunch activity
-                    showSnackBarMessage("your lunch");
+                    Intent yourLunchIntent = new Intent(this, YourLunchActivity.class);
+                    yourLunchIntent.putExtra(USER_ID, currentUser.getUid());
+                    startActivity(yourLunchIntent);
                     break;
                 case R.id.settingsNavDrawer:
                     Intent settingIntent = new Intent(this, SettingsActivity.class);

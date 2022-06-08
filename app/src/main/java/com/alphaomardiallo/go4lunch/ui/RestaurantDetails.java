@@ -295,33 +295,29 @@ public class RestaurantDetails extends AppCompatActivity {
     }
 
     private void setupLikeButton() {
-        binding.ibLikeDetail.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                boolean isInList = false;
+        binding.ibLikeDetail.setOnClickListener(view -> {
+            boolean isInList = false;
 
-                if (user != null) {
-                    if (user.getFavouriteRestaurants() != null) {
-                        for (String rID : user.getFavouriteRestaurants()) {
-                            if (rID.equalsIgnoreCase(restaurantID)) {
-                                isInList = true;
-                                break;
-                            }
+            if (user != null) {
+                if (user.getFavouriteRestaurants() != null) {
+                    for (String rID : user.getFavouriteRestaurants()) {
+                        if (rID.equalsIgnoreCase(restaurantID)) {
+                            isInList = true;
+                            break;
                         }
                     }
                 }
-
-                if (isInList) {
-                    System.out.println("delete");
-                    viewModel.removeRestaurantFromFavourite(restaurantID);
-                    setupLikeButtonAppearance();
-                } else {
-                    System.out.println("add");
-                    addRestaurantToFavourite(restaurantID);
-                    setupLikeButtonAppearance();
-                }
-
             }
+
+            if (isInList) {
+                System.out.println("delete");
+                viewModel.removeRestaurantFromFavourite(restaurantID);
+            } else {
+                System.out.println("add");
+                addRestaurantToFavourite(restaurantID);
+            }
+            setupLikeButtonAppearance();
+
         });
     }
 

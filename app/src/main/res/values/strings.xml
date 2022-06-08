@@ -122,5 +122,6 @@
     <string name="delete_booking">Do you want to delete your booking?</string>
     <string name="delete_booking_title">You already have a booking at that restaurant</string>
     <string name="unlike">UNLIKE</string>
-
+    <string name="no_booking">You have not taken a decision yet</string>
+    <string name="yes_booking">You have selected %s for lunch today</string>
 </resources>
