@@ -1,5 +1,7 @@
 package com.alphaomardiallo.go4lunch.ui;
 
+import static android.content.ContentValues.TAG;
+
 import android.app.AlertDialog;
 import android.content.Intent;
 import android.content.res.ColorStateList;
@@ -47,6 +49,7 @@ public class RestaurantDetails extends AppCompatActivity {
     private List<Booking> allBookings;
     private Intent intent;
     private final WorkmatesJoiningAdapter adapter = new WorkmatesJoiningAdapter(new WorkmatesAdapter.ListDiff(), this);
+    private User user;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,6 +70,10 @@ public class RestaurantDetails extends AppCompatActivity {
         setupFAB();
 
         observeUsersDiningIn();
+
+        getCurrentUser();
+
+        setupLikeButton();
 
     }
 
@@ -280,6 +287,63 @@ public class RestaurantDetails extends AppCompatActivity {
     }
 
     /**
+     * Favourite button settings
+     */
+
+    private void addRestaurantToFavourite(String restaurantID) {
+        viewModel.addRestaurantToFavourite(restaurantID);
+    }
+
+    private void setupLikeButton() {
+        binding.ibLikeDetail.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                boolean isInList = false;
+
+                if (user != null) {
+                    if (user.getFavouriteRestaurants() != null) {
+                        for (String rID : user.getFavouriteRestaurants()) {
+                            if (rID.equalsIgnoreCase(restaurantID)) {
+                                isInList = true;
+                                break;
+                            }
+                        }
+                    }
+                }
+
+                if (isInList) {
+                    System.out.println("delete");
+                    viewModel.removeRestaurantFromFavourite(restaurantID);
+                    setupLikeButtonAppearance();
+                } else {
+                    System.out.println("add");
+                    addRestaurantToFavourite(restaurantID);
+                    setupLikeButtonAppearance();
+                }
+
+            }
+        });
+    }
+
+    private void setupLikeButtonAppearance() {
+        if (user != null) {
+            Log.e(TAG, "setupLikeButtonAppearance: user " + user, null);
+            if (user.getFavouriteRestaurants() != null) {
+                System.out.println("here");
+                if (user.getFavouriteRestaurants().contains(restaurantID)) {
+                    binding.tvLLikeDetails.setText(getString(R.string.unlike));
+                    System.out.println("here again");
+                } else {
+                    binding.tvLLikeDetails.setText(getString(R.string.like));
+                    System.out.println("here too");
+                }
+            }
+        }
+
+    }
+
+
+    /**
      * RecycleView settings
      */
 
@@ -318,6 +382,20 @@ public class RestaurantDetails extends AppCompatActivity {
         } else {
             binding.ivEatingAloneDetail.setVisibility(View.INVISIBLE);
         }
+    }
+
+    /**
+     * Get current user
+     */
+    private void getCurrentUser() {
+        viewModel.getDataBaseInstanceUser();
+        viewModel.getCurrentUserDataFromFireStore(viewModel.getCurrentUser().getUid());
+        viewModel.observeCurrentUser().observe(this, this::updateUser);
+    }
+
+    private void updateUser(User user) {
+        this.user = user;
+        setupLikeButtonAppearance();
     }
 
     /**

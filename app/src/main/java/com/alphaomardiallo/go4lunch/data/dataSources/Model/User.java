@@ -2,6 +2,8 @@ package com.alphaomardiallo.go4lunch.data.dataSources.Model;
 
 import androidx.annotation.Nullable;
 
+import java.util.List;
+
 public class User {
 
     private String uid;
@@ -10,7 +12,7 @@ public class User {
     @Nullable
     private String urlPicture;
     @Nullable
-    Boolean bookingOfTheDay;
+    List<String> favouriteRestaurants;
 
     public User() {
     }
@@ -20,7 +22,7 @@ public class User {
         this.username = userName;
         this.userEmail = userEmail;
         this.urlPicture = userPicture;
-        this.bookingOfTheDay = null;
+        this.favouriteRestaurants = null;
     }
 
     // GETTERS
@@ -43,8 +45,8 @@ public class User {
     }
 
     @Nullable
-    public Boolean getBookingOfTheDay() {
-        return bookingOfTheDay;
+    public List<String> getFavouriteRestaurants() {
+        return favouriteRestaurants;
     }
 
     //SETTERS
@@ -65,8 +67,7 @@ public class User {
         this.urlPicture = urlPicture;
     }
 
-    public void setBookingOfTheDay(@Nullable Boolean bookingOfTheDay) {
-        this.bookingOfTheDay = bookingOfTheDay;
+    public void setFavouriteRestaurants(@Nullable List<String> favouriteRestaurants) {
+        this.favouriteRestaurants = favouriteRestaurants;
     }
-
 }

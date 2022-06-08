@@ -102,6 +102,14 @@ public class RestaurantDetailsViewModel extends ViewModel {
         bookingRepository.updateBooking(bookingID, restaurantID, restaurantName);
     }
 
+    public void addRestaurantToFavourite(String restaurantID) {
+       userRepository.addFavouriteRestaurant(userRepository.getCurrentUserID(), restaurantID);
+    }
+
+    public void removeRestaurantFromFavourite(String restaurantID) {
+        userRepository.removeFavouriteRestaurant(userRepository.getCurrentUserID(), restaurantID);
+    }
+
     public void deleteBooking(String bookingID) {
         bookingRepository.deleteBookingInDatabase(bookingID);
     }
@@ -120,5 +128,13 @@ public class RestaurantDetailsViewModel extends ViewModel {
 
     public LiveData<List<User>> getUserWhoBookedThatRestaurant() {
         return userDiningCurrentRestaurant;
+    }
+
+    public void getCurrentUserDataFromFireStore(String userID) {
+        userRepository.getUserDataFromDataBase(userID);
+    }
+
+    public LiveData<User> observeCurrentUser() {
+        return userRepository.observeCurrentUser();
     }
 }

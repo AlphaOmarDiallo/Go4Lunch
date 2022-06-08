@@ -43,5 +43,12 @@ public interface UserRepository {
 
     void getAllUsersFromDataBase();
 
+    void getUserDataFromDataBase(String userID);
+
+    LiveData<User> observeCurrentUser();
+
+    void addFavouriteRestaurant(String userID, String restaurantID);
+
+    void removeFavouriteRestaurant(String userID, String restaurantID);
 
 }

@@ -121,5 +121,6 @@
     <string name="deleted_booking">Your booking has been deleted successfully</string>
     <string name="delete_booking">Do you want to delete your booking?</string>
     <string name="delete_booking_title">You already have a booking at that restaurant</string>
+    <string name="unlike">UNLIKE</string>
 
 </resources>

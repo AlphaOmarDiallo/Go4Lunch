@@ -5,18 +5,22 @@ import static android.content.ContentValues.TAG;
 import android.content.Context;
 import android.util.Log;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
 import com.alphaomardiallo.go4lunch.data.dataSources.Model.User;
 import com.firebase.ui.auth.AuthUI;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.List;
@@ -101,9 +105,9 @@ public class UserRepositoryImp implements UserRepository {
             Task<DocumentSnapshot> userData = getUserData();
 
             userData.addOnSuccessListener(documentSnapshot -> {
-                if (documentSnapshot.contains(HAS_A_BOOKING)) {
+                /*if (documentSnapshot.contains(HAS_A_BOOKING)) {
                     userToCreate.setBookingOfTheDay((Boolean)documentSnapshot.get(HAS_A_BOOKING));
-                }
+                }*/
                 this.getUserCollection().document(userID).set(userToCreate);
             });
         }
@@ -180,5 +184,39 @@ public class UserRepositoryImp implements UserRepository {
 
     public LiveData<User> observeCurrentUser() {
         return user;
+    }
+
+    public void addFavouriteRestaurant (String userID, String restaurantID) {
+        database.collection(COLLECTION_NAME).document(userID)
+                .update("favouriteRestaurants", FieldValue.arrayUnion(restaurantID))
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void unused) {
+                        System.out.println("DONE");
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        System.out.println(e.getMessage());
+                    }
+                });
+    }
+
+    public void removeFavouriteRestaurant (String userID, String restaurantID) {
+        database.collection(COLLECTION_NAME).document(userID)
+                .update("favouriteRestaurants", FieldValue.arrayRemove(restaurantID))
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void unused) {
+                        System.out.println("DONE");
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        System.out.println(e.getMessage());
+                    }
+                });
     }
 }
