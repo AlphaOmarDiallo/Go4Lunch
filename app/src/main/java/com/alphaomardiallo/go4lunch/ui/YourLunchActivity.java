@@ -13,12 +13,15 @@ import com.alphaomardiallo.go4lunch.data.dataSources.Model.User;
 import com.alphaomardiallo.go4lunch.data.viewModels.YourLunchViewModel;
 import com.alphaomardiallo.go4lunch.databinding.ActivityYourLunchBinding;
 
+import java.util.List;
+
 import dagger.hilt.android.AndroidEntryPoint;
 
 @AndroidEntryPoint
 public class YourLunchActivity extends AppCompatActivity {
 
     private static final String USER_ID = "userID";
+    private static final String ID = "id";
     private ActivityYourLunchBinding binding;
     private YourLunchViewModel viewModel;
     private String userID;
@@ -60,25 +63,46 @@ public class YourLunchActivity extends AppCompatActivity {
 
     private void updateUser(User user){
         currentUser = user;
-        getUserBooking();
+        getAllBooking();
     }
 
     /**
      * Booking Data
      */
 
-    private void getUserBooking() {
-        viewModel.getUserBooking(userID).observe(this, this::updateUserBooking);
+    private void getAllBooking() {
+        viewModel.getAllBookings().observe(this, this::updateUserBooking);
     }
 
-    private void updateUserBooking(Booking booking){
-        userBooking = booking;
-        System.out.println(booking);
+    private void updateUserBooking(List<Booking> list){
 
-        if (booking != null) {
-            binding.tvRestaurantNameYourLunch.setText(String.format(getString(R.string.yes_booking), booking.getBookedRestaurantName()));
+        for (Booking booking : list) {
+            if (booking.getUserWhoBooked().equalsIgnoreCase(userID)){
+                userBooking = booking;
+                break;
+            }
+        }
+
+        if (userBooking != null) {
+            binding.tvRestaurantNameYourLunch.setText(String.format(getString(R.string.yes_booking), userBooking.getBookedRestaurantName()));
+            binding.cardViewYourLunch.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    openDetailActivity(userBooking.getBookedRestaurantID());
+                }
+            });
         } else {
             binding.tvRestaurantNameYourLunch.setText(getString(R.string.no_booking));
         }
+    }
+
+    /**
+     * Detail activity
+     */
+
+    private void openDetailActivity(String restaurantID) {
+        Intent intent = new Intent(this, RestaurantDetails.class);
+        intent.putExtra(ID, restaurantID);
+        startActivity(intent);
     }
 }

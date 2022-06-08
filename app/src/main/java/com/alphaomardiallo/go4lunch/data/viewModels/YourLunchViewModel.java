@@ -50,20 +50,9 @@ public class YourLunchViewModel extends ViewModel {
      * Booking Data
      */
 
-    public LiveData<Booking> getUserBooking(String userID){
+    public LiveData<List<Booking>> getAllBookings() {
         bookingRepository.getInstance();
         bookingRepository.getAllBookingsFromDataBase();
-
-        if (bookings.getValue() != null){
-            for (Booking booking : bookings.getValue()) {
-                if(booking.getUserWhoBooked().equalsIgnoreCase(userID)){
-                    userBooking.setValue(booking);
-                    break;
-                }
-            }
-        }
-
-        return userBooking;
-
+        return bookingRepository.getAllBookings();
     }
 }
