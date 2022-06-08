@@ -4,8 +4,6 @@ import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.location.Location;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -38,9 +36,6 @@ public class ListViewFragment extends Fragment implements OnClickItemListener {
 
     private static final String KEY_RESTAURANT_ID = "id";
     private static final int SNACK_BAR_LENGTH_LONG = 10000;
-    private static final int HANDLER_LENGTH_LONG = 20000;
-    private static final int SIZE_PICTURE = 100;
-    private final Handler handler = new Handler(Looper.getMainLooper());
     private final PositionUtils positionUtils = new PositionUtils();
     private final Location location = positionUtils.getOfficeLocationFormat();
     private FragmentListViewBinding binding;
@@ -178,15 +173,6 @@ public class ListViewFragment extends Fragment implements OnClickItemListener {
             binding.tvLoadingMessage.setVisibility(View.INVISIBLE);
             binding.ivLoadingGIF.setVisibility(View.INVISIBLE);
         }
-
-/*        handler.postDelayed(() -> {
-            binding.tvLoadingMessage.setText(R.string.no_restaurant_in_your_area);
-            Glide.with(binding.ivLoadingGIF)
-                    .asGif()
-                    .override(SIZE_PICTURE, SIZE_PICTURE)
-                    .load(getString(R.string.no_results_gif))
-                    .into(binding.ivLoadingGIF);
-        }, HANDLER_LENGTH_LONG);*/
     }
 
     /**

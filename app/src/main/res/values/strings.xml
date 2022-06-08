@@ -124,4 +124,5 @@
     <string name="unlike">UNLIKE</string>
     <string name="no_booking">You have not taken a decision yet</string>
     <string name="yes_booking">You have selected %s for lunch today</string>
+    <string name="your_favourite_restaurants">Your favourite restaurants</string>
 </resources>

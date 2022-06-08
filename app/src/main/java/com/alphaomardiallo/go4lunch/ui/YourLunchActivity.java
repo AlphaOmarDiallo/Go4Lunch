@@ -3,7 +3,6 @@ package com.alphaomardiallo.go4lunch.ui;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
-import android.util.Log;
 import android.view.View;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -13,13 +12,13 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import com.alphaomardiallo.go4lunch.R;
 import com.alphaomardiallo.go4lunch.data.dataSources.Model.Booking;
 import com.alphaomardiallo.go4lunch.data.dataSources.Model.User;
-import com.alphaomardiallo.go4lunch.data.dataSources.Model.detailsPojo.Result;
 import com.alphaomardiallo.go4lunch.data.viewModels.YourLunchViewModel;
 import com.alphaomardiallo.go4lunch.databinding.ActivityYourLunchBinding;
 import com.alphaomardiallo.go4lunch.domain.OnClickItemListener;
 import com.alphaomardiallo.go4lunch.ui.adapters.FavListRestaurantAdapter;
 
 import java.util.List;
+import java.util.Objects;
 
 import dagger.hilt.android.AndroidEntryPoint;
 
@@ -54,7 +53,7 @@ public class YourLunchActivity extends AppCompatActivity implements OnClickItemL
     /**
      * Set recyclerView
      */
-    private void setRecyclerView(){
+    private void setRecyclerView() {
         binding.rvFavouritesYourLunch.setHasFixedSize(true);
         binding.rvFavouritesYourLunch.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
         adapter = new FavListRestaurantAdapter(new FavListRestaurantAdapter.ListDiff(), this);
@@ -65,7 +64,7 @@ public class YourLunchActivity extends AppCompatActivity implements OnClickItemL
      * Getting data from intent
      */
 
-    private void gettingIntent(){
+    private void gettingIntent() {
         Intent intent = getIntent();
         userID = intent.getStringExtra(USER_ID);
     }
@@ -74,13 +73,13 @@ public class YourLunchActivity extends AppCompatActivity implements OnClickItemL
      * User data
      */
 
-    private void gettingUserData(){
+    private void gettingUserData() {
         viewModel.getDataBaseInstanceUser();
         viewModel.getCurrentUserDataFromFireStore(userID);
         viewModel.observeCurrentUser().observe(this, this::updateUser);
     }
 
-    private void updateUser(User user){
+    private void updateUser(User user) {
         currentUser = user;
         getAllBooking();
         setListFav(currentUser.getFavouriteRestaurants());
@@ -94,10 +93,10 @@ public class YourLunchActivity extends AppCompatActivity implements OnClickItemL
         viewModel.getAllBookings().observe(this, this::updateUserBooking);
     }
 
-    private void updateUserBooking(List<Booking> list){
+    private void updateUserBooking(List<Booking> list) {
 
         for (Booking booking : list) {
-            if (booking.getUserWhoBooked().equalsIgnoreCase(userID)){
+            if (booking.getUserWhoBooked().equalsIgnoreCase(userID)) {
                 userBooking = booking;
                 break;
             }
@@ -105,12 +104,7 @@ public class YourLunchActivity extends AppCompatActivity implements OnClickItemL
 
         if (userBooking != null) {
             binding.tvRestaurantNameYourLunch.setText(String.format(getString(R.string.yes_booking), userBooking.getBookedRestaurantName()));
-            binding.cardViewYourLunch.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    openDetailActivity(userBooking.getBookedRestaurantID());
-                }
-            });
+            binding.cardViewYourLunch.setOnClickListener(view -> openDetailActivity(userBooking.getBookedRestaurantID()));
         } else {
             binding.tvRestaurantNameYourLunch.setText(getString(R.string.no_booking));
         }
@@ -120,23 +114,17 @@ public class YourLunchActivity extends AppCompatActivity implements OnClickItemL
      * FavList settings
      */
 
-    private void setListFav(List<String> favList){
+    private void setListFav(List<String> favList) {
         viewModel.setListOfFavourites(favList);
         Handler handler = new Handler();
-        handler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                getListFav();
-            }
+        handler.postDelayed(() -> {
+            binding.progressBar.setVisibility(View.INVISIBLE);
+            getListFav();
         }, 3000);
     }
 
-    private void getListFav(){
+    private void getListFav() {
         viewModel.observeFavList().observe(this, adapter::submitList);
-    }
-
-    public void printList(List<Result> list) {
-        Log.e("print", "printList: " + list, null);
     }
 
     /**
@@ -155,6 +143,7 @@ public class YourLunchActivity extends AppCompatActivity implements OnClickItemL
 
     @Override
     public void onClickItem(int position) {
-
+        openDetailActivity(Objects.requireNonNull(currentUser.getFavouriteRestaurants()).get(position));
     }
+
 }

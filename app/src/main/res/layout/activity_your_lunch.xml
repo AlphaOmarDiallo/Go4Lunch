@@ -25,7 +25,7 @@
                 android:id="@+id/tvYourLunchTitle"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:text="Your lunch"
+                android:text="@string/your_lunch"
                 android:textColor="@color/white"
                 android:textSize="24sp"
                 android:textStyle="bold"
@@ -68,7 +68,7 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                tools:text="You are having lunch at la croissanterie" />
+                tools:text="You are having lunch at Bistro" />
         </androidx.constraintlayout.widget.ConstraintLayout>
 
     </androidx.cardview.widget.CardView>
@@ -81,6 +81,7 @@
         android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginBottom="8dp"
+        android:background="@color/whiteSmoke"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -94,10 +95,20 @@
         android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginBottom="8dp"
-        android:text="Your favourite restaurants"
+        android:text="@string/your_favourite_restaurants"
         android:textSize="20sp"
         app:layout_constraintBottom_toTopOf="@+id/rvFavouritesYourLunch"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/cardViewYourLunch" />
+
+    <ProgressBar
+        android:id="@+id/progressBar"
+        style="?android:attr/progressBarStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="@+id/rvFavouritesYourLunch"
+        app:layout_constraintStart_toStartOf="@+id/rvFavouritesYourLunch"
+        app:layout_constraintTop_toTopOf="@+id/rvFavouritesYourLunch" />
 </androidx.constraintlayout.widget.ConstraintLayout>

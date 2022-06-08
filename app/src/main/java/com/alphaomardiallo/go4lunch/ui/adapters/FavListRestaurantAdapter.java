@@ -25,8 +25,7 @@ import com.bumptech.glide.Glide;
 
 public class FavListRestaurantAdapter extends ListAdapter<Result, FavListRestaurantAdapter.ListViewHolder> {
 
-    private ItemRestaurantBinding binding;
-    private OnClickItemListener onClickItemListener;
+    private final OnClickItemListener onClickItemListener;
 
     public FavListRestaurantAdapter(@NonNull DiffUtil.ItemCallback<Result> diffCallback, OnClickItemListener onClickItemListener) {
         super(diffCallback);
@@ -36,7 +35,7 @@ public class FavListRestaurantAdapter extends ListAdapter<Result, FavListRestaur
     @NonNull
     @Override
     public ListViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        binding = ItemRestaurantBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false);
+        com.alphaomardiallo.go4lunch.databinding.ItemRestaurantBinding binding = ItemRestaurantBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false);
         return new ListViewHolder(binding.getRoot());
     }
 
@@ -100,6 +99,7 @@ public class FavListRestaurantAdapter extends ListAdapter<Result, FavListRestaur
                         .placeholder(R.drawable.hungry_droid)
                         .into(restaurantPhoto);
             } else {
+                assert false;
                 restaurantPhoto.setImageResource(R.drawable.hungry_droid);
             }
 

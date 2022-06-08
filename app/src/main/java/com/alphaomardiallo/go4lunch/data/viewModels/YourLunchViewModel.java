@@ -1,7 +1,6 @@
 package com.alphaomardiallo.go4lunch.data.viewModels;
 
 import androidx.lifecycle.LiveData;
-import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 import com.alphaomardiallo.go4lunch.data.dataSources.Model.Booking;
@@ -23,8 +22,6 @@ public class YourLunchViewModel extends ViewModel {
     private final UserRepository userRepository;
     private final BookingRepository bookingRepository;
     private final PlacesAPIRepository placesAPIRepository;
-    private MutableLiveData<List<Result>> favList = new MutableLiveData<>();
-
 
     @Inject
     public YourLunchViewModel(UserRepository userRepository, BookingRepository bookingRepository, PlacesAPIRepository placesAPIRepository) {
@@ -65,7 +62,7 @@ public class YourLunchViewModel extends ViewModel {
 
     public void setListOfFavourites(List<String> favRestaurantID) {
 
-        if(favRestaurantID != null) {
+        if (favRestaurantID != null) {
             placesAPIRepository.fetchDetailsForFavourite(favRestaurantID);
         }
     }
