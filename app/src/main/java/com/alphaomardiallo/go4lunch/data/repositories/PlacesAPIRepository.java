@@ -24,4 +24,8 @@ public interface PlacesAPIRepository {
 
     LiveData<List<PredictionsItem>> autoCompleteSearch(String Query, String location, int radius);
 
+    void fetchDetailsForFavourite(List<String> placeIDList);
+
+    LiveData<List<Result>> observeListFavouriteRestaurant();
+
 }

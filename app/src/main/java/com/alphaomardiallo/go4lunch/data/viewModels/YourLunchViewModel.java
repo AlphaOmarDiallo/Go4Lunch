@@ -6,7 +6,9 @@ import androidx.lifecycle.ViewModel;
 
 import com.alphaomardiallo.go4lunch.data.dataSources.Model.Booking;
 import com.alphaomardiallo.go4lunch.data.dataSources.Model.User;
+import com.alphaomardiallo.go4lunch.data.dataSources.Model.detailsPojo.Result;
 import com.alphaomardiallo.go4lunch.data.repositories.BookingRepository;
+import com.alphaomardiallo.go4lunch.data.repositories.PlacesAPIRepository;
 import com.alphaomardiallo.go4lunch.data.repositories.UserRepository;
 
 import java.util.List;
@@ -20,14 +22,15 @@ public class YourLunchViewModel extends ViewModel {
 
     private final UserRepository userRepository;
     private final BookingRepository bookingRepository;
-    private LiveData<List<Booking>> bookings;
-    private MutableLiveData<Booking> userBooking = new MutableLiveData<>();
+    private final PlacesAPIRepository placesAPIRepository;
+    private MutableLiveData<List<Result>> favList = new MutableLiveData<>();
+
 
     @Inject
-    public YourLunchViewModel(UserRepository userRepository, BookingRepository bookingRepository) {
+    public YourLunchViewModel(UserRepository userRepository, BookingRepository bookingRepository, PlacesAPIRepository placesAPIRepository) {
         this.userRepository = userRepository;
         this.bookingRepository = bookingRepository;
-        bookings = bookingRepository.getAllBookings();
+        this.placesAPIRepository = placesAPIRepository;
     }
 
     /**
@@ -54,5 +57,20 @@ public class YourLunchViewModel extends ViewModel {
         bookingRepository.getInstance();
         bookingRepository.getAllBookingsFromDataBase();
         return bookingRepository.getAllBookings();
+    }
+
+    /**
+     * Favourite
+     */
+
+    public void setListOfFavourites(List<String> favRestaurantID) {
+
+        if(favRestaurantID != null) {
+            placesAPIRepository.fetchDetailsForFavourite(favRestaurantID);
+        }
+    }
+
+    public LiveData<List<Result>> observeFavList() {
+        return placesAPIRepository.observeListFavouriteRestaurant();
     }
 }

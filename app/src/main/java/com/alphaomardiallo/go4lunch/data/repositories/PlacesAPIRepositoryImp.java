@@ -47,6 +47,7 @@ public class PlacesAPIRepositoryImp implements PlacesAPIRepository {
     private final MutableLiveData<Result> restaurantDetails = new MutableLiveData<>();
     private final MutableLiveData<List<PredictionsItem>> predictionAutoComplete = new MutableLiveData<>();
     private final MutableLiveData<Result> selectedRestaurantDetails = new MutableLiveData<>();
+    private List<Result> favRestaurant = new ArrayList<>();
 
     @Inject
     public PlacesAPIRepositoryImp() {
@@ -247,6 +248,7 @@ public class PlacesAPIRepositoryImp implements PlacesAPIRepository {
 
                 if (response.body() != null) {
                     restaurantDetails.setValue(response.body().getResult());
+                    System.out.println(response.raw().request().url());
                 }
             }
 
@@ -258,6 +260,40 @@ public class PlacesAPIRepositoryImp implements PlacesAPIRepository {
 
     }
 
+    @Override
+    public void fetchDetailsForFavourite(List<String> placeIDList) {
+
+        List<Result> tempList = new ArrayList<>();
+
+        for (String placeID : placeIDList) {
+
+            Call<PlaceDetails> call6 = retrofitDetailsAPI.getPlaceDetails(FIELDS_RESTAURANT_DETAIL_ACTIVITY, placeID, PLACES_API_KEY);
+            call6.enqueue(new Callback<PlaceDetails>() {
+                @Override
+                public void onResponse(@NonNull Call<PlaceDetails> call, @NonNull Response<PlaceDetails> response) {
+                    if (!response.isSuccessful()) {
+                        System.out.println(response.raw().request().url());
+                        return;
+                    }
+
+                    if (response.body() != null) {
+                        tempList.add(response.body().getResult());
+                        System.out.println(response.raw().request().url());
+                        System.out.println(tempList);
+                    }
+                }
+
+                @Override
+                public void onFailure(@NonNull Call<PlaceDetails> call, @NonNull Throwable t) {
+                    System.out.println(t.getMessage());
+                }
+            });
+        }
+
+        favRestaurant = tempList;
+
+    }
+
     /**
      * Places AutoComplete
      */
@@ -266,8 +302,8 @@ public class PlacesAPIRepositoryImp implements PlacesAPIRepository {
 
     public LiveData<List<PredictionsItem>> autoCompleteSearch(String Query, String location, int radius) {
 
-        Call<PlaceAutoComplete> call6 = retrofitAutocompleteAPI.getPlaceAutocomplete(Query, OFFSET, location, location, RESTAURANT, radius, STRICTBOUNDS, PLACES_API_KEY);
-        call6.enqueue(new Callback<PlaceAutoComplete>() {
+        Call<PlaceAutoComplete> call7 = retrofitAutocompleteAPI.getPlaceAutocomplete(Query, OFFSET, location, location, RESTAURANT, radius, STRICTBOUNDS, PLACES_API_KEY);
+        call7.enqueue(new Callback<PlaceAutoComplete>() {
             @Override
             public void onResponse(@NonNull Call<PlaceAutoComplete> call, @NonNull Response<PlaceAutoComplete> response) {
                 if (!response.isSuccessful()) {
@@ -288,6 +324,12 @@ public class PlacesAPIRepositoryImp implements PlacesAPIRepository {
         });
 
         return predictionAutoComplete;
+    }
+
+    public LiveData<List<Result>> observeListFavouriteRestaurant() {
+        MutableLiveData<List<Result>> listToReturn = new MutableLiveData<>();
+        listToReturn.setValue(favRestaurant);
+        return listToReturn;
     }
 
 }
