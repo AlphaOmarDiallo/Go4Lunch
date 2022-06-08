@@ -1,9 +1,12 @@
 package com.alphaomardiallo.go4lunch.ui.fragments;
 
+import static android.content.ContentValues.TAG;
+
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.location.Location;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,6 +18,7 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.alphaomardiallo.go4lunch.R;
+import com.alphaomardiallo.go4lunch.data.dataSources.Model.Booking;
 import com.alphaomardiallo.go4lunch.data.dataSources.Model.nearBySearchPojo.ResultsItem;
 import com.alphaomardiallo.go4lunch.data.viewModels.MainSharedViewModel;
 import com.alphaomardiallo.go4lunch.databinding.FragmentListViewBinding;
@@ -41,7 +45,8 @@ public class ListViewFragment extends Fragment implements OnClickItemListener {
     private FragmentListViewBinding binding;
     private MainSharedViewModel viewModel;
     private List<ResultsItem> restaurantList = new ArrayList<>();
-    private ListViewAdapter adapter = new ListViewAdapter(new ListViewAdapter.ListDiff(), this, location);
+    private List<Booking> bookingList = new ArrayList<>();
+    private ListViewAdapter adapter = new ListViewAdapter(new ListViewAdapter.ListDiff(), this, location, bookingList);
 
     @Nullable
     @Override
@@ -78,14 +83,14 @@ public class ListViewFragment extends Fragment implements OnClickItemListener {
     private void observeData(boolean hasPermission) {
         if (hasPermission) {
             if (this.isAdded()) {
-                viewModel.getCurrentLocation().observe(requireActivity(), this::updateLocation);
-                viewModel.getRestaurantToFocusOn().observe(requireActivity(), this::getSearchResult);
+                viewModel.getAllBookings().observe(requireActivity(), this::updateBookingList);
             }
         }
     }
 
     private void updateViewsWithParametersLocation(Location location) {
         if (this.isAdded()) {
+            Log.e(TAG, "updateViewsWithParametersLocation: ", null);
             viewModel.getRestaurants().observe(requireActivity(), this::setLoadersAfterAPICalls);
             viewModel.getRestaurants().observe(requireActivity(), adapter::submitList);
         }
@@ -96,6 +101,13 @@ public class ListViewFragment extends Fragment implements OnClickItemListener {
         if (this.isAdded()) {
             viewModel.getCurrentLocation().observe(requireActivity(), this::updateViewsWithParametersLocation);
         }
+    }
+
+    private void updateBookingList(List<Booking> bookingList) {
+        this.bookingList = bookingList;
+        setAdapter(location);
+        viewModel.getCurrentLocation().observe(requireActivity(), this::updateLocation);
+        viewModel.getRestaurantToFocusOn().observe(requireActivity(), this::getSearchResult);
     }
 
     private void getSearchResult(String restaurantID) {
@@ -121,7 +133,7 @@ public class ListViewFragment extends Fragment implements OnClickItemListener {
      */
 
     private void setAdapter(Location location) {
-        adapter = new ListViewAdapter(new ListViewAdapter.ListDiff(), this, location);
+        adapter = new ListViewAdapter(new ListViewAdapter.ListDiff(), this, location, bookingList);
         binding.recyclerView.setAdapter(adapter);
     }
 

@@ -19,35 +19,38 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.alphaomardiallo.go4lunch.BuildConfig;
 import com.alphaomardiallo.go4lunch.R;
+import com.alphaomardiallo.go4lunch.data.dataSources.Model.Booking;
 import com.alphaomardiallo.go4lunch.data.dataSources.Model.nearBySearchPojo.ResultsItem;
 import com.alphaomardiallo.go4lunch.databinding.ItemRestaurantBinding;
 import com.alphaomardiallo.go4lunch.domain.OnClickItemListener;
 import com.bumptech.glide.Glide;
 
+import java.util.List;
 import java.util.Locale;
 
 public class ListViewAdapter extends ListAdapter<ResultsItem, ListViewAdapter.ListViewHolder> {
 
-    private ItemRestaurantBinding binding;
-    private OnClickItemListener onClickItemListener;
-    private Location location;
+    private final OnClickItemListener onClickItemListener;
+    private final Location location;
+    private final List<Booking> bookingList;
 
-    public ListViewAdapter(@NonNull DiffUtil.ItemCallback<ResultsItem> diffCallback, OnClickItemListener onClickItemListener, Location location) {
+    public ListViewAdapter(@NonNull DiffUtil.ItemCallback<ResultsItem> diffCallback, OnClickItemListener onClickItemListener, Location location, List<Booking> bookingList) {
         super(diffCallback);
         this.onClickItemListener = onClickItemListener;
         this.location = location;
+        this.bookingList = bookingList;
     }
 
     @NonNull
     @Override
     public ListViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        binding = ItemRestaurantBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false);
+        com.alphaomardiallo.go4lunch.databinding.ItemRestaurantBinding binding = ItemRestaurantBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false);
         return new ListViewHolder(binding.getRoot());
     }
 
     @Override
     public void onBindViewHolder(@NonNull ListViewHolder holder, int position) {
-        holder.bind(getItem(position), onClickItemListener, location);
+        holder.bind(getItem(position), onClickItemListener, location, bookingList);
     }
 
     public static class ListDiff extends DiffUtil.ItemCallback<ResultsItem> {
@@ -93,12 +96,12 @@ public class ListViewAdapter extends ListAdapter<ResultsItem, ListViewAdapter.Li
             setupRatingBar();
         }
 
-        public void bind(ResultsItem restaurant, OnClickItemListener onClickItemListener, Location location) {
+        public void bind(ResultsItem restaurant, OnClickItemListener onClickItemListener, Location location, List<Booking> bookingList) {
             restaurantName.setText(restaurant.getName());
             restaurantStyleAndAddress.setText(restaurant.getVicinity());
             restaurantOpeningTime.setText(getOpeningTime(restaurant.getOpeningHours().isOpenNow()));
             restaurantDistance.setText(restaurant.getGeometry().getLocation().toString());
-            restaurantNumberOfWorkmates.setText(getNumberOfWorkmates());
+            restaurantNumberOfWorkmates.setText(getNumberOfWorkmates(bookingList, restaurant.getPlaceId()));
             restaurantRating.setRating(getRating(restaurant.getRating()));
             Location restaurantLocation = new Location("restaurant");
             restaurantLocation.setLatitude(restaurant.getGeometry().getLocation().getLat());
@@ -111,6 +114,7 @@ public class ListViewAdapter extends ListAdapter<ResultsItem, ListViewAdapter.Li
                         .placeholder(R.drawable.hungry_droid)
                         .into(restaurantPhoto);
             } else {
+                assert false;
                 restaurantPhoto.setImageResource(R.drawable.hungry_droid);
             }
 
@@ -139,9 +143,17 @@ public class ListViewAdapter extends ListAdapter<ResultsItem, ListViewAdapter.Li
             return (float) ((rating / 5) * 3);
         }
 
-        private String getNumberOfWorkmates() {
-            //TODO set method
-            return String.format(Locale.getDefault(), "(%d)", 2);
+        private String getNumberOfWorkmates(List<Booking> bookingList, String restaurantID) {
+            int numberOfBookings = 0;
+            if (bookingList != null && bookingList.size() > 0) {
+                for (Booking booking : bookingList) {
+                    if (booking.getBookedRestaurantID().equalsIgnoreCase(restaurantID)) {
+                        numberOfBookings++;
+                    }
+                }
+            }
+
+            return String.format(Locale.getDefault(), "(%d)", numberOfBookings);
         }
     }
 }
