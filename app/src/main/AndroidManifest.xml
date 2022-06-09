@@ -56,7 +56,12 @@
             </intent-filter>
         </activity>
 
-        <receiver android:name=".domain.AlarmReceiver"/>
+        <service android:name=".domain.NotificationService"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT"/>
+            </intent-filter>
+        </service>
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"

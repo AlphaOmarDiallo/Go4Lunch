@@ -470,12 +470,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             intent.putExtra("notifString", text);
             sendBroadcast(intent);
         }
-
-
+        
         Notification lunchNotification = new NotificationCompat.Builder(this, CHANNEL_LUNCHTIME_REMINDER)
                 .setSmallIcon(R.drawable.ic_baseline_ramen_dining_24)
                 .setContentTitle(getString(R.string.notification_title))
                 .setContentText(text)
+                .setAutoCancel(true)
                 .setStyle(new NotificationCompat.BigTextStyle()
                 .bigText(text))
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
