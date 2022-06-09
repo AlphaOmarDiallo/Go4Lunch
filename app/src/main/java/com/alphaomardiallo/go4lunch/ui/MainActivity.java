@@ -2,9 +2,11 @@ package com.alphaomardiallo.go4lunch.ui;
 
 import static android.Manifest.permission.ACCESS_FINE_LOCATION;
 import static android.content.ContentValues.TAG;
+import static com.alphaomardiallo.go4lunch.MainApplication.CHANNEL_LUNCHTIME_REMINDER;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.Notification;
 import android.content.Intent;
 import android.location.Location;
 import android.os.Bundle;
@@ -27,10 +29,14 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.alphaomardiallo.go4lunch.R;
+import com.alphaomardiallo.go4lunch.data.dataSources.Model.Booking;
 import com.alphaomardiallo.go4lunch.data.dataSources.Model.User;
+import com.alphaomardiallo.go4lunch.data.dataSources.Model.detailsPojo.Result;
 import com.alphaomardiallo.go4lunch.data.viewModels.MainSharedViewModel;
 import com.alphaomardiallo.go4lunch.databinding.ActivityMainBinding;
 import com.alphaomardiallo.go4lunch.domain.PermissionUtils;
@@ -68,6 +74,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private final MapsFragment mapsFragment = new MapsFragment();
     private final ListViewFragment listViewFragment = new ListViewFragment();
     private final WorkmatesFragment workmatesFragment = new WorkmatesFragment();
+    private NotificationManagerCompat notificationManager;
     private User currentUser;
     private ActivityMainBinding binding;
     private ActionBarDrawerToggle toggle;
@@ -125,6 +132,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         observePermissions();
 
         observeBookings();
+
+        setNotificationManager();
+
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                setupNotif();
+            }
+        }, 3000);
 
     }
 
@@ -413,6 +429,48 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         EasyPermissions.onRequestPermissionsResult(requestCode, permissions, grantResults, this);
     }
+
+    /**
+     * Notifications
+     */
+
+    private void setupNotif() {
+        viewModel.getAllBookings().observe(this, this::checkUserBookingStatus);
+    }
+
+    private void setNotificationManager() {
+        notificationManager = NotificationManagerCompat.from(this);
+    }
+
+    private void checkUserBookingStatus(List<Booking> bookings) {
+        viewModel.checkIfUserNeedsLunchNotification(currentUser.getUid(), bookings).observe(this, this::getRestaurant);
+    }
+
+    private void getRestaurant(String restaurantID) {
+        if (restaurantID != null) {
+            viewModel.fetchPartialRestaurantDetails(restaurantID);
+            viewModel.getPartialRestaurantDetails().observe(this, this::sendLunchReminderNotification);
+        }
+    }
+
+    private void sendLunchReminderNotification(Result restaurant){
+
+        List<String> notificationInfo = viewModel.getInfoForLunchNotification(currentUser.getUid(), restaurant);
+        String text = String.format(getString(R.string.notification_text), notificationInfo.get(0), notificationInfo.get(1), notificationInfo.get(2));
+
+        Notification lunchNotification = new NotificationCompat.Builder(this, CHANNEL_LUNCHTIME_REMINDER)
+                .setSmallIcon(R.drawable.ic_baseline_ramen_dining_24)
+                .setContentTitle(getString(R.string.notification_title))
+                .setContentText(text)
+                .setStyle(new NotificationCompat.BigTextStyle()
+                .bigText(text))
+                .setPriority(NotificationCompat.PRIORITY_HIGH)
+                .setCategory(NotificationCompat.CATEGORY_ALARM)
+                .build();
+
+        notificationManager.notify(1, lunchNotification);
+    }
+
 
     /**
      * LifeCycle related methods
