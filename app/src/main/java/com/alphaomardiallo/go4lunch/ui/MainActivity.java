@@ -256,7 +256,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 if (query.length() > 0) {
                     Intent intent = new Intent(MainActivity.this, SearchActivity.class);
                     intent.putExtra(KEY_SEARCH_QUERY, query);
-                    intent.putExtra(KEY_LOCATION_STRING, String.format(getString(R.string.location_to_string), currentLocation.getLatitude(), currentLocation.getLongitude()));
+                    intent.putExtra(KEY_LOCATION_STRING, String.format("%s,%s", currentLocation.getLatitude(), currentLocation.getLongitude()));
+                    Log.e(TAG, "onQueryTextChange: " + currentLocation.getLongitude(), null);
                     searchLauncher.launch(intent);
                 }
                 return true;
@@ -443,6 +444,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     private void checkUserBookingStatus(List<Booking> bookings) {
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                System.out.println("hold");
+            }
+        },3000);
         viewModel.checkIfUserNeedsLunchNotification(currentUser.getUid(), bookings).observe(this, this::getRestaurant);
     }
 
@@ -457,6 +464,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         List<String> notificationInfo = viewModel.getInfoForLunchNotification(currentUser.getUid(), restaurant);
         String text = String.format(getString(R.string.notification_text), notificationInfo.get(0), notificationInfo.get(1), notificationInfo.get(2));
+
+        if (restaurant != null) {
+            Intent intent = new Intent("notificationString");
+            intent.putExtra("notifString", text);
+            sendBroadcast(intent);
+        }
+
 
         Notification lunchNotification = new NotificationCompat.Builder(this, CHANNEL_LUNCHTIME_REMINDER)
                 .setSmallIcon(R.drawable.ic_baseline_ramen_dining_24)
