@@ -45,6 +45,12 @@
     <!-- location -->
     <string name="office_location">48.86501071160738,2.3467211059168793</string>
 
+    <!-- notification -->
+    <string name="notification_title">It is lunch time!</string>
+    <string name="notification_text">Time to make it to %s, at %s. \n %s </string>
+    <string name="channel_name">Lunch</string>
+    <string name="channel_description">Lunch time reminder</string>
+
     <string name="app_name">Go4Lunch</string>
     <string name="slogan">Find a nice restaurant and invite your co-workers for lunch!</string>
     <string name="app_logo">App logo</string>
@@ -125,4 +131,5 @@
     <string name="no_booking">You have not taken a decision yet</string>
     <string name="yes_booking">You have selected %s for lunch today</string>
     <string name="your_favourite_restaurants">Your favourite restaurants</string>
+
 </resources>
