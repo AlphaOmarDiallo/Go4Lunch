@@ -16,7 +16,6 @@ public interface RetrofitAutocompleteAPI {
             @Query("location") String location,
             @Query("types") String types,
             @Query("radius") int radius,
-            @Query("strictbounds") boolean strictBounds,
             @Query("key") String key
     );
 }

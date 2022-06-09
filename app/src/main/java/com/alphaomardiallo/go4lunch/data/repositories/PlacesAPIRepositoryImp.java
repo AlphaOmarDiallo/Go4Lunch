@@ -40,7 +40,6 @@ public class PlacesAPIRepositoryImp implements PlacesAPIRepository {
     private static final int MAXPRICE = 2;
     private static final int HANDLING_TIME = 2000;
     private static final int OFFSET = 2;
-    private static final boolean STRICTBOUNDS = true;
     private final Handler handler = new Handler(Looper.getMainLooper());
     private final MutableLiveData<List<ResultsItem>> restaurantListLiveData = new MutableLiveData<>();
     private final List<ResultsItem> restaurantList = new ArrayList<>();
@@ -302,7 +301,7 @@ public class PlacesAPIRepositoryImp implements PlacesAPIRepository {
 
     public LiveData<List<PredictionsItem>> autoCompleteSearch(String Query, String location, int radius) {
 
-        Call<PlaceAutoComplete> call7 = retrofitAutocompleteAPI.getPlaceAutocomplete(Query, OFFSET, location, location, RESTAURANT, radius, STRICTBOUNDS, PLACES_API_KEY);
+        Call<PlaceAutoComplete> call7 = retrofitAutocompleteAPI.getPlaceAutocomplete(Query, OFFSET, location, location, RESTAURANT, radius, PLACES_API_KEY);
         call7.enqueue(new Callback<PlaceAutoComplete>() {
             @Override
             public void onResponse(@NonNull Call<PlaceAutoComplete> call, @NonNull Response<PlaceAutoComplete> response) {
