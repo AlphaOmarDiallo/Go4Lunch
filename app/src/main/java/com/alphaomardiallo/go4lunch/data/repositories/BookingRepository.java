@@ -1,5 +1,7 @@
 package com.alphaomardiallo.go4lunch.data.repositories;
 
+import android.content.Context;
+
 import androidx.annotation.NonNull;
 import androidx.lifecycle.LiveData;
 
@@ -11,7 +13,7 @@ public interface BookingRepository {
 
     void getInstance();
 
-    void createBookingAndAddInDatabase(@NonNull Booking bookingToSave);
+    void createBookingAndAddInDatabase(@NonNull Booking bookingToSave, Context context);
 
     void deleteBookingInDatabase(String bookingID);
 

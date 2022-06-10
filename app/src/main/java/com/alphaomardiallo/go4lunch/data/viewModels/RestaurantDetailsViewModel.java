@@ -94,8 +94,8 @@ public class RestaurantDetailsViewModel extends ViewModel {
         return hasBooking;
     }
 
-    public void createBooking(Booking bookingToSave) {
-        bookingRepository.createBookingAndAddInDatabase(bookingToSave);
+    public void createBooking(Booking bookingToSave, Context context) {
+        bookingRepository.createBookingAndAddInDatabase(bookingToSave, context.getApplicationContext());
     }
 
     public void updateBooking(String bookingID, String restaurantID, String restaurantName) {

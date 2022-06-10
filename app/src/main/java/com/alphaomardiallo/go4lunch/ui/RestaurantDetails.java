@@ -1,9 +1,6 @@
 package com.alphaomardiallo.go4lunch.ui;
 
-import android.annotation.SuppressLint;
-import android.app.AlarmManager;
 import android.app.AlertDialog;
-import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.ColorStateList;
@@ -25,13 +22,11 @@ import com.alphaomardiallo.go4lunch.data.dataSources.Model.User;
 import com.alphaomardiallo.go4lunch.data.dataSources.Model.detailsPojo.Result;
 import com.alphaomardiallo.go4lunch.data.viewModels.RestaurantDetailsViewModel;
 import com.alphaomardiallo.go4lunch.databinding.ActivityRestaurantDetailsBinding;
-import com.alphaomardiallo.go4lunch.domain.AlarmReceiver;
 import com.alphaomardiallo.go4lunch.ui.adapters.WorkmatesAdapter;
 import com.alphaomardiallo.go4lunch.ui.adapters.WorkmatesJoiningAdapter;
 import com.bumptech.glide.Glide;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
 
 import dagger.hilt.android.AndroidEntryPoint;
@@ -121,8 +116,8 @@ public class RestaurantDetails extends AppCompatActivity {
         setupFABColor();
     }
 
-    private void createBooking(Booking bookingToCreate) {
-        viewModel.createBooking(bookingToCreate);
+    private void createBooking(Booking bookingToCreate, Context context) {
+        viewModel.createBooking(bookingToCreate, context);
     }
 
     /**
@@ -215,7 +210,7 @@ public class RestaurantDetails extends AppCompatActivity {
 
             if (bookingToCheck == null) {
                 Booking booking = bookingToCreate();
-                createBooking(booking);
+                createBooking(booking, RestaurantDetails.this);
             } else {
                 if (bookingToCheck.getBookedRestaurantID().equalsIgnoreCase(restaurantID)) {
                     deleteBookingAlertDialog(bookingToCheck.getBookingID());
@@ -382,30 +377,7 @@ public class RestaurantDetails extends AppCompatActivity {
         setupLikeButtonAppearance();
     }
 
-    /**
-     * AlarmReceiver
-     */
 
-    private void setAlarmExactRTCWakeUp() {
-        Calendar c = Calendar.getInstance();
-        c.set(Calendar.HOUR_OF_DAY, 22);
-        c.set(Calendar.MINUTE, 47);
-        c.set(Calendar.SECOND, 0);
-
-        @SuppressLint("ServiceCast")
-        AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ACTIVITY_SERVICE);
-        Intent alarmIntent = new Intent(this, AlarmReceiver.class);
-        PendingIntent pendingAlarmIntent = PendingIntent.getBroadcast(this, 1, alarmIntent, PendingIntent.FLAG_ONE_SHOT);
-        alarmManager.setExact(AlarmManager.RTC_WAKEUP, c.getTimeInMillis(), pendingAlarmIntent);
-    }
-
-    private void cancelAlarm() {
-        @SuppressLint("ServiceCast")
-        AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ACTIVITY_SERVICE);
-        Intent alarmIntent = new Intent(this, AlarmReceiver.class);
-        PendingIntent pendingAlarmIntent = PendingIntent.getBroadcast(this, 1, alarmIntent, 0);
-        alarmManager.cancel(pendingAlarmIntent);
-    }
 
     /**
      * LifeCycle related

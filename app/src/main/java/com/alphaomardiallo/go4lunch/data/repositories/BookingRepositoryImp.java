@@ -2,6 +2,11 @@ package com.alphaomardiallo.go4lunch.data.repositories;
 
 import static android.content.ContentValues.TAG;
 
+import android.annotation.SuppressLint;
+import android.app.AlarmManager;
+import android.app.PendingIntent;
+import android.content.Context;
+import android.content.Intent;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -10,6 +15,7 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
 import com.alphaomardiallo.go4lunch.data.dataSources.Model.Booking;
+import com.alphaomardiallo.go4lunch.domain.AlarmReceiver;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.DocumentReference;
@@ -49,7 +55,7 @@ public class BookingRepositoryImp implements BookingRepository {
         Log.i(TAG, "getInstance: FireBase " + database);
     }
 
-    public void createBookingAndAddInDatabase(@NonNull Booking bookingToSave) {
+    public void createBookingAndAddInDatabase(@NonNull Booking bookingToSave, Context context) {
         //Create a booking
         Map<String, Object> booking = new HashMap<>();
         booking.put(BOOKING_ID, null);
@@ -66,7 +72,14 @@ public class BookingRepositoryImp implements BookingRepository {
                         Log.d(TAG, "onSuccess: document added " + documentReference);
                         database.collection(COLLECTION_NAME)
                                 .document(documentReference.getId())
-                                .update(BOOKING_ID, documentReference.getId());
+                                .update(BOOKING_ID, documentReference.getId())
+                                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                    @Override
+                                    public void onSuccess(Void unused) {
+                                        Log.e(TAG, "onSuccess: booking created and alarm is about ot be set", null);
+                                        setAlarmExactRTCWakeUp(context);
+                                    }
+                                });
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
@@ -156,6 +169,31 @@ public class BookingRepositoryImp implements BookingRepository {
                 Log.e(TAG, "deleteBookingsFromPreviousDays: deleted " + booking.getBookingID(), null);
             }
         }
+    }
+
+    /**
+     * AlarmReceiver
+     */
+
+    private void setAlarmExactRTCWakeUp(Context context) {
+        Calendar c = Calendar.getInstance();
+        c.set(Calendar.HOUR_OF_DAY, 0);
+        c.set(Calendar.MINUTE, 37);
+        c.set(Calendar.SECOND, 0);
+
+
+        AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+        Intent alarmIntent = new Intent(context, AlarmReceiver.class);
+        PendingIntent pendingAlarmIntent = PendingIntent.getBroadcast(context, 1, alarmIntent, PendingIntent.FLAG_ONE_SHOT);
+        alarmManager.setExact(AlarmManager.RTC_WAKEUP, c.getTimeInMillis(), pendingAlarmIntent);
+    }
+
+    private void cancelAlarm(Context context) {
+        @SuppressLint("ServiceCast")
+        AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+        Intent alarmIntent = new Intent(context, AlarmReceiver.class);
+        PendingIntent pendingAlarmIntent = PendingIntent.getBroadcast(context, 1, alarmIntent, 0);
+        alarmManager.cancel(pendingAlarmIntent);
     }
 
 
