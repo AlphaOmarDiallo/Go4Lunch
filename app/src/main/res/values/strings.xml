@@ -132,5 +132,6 @@
     <string name="yes_booking">You have selected %s for lunch today</string>
     <string name="your_favourite_restaurants">Your favourite restaurants</string>
     <string name="default_notification_channel_id">com.google.firebase.messaging.default_notification_channel_id</string>
+    <string name="msg_token_fmt">%s</string>
 
 </resources>
