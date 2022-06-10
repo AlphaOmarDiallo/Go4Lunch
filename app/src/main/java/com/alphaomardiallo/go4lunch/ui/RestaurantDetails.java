@@ -1,14 +1,15 @@
 package com.alphaomardiallo.go4lunch.ui;
 
-import static android.content.ContentValues.TAG;
-
+import android.annotation.SuppressLint;
+import android.app.AlarmManager;
 import android.app.AlertDialog;
+import android.app.PendingIntent;
+import android.content.Context;
 import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
@@ -24,11 +25,13 @@ import com.alphaomardiallo.go4lunch.data.dataSources.Model.User;
 import com.alphaomardiallo.go4lunch.data.dataSources.Model.detailsPojo.Result;
 import com.alphaomardiallo.go4lunch.data.viewModels.RestaurantDetailsViewModel;
 import com.alphaomardiallo.go4lunch.databinding.ActivityRestaurantDetailsBinding;
+import com.alphaomardiallo.go4lunch.domain.AlarmReceiver;
 import com.alphaomardiallo.go4lunch.ui.adapters.WorkmatesAdapter;
 import com.alphaomardiallo.go4lunch.ui.adapters.WorkmatesJoiningAdapter;
 import com.bumptech.glide.Glide;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 import dagger.hilt.android.AndroidEntryPoint;
@@ -120,6 +123,7 @@ public class RestaurantDetails extends AppCompatActivity {
 
     private void createBooking(Booking bookingToCreate) {
         viewModel.createBooking(bookingToCreate);
+        setAlarmExactRTCWakeUp();
     }
 
     /**
@@ -211,16 +215,14 @@ public class RestaurantDetails extends AppCompatActivity {
             Booking bookingToCheck = viewModel.checkIfUserHasBooking();
 
             if (bookingToCheck == null) {
-                System.out.println("create");
                 Booking booking = bookingToCreate();
                 createBooking(booking);
+                //setAlarmExactRTCWakeUp();
             } else {
                 System.out.println(restaurantID);
                 if (bookingToCheck.getBookedRestaurantID().equalsIgnoreCase(restaurantID)) {
-                    System.out.println("delete");
                     deleteBookingAlertDialog(bookingToCheck.getBookingID());
                 } else {
-                    System.out.println("update");
                     updateBookingAlertDialog(bookingToCheck.getBookingID(), restaurantID, restaurantName);
                 }
             }
@@ -234,14 +236,11 @@ public class RestaurantDetails extends AppCompatActivity {
         Booking hasBooking = viewModel.checkIfUserHasBooking();
         if (hasBooking == null) {
             binding.fabSelectRestaurant.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.white)));
-            Log.e("setupFABColor", "null", null);
         } else {
             if (hasBooking.getBookedRestaurantID().equalsIgnoreCase(restaurantID)) {
                 binding.fabSelectRestaurant.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.teal_700)));
-                Log.e("setupFABColor", "booking at this place", null);
             } else {
                 binding.fabSelectRestaurant.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.white)));
-                Log.e("setupFABColor", "booking somewhere else", null);
             }
         }
     }
@@ -252,36 +251,34 @@ public class RestaurantDetails extends AppCompatActivity {
 
     private void updateBookingAlertDialog(String bookingID, String restaurantID, String restaurantName) {
         AlertDialog.Builder builder = new AlertDialog.Builder(RestaurantDetails.this);
-// Add the buttons
+
         builder.setPositiveButton(R.string.OK, (dialog, id) -> {
             viewModel.updateBooking(bookingID, restaurantID, restaurantName);
             Toast.makeText(this, R.string.updated_booking, Toast.LENGTH_SHORT).show();
         });
         builder.setNegativeButton(R.string.cancel, (dialog, id) -> dialog.cancel());
-// Set other dialog properties
+
         builder.setCancelable(true);
         builder.setMessage(R.string.update_booking)
                 .setTitle(R.string.update_booking_title);
 
-// Create the AlertDialog
         AlertDialog dialog = builder.create();
         dialog.show();
     }
 
     private void deleteBookingAlertDialog(String bookingID) {
         AlertDialog.Builder builder = new AlertDialog.Builder(RestaurantDetails.this);
-// Add the buttons
+
         builder.setPositiveButton(R.string.OK, (dialog, id) -> {
             viewModel.deleteBooking(bookingID);
             Toast.makeText(this, R.string.deleted_booking, Toast.LENGTH_SHORT).show();
         });
         builder.setNegativeButton(R.string.cancel, (dialog, id) -> dialog.cancel());
-// Set other dialog properties
+
         builder.setCancelable(true);
         builder.setMessage(R.string.delete_booking)
                 .setTitle(R.string.delete_booking_title);
 
-// Create the AlertDialog
         AlertDialog dialog = builder.create();
         dialog.show();
     }
@@ -310,10 +307,8 @@ public class RestaurantDetails extends AppCompatActivity {
             }
 
             if (isInList) {
-                System.out.println("delete");
                 viewModel.removeRestaurantFromFavourite(restaurantID);
             } else {
-                System.out.println("add");
                 addRestaurantToFavourite(restaurantID);
             }
             setupLikeButtonAppearance();
@@ -323,15 +318,11 @@ public class RestaurantDetails extends AppCompatActivity {
 
     private void setupLikeButtonAppearance() {
         if (user != null) {
-            Log.e(TAG, "setupLikeButtonAppearance: user " + user, null);
             if (user.getFavouriteRestaurants() != null) {
-                System.out.println("here");
                 if (user.getFavouriteRestaurants().contains(restaurantID)) {
                     binding.tvLLikeDetails.setText(getString(R.string.unlike));
-                    System.out.println("here again");
                 } else {
                     binding.tvLLikeDetails.setText(getString(R.string.like));
-                    System.out.println("here too");
                 }
             }
         }
@@ -392,6 +383,31 @@ public class RestaurantDetails extends AppCompatActivity {
     private void updateUser(User user) {
         this.user = user;
         setupLikeButtonAppearance();
+    }
+
+    /**
+     * AlarmReceiver
+     */
+
+    private void setAlarmExactRTCWakeUp() {
+        Calendar c = Calendar.getInstance();
+        c.set(Calendar.HOUR_OF_DAY, 22);
+        c.set(Calendar.MINUTE, 47);
+        c.set(Calendar.SECOND, 0);
+
+        @SuppressLint("ServiceCast")
+        AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ACTIVITY_SERVICE);
+        Intent alarmIntent = new Intent(this, AlarmReceiver.class);
+        PendingIntent pendingAlarmIntent = PendingIntent.getBroadcast(this, 1, alarmIntent, PendingIntent.FLAG_ONE_SHOT);
+        alarmManager.setExact(AlarmManager.RTC_WAKEUP, c.getTimeInMillis(),pendingAlarmIntent);
+    }
+
+    private void cancelAlarm() {
+        @SuppressLint("ServiceCast")
+        AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ACTIVITY_SERVICE);
+        Intent alarmIntent = new Intent(this, AlarmReceiver.class);
+        PendingIntent pendingAlarmIntent = PendingIntent.getBroadcast(this, 1, alarmIntent, 0);
+        alarmManager.cancel(pendingAlarmIntent);
     }
 
     /**

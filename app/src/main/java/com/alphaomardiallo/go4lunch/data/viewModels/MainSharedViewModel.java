@@ -248,9 +248,9 @@ public class MainSharedViewModel extends ViewModel {
         bookingRepository.getInstance();
     }
 
-    public void deleteBookingFromPreviousDays() {
+   /* public void deleteBookingFromPreviousDays() {
         bookingRepository.deleteBookingsFromPreviousDays();
-    }
+    }*/
 
     public void observeBookingsFromDataBase() {
         bookingRepository.getAllBookingsFromDataBase();
@@ -261,7 +261,7 @@ public class MainSharedViewModel extends ViewModel {
     }
 
     /**
-     * Notification
+     * AlarmReceiver
      */
 
     public LiveData<String> checkIfUserNeedsLunchNotification(String userID, List<Booking> bookingList) {

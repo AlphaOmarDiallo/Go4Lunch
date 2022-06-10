@@ -1,7 +1,5 @@
 package com.alphaomardiallo.go4lunch.domain;
 
-import static com.alphaomardiallo.go4lunch.MainApplication.CHANNEL_LUNCHTIME_REMINDER;
-
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -55,7 +53,7 @@ public class NotificationService extends FirebaseMessagingService {
 
         // Check if message contains a notification payload.
         if (remoteMessage.getNotification() != null) {
-            Log.d(TAG, "Message Notification Body: " + remoteMessage.getNotification().getBody());
+            Log.d(TAG, "Message AlarmReceiver Body: " + remoteMessage.getNotification().getBody());
         }
 
         sendVisualNotification(remoteMessage.getNotification());
@@ -88,17 +86,18 @@ public class NotificationService extends FirebaseMessagingService {
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_ONE_SHOT);
 
-        String channelId = CHANNEL_LUNCHTIME_REMINDER;
+        String channelId = getString(R.string.default_notification_channel_id);
         Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
 
-        // Build a Notification object
+        // Build a AlarmReceiver object
         NotificationCompat.Builder notificationBuilder =
                 new NotificationCompat.Builder(this, channelId)
                         .setSmallIcon(R.drawable.ic_baseline_ramen_dining_24)
                         .setSound(defaultSoundUri)
                         .setContentTitle(notification.getTitle())
-                        .setContentText(notification.getBody())
+                        .setContentText("hello")
                         .setAutoCancel(true)
+                        .setCategory(NotificationCompat.CATEGORY_ALARM)
                         .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
                         .setContentIntent(pendingIntent);
 

@@ -135,13 +135,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         setNotificationManager();
 
-        handler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                setupNotif();
-            }
-        }, 3000);
-
     }
 
     /**
@@ -449,14 +442,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             public void run() {
                 System.out.println("hold");
             }
-        },3000);
+        },10000);
         viewModel.checkIfUserNeedsLunchNotification(currentUser.getUid(), bookings).observe(this, this::getRestaurant);
     }
 
     private void getRestaurant(String restaurantID) {
         if (restaurantID != null) {
             viewModel.fetchPartialRestaurantDetails(restaurantID);
-            viewModel.getPartialRestaurantDetails().observe(this, this::sendLunchReminderNotification);
+            //viewModel.getPartialRestaurantDetails().observe(this, this::sendLunchReminderNotification);
         }
     }
 
