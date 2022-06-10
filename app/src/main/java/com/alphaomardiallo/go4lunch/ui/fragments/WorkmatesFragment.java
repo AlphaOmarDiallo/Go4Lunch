@@ -120,11 +120,6 @@ public class WorkmatesFragment extends Fragment implements OnClickWormkmateListe
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-
-        if (viewModel.hasPermission(requireContext())) {
-            viewModel.stopTrackingLocation();
-        }
-
-        Log.e(TAG, "onDestroyView: Destroy", null);
+        viewModel.observeUserList().removeObservers(this);
     }
 }

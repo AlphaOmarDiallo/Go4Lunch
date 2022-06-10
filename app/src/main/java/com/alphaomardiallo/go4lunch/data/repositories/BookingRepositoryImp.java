@@ -37,10 +37,8 @@ public class BookingRepositoryImp implements BookingRepository {
     private static final String BOOKING_RESTAURANT_ID = "bookedRestaurantID";
     private static final String BOOKING_RESTAURANT_NAME = "bookedRestaurantName";
     private static final String BOOKING_USER_ID = "userWhoBooked";
-    private static final String BOOKING_USER_FAVOURITES = "favouriteRestaurants";
-
     private FirebaseFirestore database;
-    private MutableLiveData<List<Booking>> allBookings = new MutableLiveData<>();
+    private final MutableLiveData<List<Booking>> allBookings = new MutableLiveData<>();
 
     @Inject
     public BookingRepositoryImp() {

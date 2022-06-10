@@ -123,7 +123,6 @@ public class RestaurantDetails extends AppCompatActivity {
 
     private void createBooking(Booking bookingToCreate) {
         viewModel.createBooking(bookingToCreate);
-        setAlarmExactRTCWakeUp();
     }
 
     /**
@@ -217,9 +216,7 @@ public class RestaurantDetails extends AppCompatActivity {
             if (bookingToCheck == null) {
                 Booking booking = bookingToCreate();
                 createBooking(booking);
-                //setAlarmExactRTCWakeUp();
             } else {
-                System.out.println(restaurantID);
                 if (bookingToCheck.getBookedRestaurantID().equalsIgnoreCase(restaurantID)) {
                     deleteBookingAlertDialog(bookingToCheck.getBookingID());
                 } else {
@@ -399,7 +396,7 @@ public class RestaurantDetails extends AppCompatActivity {
         AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ACTIVITY_SERVICE);
         Intent alarmIntent = new Intent(this, AlarmReceiver.class);
         PendingIntent pendingAlarmIntent = PendingIntent.getBroadcast(this, 1, alarmIntent, PendingIntent.FLAG_ONE_SHOT);
-        alarmManager.setExact(AlarmManager.RTC_WAKEUP, c.getTimeInMillis(),pendingAlarmIntent);
+        alarmManager.setExact(AlarmManager.RTC_WAKEUP, c.getTimeInMillis(), pendingAlarmIntent);
     }
 
     private void cancelAlarm() {
