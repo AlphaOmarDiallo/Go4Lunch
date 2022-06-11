@@ -3,6 +3,7 @@ package com.alphaomardiallo.go4lunch.ui;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.res.ColorStateList;
 import android.location.Location;
 import android.net.Uri;
@@ -118,6 +119,16 @@ public class RestaurantDetails extends AppCompatActivity {
 
     private void createBooking(Booking bookingToCreate, Context context) {
         viewModel.createBooking(bookingToCreate, context);
+    }
+
+    private void saveRestaurantIDInSharePreferences(){
+        Context context = this;
+        SharedPreferences sharedPreferences = context.getSharedPreferences(
+                getString(R.string.preferences_main_file), MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString("bookedRestaurantID", bookingToCreate().getBookedRestaurantID());
+        editor.putString("bookedRestaurantName" ,bookingToCreate().getBookedRestaurantName());
+        editor.apply();
     }
 
     /**

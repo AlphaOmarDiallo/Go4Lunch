@@ -42,6 +42,9 @@
     <string name="facebook_app_id">275016551500747</string>
     <string name="facebook_application_id">fb275016551500747</string>
 
+    <!--  SharedPreferences -->
+    <string name="preferences_main_file">preferencesMainFile</string>
+
     <!-- location -->
     <string name="office_location">48.86501071160738,2.3467211059168793</string>
 

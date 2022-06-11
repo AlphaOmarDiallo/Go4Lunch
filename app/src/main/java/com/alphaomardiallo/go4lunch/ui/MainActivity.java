@@ -7,7 +7,9 @@ import static com.alphaomardiallo.go4lunch.MainApplication.CHANNEL_LUNCHTIME_REM
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Notification;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.location.Location;
 import android.os.Bundle;
 import android.os.Handler;
@@ -327,6 +329,18 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         userName.setText(user.getUsername());
         userEmail.setText(user.getUserEmail());
+
+        saveInSharePreferences();
+    }
+
+    private void saveInSharePreferences(){
+        Context context = this;
+        SharedPreferences sharedPreferences = context.getSharedPreferences(
+                getString(R.string.preferences_main_file), MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString("currentUserID", currentUser.getUid());
+        editor.putString("currentUserUsername", currentUser.getUsername());
+        editor.apply();
     }
 
     /**
@@ -442,7 +456,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             public void run() {
                 System.out.println("hold");
             }
-        },10000);
+        }, 10000);
         viewModel.checkIfUserNeedsLunchNotification(currentUser.getUid(), bookings).observe(this, this::getRestaurant);
     }
 
@@ -453,7 +467,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
     }
 
-    private void sendLunchReminderNotification(Result restaurant){
+    private void sendLunchReminderNotification(Result restaurant) {
 
         List<String> notificationInfo = viewModel.getInfoForLunchNotification(currentUser.getUid(), restaurant);
         String text = String.format(getString(R.string.notification_text), notificationInfo.get(0), notificationInfo.get(1), notificationInfo.get(2));
@@ -463,14 +477,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             intent.putExtra("notifString", text);
             sendBroadcast(intent);
         }
-        
+
         Notification lunchNotification = new NotificationCompat.Builder(this, CHANNEL_LUNCHTIME_REMINDER)
                 .setSmallIcon(R.drawable.ic_baseline_ramen_dining_24)
                 .setContentTitle(getString(R.string.notification_title))
                 .setContentText(text)
                 .setAutoCancel(true)
                 .setStyle(new NotificationCompat.BigTextStyle()
-                .bigText(text))
+                        .bigText(text))
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
                 .setCategory(NotificationCompat.CATEGORY_ALARM)
                 .build();

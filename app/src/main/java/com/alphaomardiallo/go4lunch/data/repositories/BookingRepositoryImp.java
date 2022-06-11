@@ -77,7 +77,7 @@ public class BookingRepositoryImp implements BookingRepository {
                                     @Override
                                     public void onSuccess(Void unused) {
                                         Log.e(TAG, "onSuccess: booking created and alarm is about ot be set", null);
-                                        setAlarmExactRTCWakeUp(context);
+                                        setAlarmExactRTCWakeUp(context, bookingToSave);
                                     }
                                 });
                     }
@@ -175,17 +175,18 @@ public class BookingRepositoryImp implements BookingRepository {
      * AlarmReceiver
      */
 
-    private void setAlarmExactRTCWakeUp(Context context) {
+    @SuppressLint("MissingPermission")
+    private void setAlarmExactRTCWakeUp(Context context, Booking booking) {
         Calendar c = Calendar.getInstance();
-        c.set(Calendar.HOUR_OF_DAY, 0);
-        c.set(Calendar.MINUTE, 37);
+        c.set(Calendar.HOUR_OF_DAY, 2);
+        c.set(Calendar.MINUTE, 50);
         c.set(Calendar.SECOND, 0);
-
 
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         Intent alarmIntent = new Intent(context, AlarmReceiver.class);
         PendingIntent pendingAlarmIntent = PendingIntent.getBroadcast(context, 1, alarmIntent, PendingIntent.FLAG_ONE_SHOT);
         alarmManager.setExact(AlarmManager.RTC_WAKEUP, c.getTimeInMillis(), pendingAlarmIntent);
+        Log.e(TAG, "setAlarmExactRTCWakeUp: set", null);
     }
 
     private void cancelAlarm(Context context) {
