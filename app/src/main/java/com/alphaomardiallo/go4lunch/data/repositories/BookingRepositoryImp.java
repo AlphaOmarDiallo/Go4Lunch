@@ -33,10 +33,10 @@ import javax.inject.Inject;
 
 public class BookingRepositoryImp implements BookingRepository {
 
-    private static final int ALARM_HOUR = 23;
-    private static final int ALARM_MIN_SEC = 26;
+    private static final int ALARM_HOUR = 12;
+    private static final int ALARM_MIN_SEC = 0;
     private static final int TO_COMPARE_TO = 0;
-    private static final String NOTIFICATION_TIME = "23:30";
+    private static final String NOTIFICATION_TIME = "12:00";
     private static final String DATE_FORMAT = "dd MMM yyyy";
     private static final String TIME_FORMAT = "HH:mm";
     private static final String COLLECTION_NAME = "booking";

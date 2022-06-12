@@ -20,10 +20,13 @@ public class Booking {
         this.bookedRestaurantID = bookedRestaurantID;
         this.bookedRestaurantName = bookedRestaurantName;
         this.userWhoBooked = userWhoBooked;
+        bookingID = null;
+        bookingDate = null;
     }
 
     //Getters
 
+    @Nullable
     public String getBookingID() {
         return bookingID;
     }
@@ -44,25 +47,4 @@ public class Booking {
         return userWhoBooked;
     }
 
-    //Setters
-
-    public void setBookingID(String bookingID) {
-        this.bookingID = bookingID;
-    }
-
-    public void setBookingDate(Date bookingDate) {
-        this.bookingDate = bookingDate;
-    }
-
-    public void setBookedRestaurantID(String bookedRestaurantID) {
-        this.bookedRestaurantID = bookedRestaurantID;
-    }
-
-    public void setBookedRestaurantName(String bookedRestaurantName) {
-        this.bookedRestaurantName = bookedRestaurantName;
-    }
-
-    public void setUserWhoBooked(String userWhoBooked) {
-        this.userWhoBooked = userWhoBooked;
-    }
 }

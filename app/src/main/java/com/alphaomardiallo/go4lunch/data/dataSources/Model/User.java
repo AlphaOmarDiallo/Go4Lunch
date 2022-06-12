@@ -49,25 +49,4 @@ public class User {
         return favouriteRestaurants;
     }
 
-    //SETTERS
-
-    public void setUid(String uid) {
-        this.uid = uid;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    public void setUserEmail(String userEmail) {
-        this.userEmail = userEmail;
-    }
-
-    public void setUrlPicture(@Nullable String urlPicture) {
-        this.urlPicture = urlPicture;
-    }
-
-    public void setFavouriteRestaurants(@Nullable List<String> favouriteRestaurants) {
-        this.favouriteRestaurants = favouriteRestaurants;
-    }
 }
