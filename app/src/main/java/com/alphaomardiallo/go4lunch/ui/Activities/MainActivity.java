@@ -309,9 +309,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         Glide.with(this)
                 .load(getString(R.string.nav_drawer_background))
                 .into(background);
-        if (user.getUrlPicture() != null) {
+        if (currentUser.getUrlPicture() != null) {
             Glide.with(this)
-                    .load(viewModel.getCurrentUser().getPhotoUrl())
+                    .load(currentUser.getUrlPicture())
                     .circleCrop()
                     .into(userAvatar);
         } else {
