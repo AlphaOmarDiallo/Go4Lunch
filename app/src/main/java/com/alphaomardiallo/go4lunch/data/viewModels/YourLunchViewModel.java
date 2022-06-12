@@ -53,7 +53,7 @@ public class YourLunchViewModel extends ViewModel {
     public LiveData<List<Booking>> getAllBookings() {
         bookingRepository.getInstance();
         bookingRepository.getAllBookingsFromDataBase();
-        return bookingRepository.getAllBookings();
+        return bookingRepository.getAllBookingsAsList();
     }
 
     /**

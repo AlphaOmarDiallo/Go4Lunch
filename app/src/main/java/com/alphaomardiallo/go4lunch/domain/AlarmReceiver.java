@@ -1,6 +1,5 @@
 package com.alphaomardiallo.go4lunch.domain;
 
-import static android.content.ContentValues.TAG;
 import static android.content.Context.MODE_PRIVATE;
 
 import android.app.NotificationChannel;
@@ -13,9 +12,6 @@ import android.content.SharedPreferences;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Build;
-import android.os.Handler;
-import android.os.Looper;
-import android.util.Log;
 
 import androidx.core.app.NotificationCompat;
 
@@ -41,10 +37,12 @@ public class AlarmReceiver extends BroadcastReceiver {
     private final String NOTIFICATION_TAG = "GO4LUNCH";
     public BookingRepository bookingRepository = new BookingRepositoryImp();
     public UserRepository userRepository = new UserRepositoryImp();
-    String notification = null;
+    String notification1 = null;
+    String notification2 = null;
     String userID = null;
     String restaurantID = null;
     String restaurantName = null;
+    String restaurantVicinity = null;
 
     @Inject
     public AlarmReceiver() {
@@ -55,38 +53,31 @@ public class AlarmReceiver extends BroadcastReceiver {
         //TODO something on receive BroadCast from Alarm - make sure to get last data possible
         setupFireBase();
         getUserDataFromSharedPreferences(context);
-        Handler handle = new Handler(Looper.getMainLooper());
-        handle.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                setNotificationString(context);
-            }
-        }, 3000);
-        sendVisualNotification(notification, context);
+        setNotificationString(context);
+        sendVisualNotification(notification2, context);
     }
 
     private void setupFireBase() {
         bookingRepository.getInstance();
         userRepository.getDataBaseInstance();
-        Log.e(TAG, "setupFireBase: " + userRepository, null);
         bookingRepository.getAllBookingsFromDataBase();
         userRepository.getAllUsersFromDataBase();
     }
 
     private void getUserDataFromSharedPreferences(Context context){
         SharedPreferences sharedPreferences = context.getSharedPreferences(context.getString(R.string.preferences_main_file), MODE_PRIVATE);
-        userID = sharedPreferences.getString("currentUserID", null);
-        userID = sharedPreferences.getString("bookedRestaurantID", null);
-        userID = sharedPreferences.getString("bookedRestaurantName", null);
+        userID = sharedPreferences.getString(context.getString(R.string.shared_pref_current_User_ID), null);
+        restaurantID = sharedPreferences.getString(context.getString(R.string.shared_pref_restaurant_ID), null);
+        restaurantName = sharedPreferences.getString(context.getString(R.string.shared_pref_restaurant_Name), null);
+        restaurantVicinity = sharedPreferences.getString(context.getString(R.string.shared_pref_restaurant_Address), null);
     }
 
     private void setNotificationString(Context context){
-        notification = "this is the text";
-    //String.format(context.getString(R.string.notification_text), restaurantName, "popol", setUserJoiningList());
+        notification1 = String.format(context.getString(R.string.notification_line_1), restaurantName, restaurantVicinity);
     }
 
     private String setUserJoiningList() {
-        List<Booking> allBookings = bookingRepository.getAllBookings().getValue();
+        List<Booking> allBookings = bookingRepository.getAllBookingsAsList().getValue();
         List<User> allUsers = userRepository.getAllUsers().getValue();
         List<User> userJoining = new ArrayList<>();
         String userJoiningString = "";
@@ -127,7 +118,7 @@ public class AlarmReceiver extends BroadcastReceiver {
                         .setSmallIcon(R.drawable.ic_baseline_ramen_dining_24)
                         .setSound(defaultSoundUri)
                         .setContentTitle(context.getString(R.string.notification_title))
-                        .setContentText("this is the text I want to see> jodjwojdbwjqbcbw;qbchbqowoownqodnwodbwqjuqwud")
+                        .setStyle(new NotificationCompat.BigTextStyle().bigText(String.format("%s.\n%s", notification1, notification2)))
                         .setAutoCancel(true)
                         .setCategory(NotificationCompat.CATEGORY_ALARM)
                         .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))

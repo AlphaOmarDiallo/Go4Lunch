@@ -209,7 +209,7 @@ public class MainSharedViewModel extends ViewModel {
 
     private void sortUserList() {
         List<User> users = userRepositoryImp.getAllUsers().getValue();
-        List<Booking> bookings = bookingRepository.getAllBookings().getValue();
+        List<Booking> bookings = bookingRepository.getAllBookingsAsList().getValue();
 
         List<User> tempList = new ArrayList<>();
 
@@ -256,7 +256,7 @@ public class MainSharedViewModel extends ViewModel {
     }
 
     public LiveData<List<Booking>> getAllBookings() {
-        return bookingRepository.getAllBookings();
+        return bookingRepository.getAllBookingsAsList();
     }
 
 }

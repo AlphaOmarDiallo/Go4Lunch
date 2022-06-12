@@ -43,6 +43,7 @@ public class RestaurantDetails extends AppCompatActivity {
     private String restaurantPhoneNumber;
     private String restaurantWebsite;
     private String restaurantName;
+    private String restaurantAddress;
     private double restaurantLatitude;
     private double restaurantLongitude;
     private List<Booking> allBookings;
@@ -119,6 +120,7 @@ public class RestaurantDetails extends AppCompatActivity {
 
     private void createBooking(Booking bookingToCreate, Context context) {
         viewModel.createBooking(bookingToCreate, context);
+        Toast.makeText(this, R.string.created_booking, Toast.LENGTH_SHORT).show();
     }
 
     private void saveRestaurantIDInSharePreferences(){
@@ -126,8 +128,9 @@ public class RestaurantDetails extends AppCompatActivity {
         SharedPreferences sharedPreferences = context.getSharedPreferences(
                 getString(R.string.preferences_main_file), MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putString("bookedRestaurantID", bookingToCreate().getBookedRestaurantID());
-        editor.putString("bookedRestaurantName" ,bookingToCreate().getBookedRestaurantName());
+        editor.putString(getString(R.string.shared_pref_restaurant_ID), restaurantID);
+        editor.putString(getString(R.string.shared_pref_restaurant_Name) ,restaurantName);
+        editor.putString(getString(R.string.shared_pref_restaurant_Address), restaurantAddress);
         editor.apply();
     }
 
@@ -146,7 +149,7 @@ public class RestaurantDetails extends AppCompatActivity {
             String restaurantPhoto = getString(R.string.restaurantPlaceHolder);
             restaurantName = restaurant.getName();
             double restaurantRating = restaurant.getRating();
-            String restaurantAddress = restaurant.getVicinity();
+            restaurantAddress = restaurant.getVicinity();
             boolean restaurantIsOpenNow = restaurant.getOpeningHours().isOpenNow();
             restaurantLatitude = restaurant.getGeometry().getLocation().getLat();
             restaurantLongitude = restaurant.getGeometry().getLocation().getLng();
@@ -221,11 +224,13 @@ public class RestaurantDetails extends AppCompatActivity {
 
             if (bookingToCheck == null) {
                 Booking booking = bookingToCreate();
+                saveRestaurantIDInSharePreferences();
                 createBooking(booking, RestaurantDetails.this);
             } else {
                 if (bookingToCheck.getBookedRestaurantID().equalsIgnoreCase(restaurantID)) {
                     deleteBookingAlertDialog(bookingToCheck.getBookingID(), RestaurantDetails.this);
                 } else {
+                    saveRestaurantIDInSharePreferences();
                     updateBookingAlertDialog(bookingToCheck.getBookingID(), restaurantID, restaurantName);
                 }
             }
@@ -256,7 +261,7 @@ public class RestaurantDetails extends AppCompatActivity {
         AlertDialog.Builder builder = new AlertDialog.Builder(RestaurantDetails.this);
 
         builder.setPositiveButton(R.string.OK, (dialog, id) -> {
-            viewModel.updateBooking(bookingID, restaurantID, restaurantName);
+            viewModel.updateBooking(bookingID, restaurantID, restaurantName, this);
             Toast.makeText(this, R.string.updated_booking, Toast.LENGTH_SHORT).show();
         });
         builder.setNegativeButton(R.string.cancel, (dialog, id) -> dialog.cancel());

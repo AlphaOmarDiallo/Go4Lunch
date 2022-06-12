@@ -13,15 +13,15 @@ public interface BookingRepository {
 
     void getInstance();
 
-    void createBookingAndAddInDatabase(@NonNull Booking bookingToSave, Context context);
+    void createBookingInDatabase(@NonNull Booking bookingToSave, Context context);
 
     void deleteBookingInDatabase(String bookingID, Context context);
 
-    void updateBooking(String bookingID, String restaurantID, String restaurantName);
+    void updateBookingInDataBase(String bookingID, String restaurantID, String restaurantName, Context context);
 
     void getAllBookingsFromDataBase();
 
-    LiveData<List<Booking>> getAllBookings();
+    LiveData<List<Booking>> getAllBookingsAsList();
 
     void deleteBookingsFromPreviousDays(Context context);
 

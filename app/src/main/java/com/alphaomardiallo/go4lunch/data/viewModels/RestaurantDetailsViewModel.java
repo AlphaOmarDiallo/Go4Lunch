@@ -18,6 +18,7 @@ import com.alphaomardiallo.go4lunch.data.repositories.UserRepository;
 import com.google.firebase.auth.FirebaseUser;
 
 import java.util.List;
+import java.util.Objects;
 
 import javax.inject.Inject;
 
@@ -30,7 +31,7 @@ public class RestaurantDetailsViewModel extends ViewModel {
     private final LocationRepository locationRepository;
     private final BookingRepository bookingRepository;
     private final UserRepository userRepository;
-    private MutableLiveData<List<User>> userDiningCurrentRestaurant = new MutableLiveData<>();
+    private final MutableLiveData<List<User>> userDiningCurrentRestaurant = new MutableLiveData<>();
 
     @Inject
     public RestaurantDetailsViewModel(PlacesAPIRepository placesAPIRepository, LocationRepository locationRepository, BookingRepository bookingRepository, UserRepository userRepository) {
@@ -59,7 +60,6 @@ public class RestaurantDetailsViewModel extends ViewModel {
      */
 
     // user
-
     public FirebaseUser getCurrentUser() {
         return userRepository.getCurrentUser();
     }
@@ -68,7 +68,7 @@ public class RestaurantDetailsViewModel extends ViewModel {
         userRepository.getDataBaseInstance();
     }
 
-    public LiveData<List<User>> getAllUsers(){
+    public LiveData<List<User>> getAllUsers() {
         userRepository.getAllUsersFromDataBase();
         return userRepository.getAllUsers();
     }
@@ -81,10 +81,10 @@ public class RestaurantDetailsViewModel extends ViewModel {
 
     public Booking checkIfUserHasBooking() {
         Booking hasBooking = null;
-        List<Booking> bookings = bookingRepository.getAllBookings().getValue();
+        List<Booking> bookings = bookingRepository.getAllBookingsAsList().getValue();
         String userID = userRepository.getCurrentUserID();
 
-        for (Booking booking : bookings) {
+        for (Booking booking : Objects.requireNonNull(bookings)) {
             if (booking.getUserWhoBooked().equalsIgnoreCase(userID)) {
                 hasBooking = booking;
                 break;
@@ -95,15 +95,15 @@ public class RestaurantDetailsViewModel extends ViewModel {
     }
 
     public void createBooking(Booking bookingToSave, Context context) {
-        bookingRepository.createBookingAndAddInDatabase(bookingToSave, context.getApplicationContext());
+        bookingRepository.createBookingInDatabase(bookingToSave, context.getApplicationContext());
     }
 
-    public void updateBooking(String bookingID, String restaurantID, String restaurantName) {
-        bookingRepository.updateBooking(bookingID, restaurantID, restaurantName);
+    public void updateBooking(String bookingID, String restaurantID, String restaurantName, Context context) {
+        bookingRepository.updateBookingInDataBase(bookingID, restaurantID, restaurantName, context);
     }
 
     public void addRestaurantToFavourite(String restaurantID) {
-       userRepository.addFavouriteRestaurant(userRepository.getCurrentUserID(), restaurantID);
+        userRepository.addFavouriteRestaurant(userRepository.getCurrentUserID(), restaurantID);
     }
 
     public void removeRestaurantFromFavourite(String restaurantID) {
@@ -119,10 +119,10 @@ public class RestaurantDetailsViewModel extends ViewModel {
     }
 
     public LiveData<List<Booking>> getAllBookings() {
-        return bookingRepository.getAllBookings();
+        return bookingRepository.getAllBookingsAsList();
     }
 
-    public void setListUserWhoBookedThisRestaurant (List<User> list) {
+    public void setListUserWhoBookedThisRestaurant(List<User> list) {
         userDiningCurrentRestaurant.setValue(list);
     }
 

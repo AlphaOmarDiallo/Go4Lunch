@@ -7,12 +7,14 @@ import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
+import com.alphaomardiallo.go4lunch.R;
 import com.alphaomardiallo.go4lunch.data.dataSources.Model.Booking;
 import com.alphaomardiallo.go4lunch.domain.AlarmReceiver;
 import com.google.firebase.firestore.FieldValue;
@@ -31,14 +33,20 @@ import javax.inject.Inject;
 
 public class BookingRepositoryImp implements BookingRepository {
 
+    private static final int ALARM_HOUR = 12;
+    private static final int ALARM_MIN_SEC = 0;
+    private static final int TO_COMPARE_TO = 0;
+    private static final String NOTIFICATION_TIME = "12:00";
+    private static final String DATE_FORMAT = "dd MMM yyyy";
+    private static final String TIME_FORMAT = "HH:mm";
     private static final String COLLECTION_NAME = "booking";
     private static final String BOOKING_ID = "bookingID";
     private static final String BOOKING_DATE = "bookingDate";
     private static final String BOOKING_RESTAURANT_ID = "bookedRestaurantID";
     private static final String BOOKING_RESTAURANT_NAME = "bookedRestaurantName";
     private static final String BOOKING_USER_ID = "userWhoBooked";
-    private FirebaseFirestore database;
     private final MutableLiveData<List<Booking>> allBookings = new MutableLiveData<>();
+    private FirebaseFirestore database;
 
     @Inject
     public BookingRepositoryImp() {
@@ -46,11 +54,10 @@ public class BookingRepositoryImp implements BookingRepository {
 
     public void getInstance() {
         database = FirebaseFirestore.getInstance();
-        Log.i(TAG, "getInstance: FireBase " + database);
     }
 
     @Override
-    public LiveData<List<Booking>> getAllBookings() {
+    public LiveData<List<Booking>> getAllBookingsAsList() {
         return allBookings;
     }
 
@@ -72,7 +79,7 @@ public class BookingRepositoryImp implements BookingRepository {
                 });
     }
 
-    public void createBookingAndAddInDatabase(@NonNull Booking bookingToSave, Context context) {
+    public void createBookingInDatabase(@NonNull Booking bookingToSave, Context context) {
         Map<String, Object> booking = new HashMap<>();
         booking.put(BOOKING_ID, null);
         booking.put(BOOKING_DATE, FieldValue.serverTimestamp());
@@ -85,11 +92,18 @@ public class BookingRepositoryImp implements BookingRepository {
                 .addOnSuccessListener(documentReference -> database.collection(COLLECTION_NAME)
                         .document(documentReference.getId())
                         .update(BOOKING_ID, documentReference.getId())
-                        .addOnSuccessListener(unused -> setAlarmExactRTCWakeUp(context)))
+                        .addOnSuccessListener(unused -> {
+                            setAlarmExactRTCWakeUp(context);
+                            SharedPreferences sharedPreferences = context.getSharedPreferences(context.getString(R.string.preferences_main_file), Context.MODE_PRIVATE);
+                            SharedPreferences.Editor editor = sharedPreferences.edit();
+                            editor.putString(context.getString(R.string.shared_pref_restaurant_ID), bookingToSave.getBookingID());
+                            editor.putString(context.getString(R.string.shared_pref_restaurant_Name), bookingToSave.getBookedRestaurantName());
+                            editor.apply();
+                        }))
                 .addOnFailureListener(e -> Log.e(TAG, "onFailure: Error adding document " + e.getMessage(), null));
     }
 
-    public void updateBooking(String bookingID, String restaurantID, String restaurantName) {
+    public void updateBookingInDataBase(String bookingID, String restaurantID, String restaurantName, Context context) {
 
         Map<String, Object> updates = new HashMap<>();
         updates.put(BOOKING_RESTAURANT_ID, restaurantID);
@@ -97,8 +111,14 @@ public class BookingRepositoryImp implements BookingRepository {
 
         database.collection(COLLECTION_NAME).document(bookingID)
                 .update(updates)
-                .addOnSuccessListener(unused -> Log.i(TAG, "updateBooking: document successfully updated"))
-                .addOnFailureListener(e -> Log.w(TAG, "onFailure: Error updating document", e));
+                .addOnSuccessListener(unused -> {
+                    SharedPreferences sharedPreferences = context.getSharedPreferences(context.getString(R.string.preferences_main_file), Context.MODE_PRIVATE);
+                    SharedPreferences.Editor editor = sharedPreferences.edit();
+                    editor.putString(context.getString(R.string.shared_pref_restaurant_ID), restaurantID);
+                    editor.putString(context.getString(R.string.shared_pref_restaurant_Name), restaurantName);
+                    editor.apply();
+                })
+                .addOnFailureListener(e -> Log.e(TAG, "onFailure: Error updating document", e));
     }
 
 
@@ -106,17 +126,17 @@ public class BookingRepositoryImp implements BookingRepository {
         database.collection(COLLECTION_NAME).document(bookingID)
                 .delete()
                 .addOnSuccessListener(unused -> cancelAlarm(context))
-                .addOnFailureListener(e -> Log.w(TAG, "onFailure: Error deleting document", e));
+                .addOnFailureListener(e -> Log.e(TAG, "onFailure: Error deleting document", e));
 
     }
 
     public void deleteBookingsFromPreviousDays(Context context) {
         for (Booking booking : Objects.requireNonNull(allBookings.getValue())) {
             long dateMilli = booking.getBookingDate().getTime();
-            @SuppressLint("SimpleDateFormat") DateFormat simple = new SimpleDateFormat("dd MMM yyyy");
+            @SuppressLint("SimpleDateFormat") DateFormat simple = new SimpleDateFormat(DATE_FORMAT);
             Date result = new Date(dateMilli);
             Date today = new Date(Calendar.getInstance().getTimeInMillis());
-            if (simple.format(result).compareTo(simple.format(today)) != 0) {
+            if (simple.format(result).compareTo(simple.format(today)) != TO_COMPARE_TO) {
                 deleteBookingInDatabase(booking.getBookingID(), context);
             }
         }
@@ -128,25 +148,20 @@ public class BookingRepositoryImp implements BookingRepository {
 
     @SuppressLint("MissingPermission")
     private void setAlarmExactRTCWakeUp(Context context) {
-        Date date = new Date();
         Calendar c = Calendar.getInstance();
-        c.setTime(date);
 
-        if (checkDateToSetNotification() < 0 ) {
-            c.set(Calendar.HOUR_OF_DAY, 12);
-            c.set(Calendar.MINUTE, 0);
-            c.set(Calendar.SECOND, 0);
+        if (checkDateToSetNotification() < TO_COMPARE_TO) {
+            c.set(Calendar.HOUR_OF_DAY, ALARM_HOUR);
+            c.set(Calendar.MINUTE, ALARM_MIN_SEC);
+            c.set(Calendar.SECOND, ALARM_MIN_SEC);
+
+            AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+            Intent alarmIntent = new Intent(context, AlarmReceiver.class);
+            @SuppressLint("UnspecifiedImmutableFlag") PendingIntent pendingAlarmIntent = PendingIntent.getBroadcast(context, 1, alarmIntent, PendingIntent.FLAG_ONE_SHOT);
+            alarmManager.setExact(AlarmManager.RTC_WAKEUP, c.getTimeInMillis(), pendingAlarmIntent);
         } else {
-            c.add(Calendar.DATE, 1);
-            c.set(Calendar.HOUR_OF_DAY, 12);
-            c.set(Calendar.MINUTE, 0);
-            c.set(Calendar.SECOND, 0);
+            Log.i(TAG, "setAlarmExactRTCWakeUp: Alarm is not set because booking is made after the notification time");
         }
-
-        AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-        Intent alarmIntent = new Intent(context, AlarmReceiver.class);
-        @SuppressLint("UnspecifiedImmutableFlag") PendingIntent pendingAlarmIntent = PendingIntent.getBroadcast(context, 1, alarmIntent, PendingIntent.FLAG_ONE_SHOT);
-        alarmManager.setExact(AlarmManager.RTC_WAKEUP, c.getTimeInMillis(), pendingAlarmIntent);
     }
 
     private void cancelAlarm(Context context) {
@@ -158,8 +173,8 @@ public class BookingRepositoryImp implements BookingRepository {
     }
 
     private int checkDateToSetNotification() {
-        @SuppressLint("SimpleDateFormat") SimpleDateFormat formatter = new SimpleDateFormat("HH:mm");
+        @SuppressLint("SimpleDateFormat") SimpleDateFormat formatter = new SimpleDateFormat(TIME_FORMAT);
         Date date = new Date();
-        return formatter.format(date).compareTo("18:41");
+        return formatter.format(date).compareTo(NOTIFICATION_TIME);
     }
 }
