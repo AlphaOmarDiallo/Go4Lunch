@@ -122,13 +122,13 @@ public class RestaurantDetails extends AppCompatActivity {
         Toast.makeText(this, R.string.created_booking, Toast.LENGTH_SHORT).show();
     }
 
-    private void saveRestaurantIDInSharePreferences(){
+    private void saveRestaurantIDInSharePreferences() {
         Context context = this;
         SharedPreferences sharedPreferences = context.getSharedPreferences(
                 getString(R.string.preferences_main_file), MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putString(getString(R.string.shared_pref_restaurant_ID), restaurantID);
-        editor.putString(getString(R.string.shared_pref_restaurant_Name) ,restaurantName);
+        editor.putString(getString(R.string.shared_pref_restaurant_Name), restaurantName);
         editor.putString(getString(R.string.shared_pref_restaurant_Address), restaurantAddress);
         editor.apply();
     }
@@ -391,7 +391,6 @@ public class RestaurantDetails extends AppCompatActivity {
         this.user = user;
         setupLikeButtonAppearance();
     }
-
 
 
     /**

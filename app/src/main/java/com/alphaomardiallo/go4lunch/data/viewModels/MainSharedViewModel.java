@@ -85,12 +85,12 @@ public class MainSharedViewModel extends ViewModel {
      * Location tracking
      */
 
-    public LatLng getOfficeLatLng(){
+    public LatLng getOfficeLatLng() {
         Location office = locationRepository.getOfficeLocation();
         return new LatLng(office.getLatitude(), office.getLongitude());
     }
 
-    public Location getOfficeLocation(){
+    public Location getOfficeLocation() {
         return locationRepository.getOfficeLocation();
     }
 

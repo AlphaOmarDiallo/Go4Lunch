@@ -61,7 +61,7 @@
 
         <receiver
             android:name=".domain.AlarmReceiver"
-            android:enabled="true"/>
+            android:enabled="true" />
 
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_channel_id"
