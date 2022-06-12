@@ -22,8 +22,11 @@ import javax.inject.Inject;
 
 public class LocationRepositoryImp implements LocationRepository {
 
+    private static final float OFFICE_LONGITUDE = 2.3467211059168793f;
+    private static final float OFFICE_LATITUDE = 48.86501071160738f;
     private static final int LOCATION_REQUEST_PROVIDER_IN_MS = 60000;
     private static final float SMALLEST_DISPLACEMENT_THRESHOLD_METER = 50;
+    private static final String OFFICE = "Office";
 
     private FusedLocationProviderClient fusedLocationProviderClient;
     private final MutableLiveData<Location> locationMutableLiveData = new MutableLiveData<>();
@@ -46,21 +49,20 @@ public class LocationRepositoryImp implements LocationRepository {
 
     @Override
     public Location getOfficeLocation() {
-        Location officeLocation = new Location("Office");
-        officeLocation.setLongitude(2.3467211059168793);
-        officeLocation.setLatitude(48.86501071160738);
+        Location officeLocation = new Location(OFFICE);
+        officeLocation.setLongitude(OFFICE_LONGITUDE);
+        officeLocation.setLatitude(OFFICE_LATITUDE);
         return officeLocation;
     }
 
     @SuppressLint("MissingPermission")
     public void startLocationRequest(Context context, Activity activity) {
 
-        Log.e(TAG, "startLocationRequest: Started", null);
         instantiateFusedLocationProviderClient(context);
 
         getLastKnownLocation(activity);
 
-        setupALocationRequest();
+        setupLocationRequest();
 
         createLocationCallback();
 
@@ -80,12 +82,12 @@ public class LocationRepositoryImp implements LocationRepository {
         fusedLocationProviderClient.getLastLocation()
                 .addOnSuccessListener(activity, location -> {
                     if (location != null) {
-                        Log.e(TAG, "onSuccess: we got the last location", null);
+                        Log.i(TAG, "onSuccess: we got the last location", null);
                     }
                 });
     }
 
-    private void setupALocationRequest() {
+    private void setupLocationRequest() {
         locationRequest = LocationRequest.create();
         locationRequest.setInterval(LOCATION_REQUEST_PROVIDER_IN_MS);
         locationRequest.setSmallestDisplacement(SMALLEST_DISPLACEMENT_THRESHOLD_METER);
@@ -114,8 +116,6 @@ public class LocationRepositoryImp implements LocationRepository {
         fusedLocationProviderClient.requestLocationUpdates(locationRequest,
                 locationCallback,
                 Looper.getMainLooper());
-
-        Log.e(TAG, "startLocationUpdates: updating", null);
     }
 
 }

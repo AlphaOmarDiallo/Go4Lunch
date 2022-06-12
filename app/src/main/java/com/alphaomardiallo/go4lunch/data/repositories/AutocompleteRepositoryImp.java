@@ -17,7 +17,6 @@ public class AutocompleteRepositoryImp implements AutocompleteRepository {
 
     @Inject
     public AutocompleteRepositoryImp() {
-
     }
 
     @Override
@@ -26,7 +25,7 @@ public class AutocompleteRepositoryImp implements AutocompleteRepository {
     }
 
     @Override
-    public LiveData<List<PredictionsItem>> searchPrediction() {
+    public LiveData<List<PredictionsItem>> searchPredictionResults() {
         return predictionsList;
     }
 

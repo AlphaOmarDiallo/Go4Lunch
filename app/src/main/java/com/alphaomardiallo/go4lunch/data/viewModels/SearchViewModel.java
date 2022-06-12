@@ -29,7 +29,7 @@ public class SearchViewModel extends ViewModel {
     }
 
     public LiveData<List<PredictionsItem>> getPredictionList() {
-        return autocompleteRepository.searchPrediction();
+        return autocompleteRepository.searchPredictionResults();
     }
 
     public LiveData<List<PredictionsItem>> searchAutoComplete(String query, String location) {

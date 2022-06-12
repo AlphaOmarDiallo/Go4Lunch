@@ -10,7 +10,7 @@ public interface AutocompleteRepository {
 
     void updatePredictionList(List<PredictionsItem> list);
 
-    LiveData<List<PredictionsItem>> searchPrediction();
+    LiveData<List<PredictionsItem>> searchPredictionResults();
 
     void setPlaceToFocusOn(PredictionsItem restaurant);
 
