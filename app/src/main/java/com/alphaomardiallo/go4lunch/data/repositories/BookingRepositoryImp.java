@@ -49,21 +49,9 @@ public class BookingRepositoryImp implements BookingRepository {
         Log.i(TAG, "getInstance: FireBase " + database);
     }
 
-    public void createBookingAndAddInDatabase(@NonNull Booking bookingToSave, Context context) {
-        Map<String, Object> booking = new HashMap<>();
-        booking.put(BOOKING_ID, null);
-        booking.put(BOOKING_DATE, FieldValue.serverTimestamp());
-        booking.put(BOOKING_RESTAURANT_ID, bookingToSave.getBookedRestaurantID());
-        booking.put(BOOKING_RESTAURANT_NAME, bookingToSave.getBookedRestaurantName());
-        booking.put(BOOKING_USER_ID, bookingToSave.getUserWhoBooked());
-
-        database.collection(COLLECTION_NAME)
-                .add(booking)
-                .addOnSuccessListener(documentReference -> database.collection(COLLECTION_NAME)
-                        .document(documentReference.getId())
-                        .update(BOOKING_ID, documentReference.getId())
-                        .addOnSuccessListener(unused -> setAlarmExactRTCWakeUp(context, bookingToSave)))
-                .addOnFailureListener(e -> Log.e(TAG, "onFailure: Error adding document " + e.getMessage(), null));
+    @Override
+    public LiveData<List<Booking>> getAllBookings() {
+        return allBookings;
     }
 
     public void getAllBookingsFromDataBase() {
@@ -84,9 +72,21 @@ public class BookingRepositoryImp implements BookingRepository {
                 });
     }
 
-    @Override
-    public LiveData<List<Booking>> getAllBookings() {
-        return allBookings;
+    public void createBookingAndAddInDatabase(@NonNull Booking bookingToSave, Context context) {
+        Map<String, Object> booking = new HashMap<>();
+        booking.put(BOOKING_ID, null);
+        booking.put(BOOKING_DATE, FieldValue.serverTimestamp());
+        booking.put(BOOKING_RESTAURANT_ID, bookingToSave.getBookedRestaurantID());
+        booking.put(BOOKING_RESTAURANT_NAME, bookingToSave.getBookedRestaurantName());
+        booking.put(BOOKING_USER_ID, bookingToSave.getUserWhoBooked());
+
+        database.collection(COLLECTION_NAME)
+                .add(booking)
+                .addOnSuccessListener(documentReference -> database.collection(COLLECTION_NAME)
+                        .document(documentReference.getId())
+                        .update(BOOKING_ID, documentReference.getId())
+                        .addOnSuccessListener(unused -> setAlarmExactRTCWakeUp(context)))
+                .addOnFailureListener(e -> Log.e(TAG, "onFailure: Error adding document " + e.getMessage(), null));
     }
 
     public void updateBooking(String bookingID, String restaurantID, String restaurantName) {
@@ -97,7 +97,7 @@ public class BookingRepositoryImp implements BookingRepository {
 
         database.collection(COLLECTION_NAME).document(bookingID)
                 .update(updates)
-                .addOnSuccessListener(unused -> Log.d(TAG, "onSuccess: DocumentSnapshot successfully updated"))
+                .addOnSuccessListener(unused -> Log.i(TAG, "updateBooking: document successfully updated"))
                 .addOnFailureListener(e -> Log.w(TAG, "onFailure: Error updating document", e));
     }
 
@@ -127,11 +127,21 @@ public class BookingRepositoryImp implements BookingRepository {
      */
 
     @SuppressLint("MissingPermission")
-    private void setAlarmExactRTCWakeUp(Context context, Booking booking) {
+    private void setAlarmExactRTCWakeUp(Context context) {
+        Date date = new Date();
         Calendar c = Calendar.getInstance();
-        c.set(Calendar.HOUR_OF_DAY, 17);
-        c.set(Calendar.MINUTE, 32);
-        c.set(Calendar.SECOND, 0);
+        c.setTime(date);
+
+        if (checkDateToSetNotification() < 0 ) {
+            c.set(Calendar.HOUR_OF_DAY, 12);
+            c.set(Calendar.MINUTE, 0);
+            c.set(Calendar.SECOND, 0);
+        } else {
+            c.add(Calendar.DATE, 1);
+            c.set(Calendar.HOUR_OF_DAY, 12);
+            c.set(Calendar.MINUTE, 0);
+            c.set(Calendar.SECOND, 0);
+        }
 
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         Intent alarmIntent = new Intent(context, AlarmReceiver.class);
@@ -147,5 +157,9 @@ public class BookingRepositoryImp implements BookingRepository {
         alarmManager.cancel(pendingAlarmIntent);
     }
 
-
+    private int checkDateToSetNotification() {
+        @SuppressLint("SimpleDateFormat") SimpleDateFormat formatter = new SimpleDateFormat("HH:mm");
+        Date date = new Date();
+        return formatter.format(date).compareTo("18:41");
+    }
 }
