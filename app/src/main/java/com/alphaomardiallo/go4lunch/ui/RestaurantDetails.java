@@ -224,7 +224,7 @@ public class RestaurantDetails extends AppCompatActivity {
                 createBooking(booking, RestaurantDetails.this);
             } else {
                 if (bookingToCheck.getBookedRestaurantID().equalsIgnoreCase(restaurantID)) {
-                    deleteBookingAlertDialog(bookingToCheck.getBookingID());
+                    deleteBookingAlertDialog(bookingToCheck.getBookingID(), RestaurantDetails.this);
                 } else {
                     updateBookingAlertDialog(bookingToCheck.getBookingID(), restaurantID, restaurantName);
                 }
@@ -269,11 +269,11 @@ public class RestaurantDetails extends AppCompatActivity {
         dialog.show();
     }
 
-    private void deleteBookingAlertDialog(String bookingID) {
+    private void deleteBookingAlertDialog(String bookingID, Context context) {
         AlertDialog.Builder builder = new AlertDialog.Builder(RestaurantDetails.this);
 
         builder.setPositiveButton(R.string.OK, (dialog, id) -> {
-            viewModel.deleteBooking(bookingID);
+            viewModel.deleteBooking(bookingID, context);
             Toast.makeText(this, R.string.deleted_booking, Toast.LENGTH_SHORT).show();
         });
         builder.setNegativeButton(R.string.cancel, (dialog, id) -> dialog.cancel());

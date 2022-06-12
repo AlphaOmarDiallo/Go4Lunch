@@ -46,7 +46,6 @@ public class MainSharedViewModel extends ViewModel {
     private final MutableLiveData<List<User>> allUsers = new MutableLiveData<>();
     private final MutableLiveData<String> restaurantToFocusOn = new MutableLiveData<>();
     private final LiveData<List<ResultsItem>> restaurants;
-    MutableLiveData<Result> restaurant = new MutableLiveData<>();
     private Location savedLocation;
     private final MutableLiveData<Boolean> hasPermissions = new MutableLiveData<>();
 
@@ -248,9 +247,9 @@ public class MainSharedViewModel extends ViewModel {
         bookingRepository.getInstance();
     }
 
-   /* public void deleteBookingFromPreviousDays() {
-        bookingRepository.deleteBookingsFromPreviousDays();
-    }*/
+    public void removeBookingsFromPreviousDay(Context context) {
+        bookingRepository.deleteBookingsFromPreviousDays(context);
+    }
 
     public void observeBookingsFromDataBase() {
         bookingRepository.getAllBookingsFromDataBase();
@@ -258,82 +257,6 @@ public class MainSharedViewModel extends ViewModel {
 
     public LiveData<List<Booking>> getAllBookings() {
         return bookingRepository.getAllBookings();
-    }
-
-    /**
-     * AlarmReceiver
-     */
-
-    public LiveData<String> checkIfUserNeedsLunchNotification(String userID, List<Booking> bookingList) {
-        String restaurantID = null;
-        MutableLiveData<String> hasABooking = new MutableLiveData<>();
-
-        if (bookingList != null) {
-            for (Booking booking : bookingList) {
-                if (booking.getUserWhoBooked().equalsIgnoreCase(userID)) {
-                    restaurantID = booking.getBookedRestaurantID();
-                    hasABooking.setValue(restaurantID);
-                    break;
-                }
-            }
-
-            if (restaurantID != null) {
-                placesAPIRepository.fetchOneNearByRestaurantDetail(restaurantID);
-            }
-
-        }
-
-        return hasABooking;
-    }
-
-    public List<String> getInfoForLunchNotification(String userID, Result restaurant) {
-        List<Booking> bookingList = bookingRepository.getAllBookings().getValue();
-        List<User> userList = userRepositoryImp.getAllUsers().getValue();
-        List<String> notificationInfo = new ArrayList<>();
-        List<String> nameUserJoining = new ArrayList<>();
-
-        if (restaurant != null) {
-            List<String> tempList = new ArrayList<>();
-
-            notificationInfo.add(restaurant.getName());
-            notificationInfo.add(restaurant.getVicinity());
-
-            for (Booking booking : bookingList) {
-                if (booking.getBookedRestaurantID().equalsIgnoreCase(restaurant.getPlaceId())) {
-                    tempList.add(booking.getUserWhoBooked());
-                }
-            }
-
-            if (tempList.size() > 0) {
-                for (String userId : tempList) {
-                    for (User user : userList) {
-                        if (!user.getUid().equalsIgnoreCase(userID) && user.getUid().equalsIgnoreCase(userId)) {
-                            nameUserJoining.add(user.getUsername());
-                            break;
-                        }
-                    }
-                }
-
-                String joiners = "";
-
-                for (String name : nameUserJoining){
-                    joiners = joiners + " " + name;
-                }
-
-                if (joiners.length() > 2) {
-                    notificationInfo.add("You are going with " + joiners);
-                } else {
-                    notificationInfo.add("");
-                }
-
-            } else {
-                notificationInfo.add("");
-            }
-        }
-
-        Log.e(TAG, "getInfoForLunchNotification: " + notificationInfo, null);
-
-        return notificationInfo;
     }
 
 }

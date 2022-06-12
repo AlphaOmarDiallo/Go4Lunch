@@ -15,7 +15,7 @@ public interface BookingRepository {
 
     void createBookingAndAddInDatabase(@NonNull Booking bookingToSave, Context context);
 
-    void deleteBookingInDatabase(String bookingID);
+    void deleteBookingInDatabase(String bookingID, Context context);
 
     void updateBooking(String bookingID, String restaurantID, String restaurantName);
 
@@ -23,6 +23,6 @@ public interface BookingRepository {
 
     LiveData<List<Booking>> getAllBookings();
 
-    void deleteBookingsFromPreviousDays();
+    void deleteBookingsFromPreviousDays(Context context);
 
 }

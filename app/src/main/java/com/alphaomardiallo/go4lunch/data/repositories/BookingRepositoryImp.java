@@ -10,20 +10,13 @@ import android.content.Intent;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
 import com.alphaomardiallo.go4lunch.data.dataSources.Model.Booking;
 import com.alphaomardiallo.go4lunch.domain.AlarmReceiver;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.FirebaseFirestoreException;
-import com.google.firebase.firestore.QuerySnapshot;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -32,6 +25,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import javax.inject.Inject;
 
@@ -56,7 +50,6 @@ public class BookingRepositoryImp implements BookingRepository {
     }
 
     public void createBookingAndAddInDatabase(@NonNull Booking bookingToSave, Context context) {
-        //Create a booking
         Map<String, Object> booking = new HashMap<>();
         booking.put(BOOKING_ID, null);
         booking.put(BOOKING_DATE, FieldValue.serverTimestamp());
@@ -66,49 +59,28 @@ public class BookingRepositoryImp implements BookingRepository {
 
         database.collection(COLLECTION_NAME)
                 .add(booking)
-                .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
-                    @Override
-                    public void onSuccess(DocumentReference documentReference) {
-                        Log.d(TAG, "onSuccess: document added " + documentReference);
-                        database.collection(COLLECTION_NAME)
-                                .document(documentReference.getId())
-                                .update(BOOKING_ID, documentReference.getId())
-                                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                    @Override
-                                    public void onSuccess(Void unused) {
-                                        Log.e(TAG, "onSuccess: booking created and alarm is about ot be set", null);
-                                        setAlarmExactRTCWakeUp(context, bookingToSave);
-                                    }
-                                });
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Log.e(TAG, "onFailure: Error adding document " + e.getMessage(), null);
-                    }
-                });
+                .addOnSuccessListener(documentReference -> database.collection(COLLECTION_NAME)
+                        .document(documentReference.getId())
+                        .update(BOOKING_ID, documentReference.getId())
+                        .addOnSuccessListener(unused -> setAlarmExactRTCWakeUp(context, bookingToSave)))
+                .addOnFailureListener(e -> Log.e(TAG, "onFailure: Error adding document " + e.getMessage(), null));
     }
 
     public void getAllBookingsFromDataBase() {
         database.collection(COLLECTION_NAME)
-                .addSnapshotListener(new EventListener<QuerySnapshot>() {
-                    @Override
-                    public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
-                        if (error != null) {
-                            Log.w(TAG, "Listen fail ", error);
-                            return;
-                        }
-
-                        if (value != null) {
-                            List<Booking> tempList = value.toObjects(Booking.class);
-                            allBookings.setValue(tempList);
-                            Log.d(TAG, "onEvent: all bookings " + allBookings.getValue());
-                        } else {
-                            Log.d(TAG, "onEvent: all user is null");
-                        }
-
+                .addSnapshotListener((value, error) -> {
+                    if (error != null) {
+                        Log.w(TAG, "Listen fail ", error);
+                        return;
                     }
+
+                    if (value != null) {
+                        List<Booking> tempList = value.toObjects(Booking.class);
+                        allBookings.setValue(tempList);
+                    } else {
+                        Log.i(TAG, "onEvent: all user is null");
+                    }
+
                 });
     }
 
@@ -125,48 +97,27 @@ public class BookingRepositoryImp implements BookingRepository {
 
         database.collection(COLLECTION_NAME).document(bookingID)
                 .update(updates)
-                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                    @Override
-                    public void onSuccess(Void unused) {
-                        Log.d(TAG, "onSuccess: DocumentSnapshot successfully updated");
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Log.w(TAG, "onFailure: Error updating document", e);
-                    }
-                });
+                .addOnSuccessListener(unused -> Log.d(TAG, "onSuccess: DocumentSnapshot successfully updated"))
+                .addOnFailureListener(e -> Log.w(TAG, "onFailure: Error updating document", e));
     }
 
 
-    public void deleteBookingInDatabase(String bookingID) {
+    public void deleteBookingInDatabase(String bookingID, Context context) {
         database.collection(COLLECTION_NAME).document(bookingID)
                 .delete()
-                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                    @Override
-                    public void onSuccess(Void unused) {
-                        System.out.println("document has been deleted");
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Log.w(TAG, "onFailure: Error deleting document " + bookingID, e);
-                    }
-                });
+                .addOnSuccessListener(unused -> cancelAlarm(context))
+                .addOnFailureListener(e -> Log.w(TAG, "onFailure: Error deleting document", e));
 
     }
 
-    public void deleteBookingsFromPreviousDays() {
-        for (Booking booking : allBookings.getValue()) {
+    public void deleteBookingsFromPreviousDays(Context context) {
+        for (Booking booking : Objects.requireNonNull(allBookings.getValue())) {
             long dateMilli = booking.getBookingDate().getTime();
-            DateFormat simple = new SimpleDateFormat("dd MMM yyyy");
+            @SuppressLint("SimpleDateFormat") DateFormat simple = new SimpleDateFormat("dd MMM yyyy");
             Date result = new Date(dateMilli);
             Date today = new Date(Calendar.getInstance().getTimeInMillis());
             if (simple.format(result).compareTo(simple.format(today)) != 0) {
-                deleteBookingInDatabase(booking.getBookingID());
-                Log.e(TAG, "deleteBookingsFromPreviousDays: deleted " + booking.getBookingID(), null);
+                deleteBookingInDatabase(booking.getBookingID(), context);
             }
         }
     }
@@ -178,22 +129,21 @@ public class BookingRepositoryImp implements BookingRepository {
     @SuppressLint("MissingPermission")
     private void setAlarmExactRTCWakeUp(Context context, Booking booking) {
         Calendar c = Calendar.getInstance();
-        c.set(Calendar.HOUR_OF_DAY, 2);
-        c.set(Calendar.MINUTE, 50);
+        c.set(Calendar.HOUR_OF_DAY, 17);
+        c.set(Calendar.MINUTE, 32);
         c.set(Calendar.SECOND, 0);
 
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         Intent alarmIntent = new Intent(context, AlarmReceiver.class);
-        PendingIntent pendingAlarmIntent = PendingIntent.getBroadcast(context, 1, alarmIntent, PendingIntent.FLAG_ONE_SHOT);
+        @SuppressLint("UnspecifiedImmutableFlag") PendingIntent pendingAlarmIntent = PendingIntent.getBroadcast(context, 1, alarmIntent, PendingIntent.FLAG_ONE_SHOT);
         alarmManager.setExact(AlarmManager.RTC_WAKEUP, c.getTimeInMillis(), pendingAlarmIntent);
-        Log.e(TAG, "setAlarmExactRTCWakeUp: set", null);
     }
 
     private void cancelAlarm(Context context) {
         @SuppressLint("ServiceCast")
-        AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+        AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         Intent alarmIntent = new Intent(context, AlarmReceiver.class);
-        PendingIntent pendingAlarmIntent = PendingIntent.getBroadcast(context, 1, alarmIntent, 0);
+        @SuppressLint("UnspecifiedImmutableFlag") PendingIntent pendingAlarmIntent = PendingIntent.getBroadcast(context, 1, alarmIntent, PendingIntent.FLAG_ONE_SHOT);
         alarmManager.cancel(pendingAlarmIntent);
     }
 

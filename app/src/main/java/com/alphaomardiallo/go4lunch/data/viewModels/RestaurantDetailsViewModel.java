@@ -110,8 +110,8 @@ public class RestaurantDetailsViewModel extends ViewModel {
         userRepository.removeFavouriteRestaurant(userRepository.getCurrentUserID(), restaurantID);
     }
 
-    public void deleteBooking(String bookingID) {
-        bookingRepository.deleteBookingInDatabase(bookingID);
+    public void deleteBooking(String bookingID, Context context) {
+        bookingRepository.deleteBookingInDatabase(bookingID, context);
     }
 
     public void observeBookingsFromDataBase() {

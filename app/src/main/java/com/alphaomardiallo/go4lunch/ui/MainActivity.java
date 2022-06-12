@@ -1,12 +1,9 @@
 package com.alphaomardiallo.go4lunch.ui;
 
 import static android.Manifest.permission.ACCESS_FINE_LOCATION;
-import static android.content.ContentValues.TAG;
-import static com.alphaomardiallo.go4lunch.MainApplication.CHANNEL_LUNCHTIME_REMINDER;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
-import android.app.Notification;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -14,7 +11,6 @@ import android.location.Location;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -31,14 +27,11 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.NotificationCompat;
-import androidx.core.app.NotificationManagerCompat;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.alphaomardiallo.go4lunch.R;
 import com.alphaomardiallo.go4lunch.data.dataSources.Model.Booking;
 import com.alphaomardiallo.go4lunch.data.dataSources.Model.User;
-import com.alphaomardiallo.go4lunch.data.dataSources.Model.detailsPojo.Result;
 import com.alphaomardiallo.go4lunch.data.viewModels.MainSharedViewModel;
 import com.alphaomardiallo.go4lunch.databinding.ActivityMainBinding;
 import com.alphaomardiallo.go4lunch.domain.PermissionUtils;
@@ -66,17 +59,17 @@ import pub.devrel.easypermissions.EasyPermissions;
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, EasyPermissions.PermissionCallbacks {
 
     private static final int REQUEST_PERMISSIONS_LOCATION = 567;
+    private static final int DELAY_SHORT = 1000;
     private static final String KEY_SELECTED_RESTAURANT_ID = "placeID";
     private static final String KEY_SELECTED_RESTAURANT_NAME = "placeName";
     private static final String KEY_SEARCH_QUERY = "Query";
     private static final String KEY_LOCATION_STRING = "Location";
-    private static final PermissionUtils permission = new PermissionUtils();
     private static final String USER_ID = "userID";
+    private static final PermissionUtils permission = new PermissionUtils();
     private final Handler handler = new Handler(Looper.getMainLooper());
     private final MapsFragment mapsFragment = new MapsFragment();
     private final ListViewFragment listViewFragment = new ListViewFragment();
     private final WorkmatesFragment workmatesFragment = new WorkmatesFragment();
-    private NotificationManagerCompat notificationManager;
     private User currentUser;
     private ActivityMainBinding binding;
     private ActionBarDrawerToggle toggle;
@@ -118,7 +111,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        Log.e(TAG, "onCreate: Called");
         super.onCreate(savedInstanceState);
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         View view = binding.getRoot();
@@ -134,9 +126,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         observePermissions();
 
         observeBookings();
-
-        setNotificationManager();
-
     }
 
     /**
@@ -209,6 +198,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private void observeBookings() {
         viewModel.getDatabaseInstanceBooking();
         viewModel.observeBookingsFromDataBase();
+        viewModel.getAllBookings().observe(this, this::cleanBookingList);
+    }
+
+    private void cleanBookingList(List<Booking> list) {
+        if (list != null && list.size() > 0) {
+            viewModel.removeBookingsFromPreviousDay(this);
+        }
     }
 
     /**
@@ -246,13 +242,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 return false;
             }
 
+            @SuppressLint("StringFormatMatches")
             @Override
             public boolean onQueryTextChange(String query) {
                 if (query.length() > 0) {
                     Intent intent = new Intent(MainActivity.this, SearchActivity.class);
                     intent.putExtra(KEY_SEARCH_QUERY, query);
-                    intent.putExtra(KEY_LOCATION_STRING, String.format("%s,%s", currentLocation.getLatitude(), currentLocation.getLongitude()));
-                    Log.e(TAG, "onQueryTextChange: " + currentLocation.getLongitude(), null);
+                    intent.putExtra(KEY_LOCATION_STRING, String.format(getString(R.string.location_to_string), currentLocation.getLatitude(), currentLocation.getLongitude()));
                     searchLauncher.launch(intent);
                 }
                 return true;
@@ -333,13 +329,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         saveInSharePreferences();
     }
 
-    private void saveInSharePreferences(){
+    private void saveInSharePreferences() {
         Context context = this;
         SharedPreferences sharedPreferences = context.getSharedPreferences(
                 getString(R.string.preferences_main_file), MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putString("currentUserID", currentUser.getUid());
-        editor.putString("currentUserUsername", currentUser.getUsername());
+        editor.putString(getString(R.string.shared_pref_current_User_ID), currentUser.getUid());
+        editor.putString(getString(R.string.shared_pref_current_User_Username), currentUser.getUsername());
         editor.apply();
     }
 
@@ -410,7 +406,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         EasyPermissions.requestPermissions(
                 this,
-                "This app needs location permission to function properly",
+                getString(R.string.permission_rationale_location),
                 REQUEST_PERMISSIONS_LOCATION,
                 ACCESS_FINE_LOCATION,
                 Manifest.permission.ACCESS_COARSE_LOCATION
@@ -439,74 +435,24 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     /**
-     * Notifications
-     */
-
-    private void setupNotif() {
-        viewModel.getAllBookings().observe(this, this::checkUserBookingStatus);
-    }
-
-    private void setNotificationManager() {
-        notificationManager = NotificationManagerCompat.from(this);
-    }
-
-    private void checkUserBookingStatus(List<Booking> bookings) {
-        handler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                System.out.println("hold");
-            }
-        }, 10000);
-        viewModel.checkIfUserNeedsLunchNotification(currentUser.getUid(), bookings).observe(this, this::getRestaurant);
-    }
-
-    private void getRestaurant(String restaurantID) {
-        if (restaurantID != null) {
-            viewModel.fetchPartialRestaurantDetails(restaurantID);
-            //viewModel.getPartialRestaurantDetails().observe(this, this::sendLunchReminderNotification);
-        }
-    }
-
-    private void sendLunchReminderNotification(Result restaurant) {
-
-        List<String> notificationInfo = viewModel.getInfoForLunchNotification(currentUser.getUid(), restaurant);
-        String text = String.format(getString(R.string.notification_text), notificationInfo.get(0), notificationInfo.get(1), notificationInfo.get(2));
-
-        if (restaurant != null) {
-            Intent intent = new Intent("notificationString");
-            intent.putExtra("notifString", text);
-            sendBroadcast(intent);
-        }
-
-        Notification lunchNotification = new NotificationCompat.Builder(this, CHANNEL_LUNCHTIME_REMINDER)
-                .setSmallIcon(R.drawable.ic_baseline_ramen_dining_24)
-                .setContentTitle(getString(R.string.notification_title))
-                .setContentText(text)
-                .setAutoCancel(true)
-                .setStyle(new NotificationCompat.BigTextStyle()
-                        .bigText(text))
-                .setPriority(NotificationCompat.PRIORITY_HIGH)
-                .setCategory(NotificationCompat.CATEGORY_ALARM)
-                .build();
-
-        notificationManager.notify(1, lunchNotification);
-    }
-
-
-    /**
      * LifeCycle related methods
      */
 
     @Override
     protected void onResume() {
-        Log.e(TAG, "onResume: called");
         super.onResume();
 
-        handler.postDelayed(this::checkIfUserIsSignedIn, 1000);
+        handler.postDelayed(this::checkIfUserIsSignedIn, DELAY_SHORT);
 
         if (searchView != null) {
             searchView.setQuery(getString(R.string.remove_query), false);
         }
         binding.toolbar.collapseActionView();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        viewModel.stopTrackingLocation();
     }
 }
