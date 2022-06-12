@@ -58,8 +58,10 @@
     <string name="notification_text">Time to make it to %s, at %s. \n %s </string>
     <string name="channel_name">Lunch</string>
     <string name="channel_description">Lunch time reminder</string>
-    <string name="notification_line_1">It\'s lunch time, time to go to %s at %s.</string>
-    <string name="notification_line_2">You are going with, %s</string>
+    <string name="notification_line_1">Time to go to %s at %s</string>
+    <string name="notification_line_2">You are going with%s</string>
+    <string name="user_joining_append">%s, %s</string>
+    <string name="final_notification">"%s.\n%s"</string>
     <string name="default_notification_channel_id">com.google.firebase.messaging.default_notification_channel_id</string>
 
     <string name="app_name">Go4Lunch</string>

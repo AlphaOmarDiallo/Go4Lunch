@@ -1,7 +1,9 @@
 package com.alphaomardiallo.go4lunch.domain;
 
+import static android.content.ContentValues.TAG;
 import static android.content.Context.MODE_PRIVATE;
 
+import android.annotation.SuppressLint;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -12,17 +14,15 @@ import android.content.SharedPreferences;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Build;
+import android.util.Log;
 
 import androidx.core.app.NotificationCompat;
 
 import com.alphaomardiallo.go4lunch.R;
 import com.alphaomardiallo.go4lunch.data.dataSources.Model.Booking;
 import com.alphaomardiallo.go4lunch.data.dataSources.Model.User;
-import com.alphaomardiallo.go4lunch.data.repositories.BookingRepository;
-import com.alphaomardiallo.go4lunch.data.repositories.BookingRepositoryImp;
-import com.alphaomardiallo.go4lunch.data.repositories.UserRepository;
-import com.alphaomardiallo.go4lunch.data.repositories.UserRepositoryImp;
 import com.alphaomardiallo.go4lunch.ui.MainActivity;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,12 +33,13 @@ import dagger.hilt.android.AndroidEntryPoint;
 
 @AndroidEntryPoint
 public class AlarmReceiver extends BroadcastReceiver {
-    private final int NOTIFICATION_ID = 007;
-    private final String NOTIFICATION_TAG = "GO4LUNCH";
-    public BookingRepository bookingRepository = new BookingRepositoryImp();
-    public UserRepository userRepository = new UserRepositoryImp();
+    private static final int NOTIFICATION_ID = 416;
+    private static final String NOTIFICATION_TAG = "GO4LUNCH";
+    Context context;
+    List<User> allUsers;
+    List<Booking> allBookings;
     String notification1 = null;
-    String notification2 = null;
+    String notification2 = "You are eating alone today.";
     String userID = null;
     String restaurantID = null;
     String restaurantName = null;
@@ -50,21 +51,15 @@ public class AlarmReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        //TODO something on receive BroadCast from Alarm - make sure to get last data possible
-        setupFireBase();
-        getUserDataFromSharedPreferences(context);
-        setNotificationString(context);
-        sendVisualNotification(notification2, context);
+        this.context = context;
+        getUserDataFromSharedPreferences();
+        getUsersFromFireStore();
+        setNotificationString();
+        sendVisualNotification();
     }
 
-    private void setupFireBase() {
-        bookingRepository.getInstance();
-        userRepository.getDataBaseInstance();
-        bookingRepository.getAllBookingsFromDataBase();
-        userRepository.getAllUsersFromDataBase();
-    }
 
-    private void getUserDataFromSharedPreferences(Context context){
+    private void getUserDataFromSharedPreferences() {
         SharedPreferences sharedPreferences = context.getSharedPreferences(context.getString(R.string.preferences_main_file), MODE_PRIVATE);
         userID = sharedPreferences.getString(context.getString(R.string.shared_pref_current_User_ID), null);
         restaurantID = sharedPreferences.getString(context.getString(R.string.shared_pref_restaurant_ID), null);
@@ -72,13 +67,35 @@ public class AlarmReceiver extends BroadcastReceiver {
         restaurantVicinity = sharedPreferences.getString(context.getString(R.string.shared_pref_restaurant_Address), null);
     }
 
-    private void setNotificationString(Context context){
+    private void setNotificationString() {
         notification1 = String.format(context.getString(R.string.notification_line_1), restaurantName, restaurantVicinity);
     }
 
-    private String setUserJoiningList() {
-        List<Booking> allBookings = bookingRepository.getAllBookingsAsList().getValue();
-        List<User> allUsers = userRepository.getAllUsers().getValue();
+    private void getUsersFromFireStore() {
+
+        FirebaseFirestore.getInstance()
+                .collection("users")
+                .get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    allUsers = queryDocumentSnapshots.toObjects(User.class);
+                    getBookingsFromFirestore();
+                })
+                .addOnFailureListener(e -> Log.e(TAG, "onFailure: Failure getting user list from Firestore", e));
+    }
+
+    private void getBookingsFromFirestore() {
+        FirebaseFirestore.getInstance()
+                .collection("booking")
+                .get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    allBookings = queryDocumentSnapshots.toObjects(Booking.class);
+                    setUserJoiningList();
+                })
+                .addOnFailureListener(e -> Log.e(TAG, "onFailure: error getting booking list", e));
+    }
+
+    private void setUserJoiningList() {
+
         List<User> userJoining = new ArrayList<>();
         String userJoiningString = "";
 
@@ -86,8 +103,7 @@ public class AlarmReceiver extends BroadcastReceiver {
             for (Booking booking : allBookings) {
                 if (booking.getUserWhoBooked().equalsIgnoreCase(user.getUid())
                         && booking.getBookedRestaurantID().equalsIgnoreCase(restaurantID)
-                        && !user.getUid().equalsIgnoreCase(userRepository.getCurrentUserID()
-                )) {
+                        && !user.getUid().equalsIgnoreCase(userID)) {
                     userJoining.add(user);
                     break;
                 }
@@ -96,18 +112,19 @@ public class AlarmReceiver extends BroadcastReceiver {
 
         if (userJoining.size() > 0) {
             for (User user : userJoining) {
-                userJoiningString = String.format("%s, %s", userJoiningString, user.getUsername());
+                userJoiningString = String.format(context.getString(R.string.user_joining_append), userJoiningString, user.getUsername());
             }
+
+            notification2 = String.format("You are going with%s", userJoiningString);
         }
 
-        return userJoiningString;
     }
 
-    private void sendVisualNotification(String notificationText, Context context) {
+    private void sendVisualNotification() {
 
         Intent intent = new Intent(context, MainActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_ONE_SHOT);
+        @SuppressLint("UnspecifiedImmutableFlag") PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_ONE_SHOT);
 
         String channelId = context.getString(R.string.default_notification_channel_id);
         Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
@@ -118,7 +135,9 @@ public class AlarmReceiver extends BroadcastReceiver {
                         .setSmallIcon(R.drawable.ic_baseline_ramen_dining_24)
                         .setSound(defaultSoundUri)
                         .setContentTitle(context.getString(R.string.notification_title))
-                        .setStyle(new NotificationCompat.BigTextStyle().bigText(String.format("%s.\n%s", notification1, notification2)))
+                        .setContentText(String.format(context.getString(R.string.final_notification), notification1, notification2))
+                        .setStyle(new NotificationCompat.BigTextStyle()
+                                .bigText(String.format(context.getString(R.string.final_notification), notification1, notification2)))
                         .setAutoCancel(true)
                         .setCategory(NotificationCompat.CATEGORY_ALARM)
                         .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
@@ -128,7 +147,7 @@ public class AlarmReceiver extends BroadcastReceiver {
 
         // Support Version >= Android 8
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            CharSequence channelName = "Firebase Messages";
+            CharSequence channelName = context.getString(R.string.channel_name);
             int importance = NotificationManager.IMPORTANCE_HIGH;
             NotificationChannel mChannel = new NotificationChannel(channelId, channelName, importance);
             notificationManager.createNotificationChannel(mChannel);
