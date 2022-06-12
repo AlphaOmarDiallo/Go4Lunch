@@ -1,4 +1,4 @@
-package com.alphaomardiallo.go4lunch.ui;
+package com.alphaomardiallo.go4lunch.ui.Activities;
 
 import android.content.Context;
 import android.content.Intent;
@@ -15,7 +15,7 @@ import com.alphaomardiallo.go4lunch.R;
 import com.alphaomardiallo.go4lunch.data.dataSources.Model.autocompletePojo.PredictionsItem;
 import com.alphaomardiallo.go4lunch.data.viewModels.SearchViewModel;
 import com.alphaomardiallo.go4lunch.databinding.ActivitySearchBinding;
-import com.alphaomardiallo.go4lunch.domain.OnClickItemListener;
+import com.alphaomardiallo.go4lunch.domain.OnClickRestaurantListener;
 import com.alphaomardiallo.go4lunch.ui.adapters.SearchAdapter;
 import com.bumptech.glide.Glide;
 
@@ -25,7 +25,7 @@ import java.util.Objects;
 import dagger.hilt.android.AndroidEntryPoint;
 
 @AndroidEntryPoint
-public class SearchActivity extends AppCompatActivity implements OnClickItemListener {
+public class SearchActivity extends AppCompatActivity implements OnClickRestaurantListener {
 
     private static final String KEY_SELECTED_RESTAURANT_ID = "placeID";
     private static final String KEY_SELECTED_RESTAURANT_NAME = "placeName";
@@ -107,7 +107,7 @@ public class SearchActivity extends AppCompatActivity implements OnClickItemList
     }
 
     @Override
-    public void onClickItem(int position) {
+    public void onClickRestaurant(int position) {
         PredictionsItem restaurant = Objects.requireNonNull(viewModel.getPredictionList().getValue()).get(position);
         viewModel.setRestaurantToFocusOn(restaurant);
         Intent returnIntent = new Intent();

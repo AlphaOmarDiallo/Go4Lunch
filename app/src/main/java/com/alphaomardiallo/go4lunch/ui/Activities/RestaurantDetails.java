@@ -1,4 +1,4 @@
-package com.alphaomardiallo.go4lunch.ui;
+package com.alphaomardiallo.go4lunch.ui.Activities;
 
 import android.app.AlertDialog;
 import android.content.Context;
@@ -23,7 +23,6 @@ import com.alphaomardiallo.go4lunch.data.dataSources.Model.User;
 import com.alphaomardiallo.go4lunch.data.dataSources.Model.detailsPojo.Result;
 import com.alphaomardiallo.go4lunch.data.viewModels.RestaurantDetailsViewModel;
 import com.alphaomardiallo.go4lunch.databinding.ActivityRestaurantDetailsBinding;
-import com.alphaomardiallo.go4lunch.ui.adapters.WorkmatesAdapter;
 import com.alphaomardiallo.go4lunch.ui.adapters.WorkmatesJoiningAdapter;
 import com.bumptech.glide.Glide;
 
@@ -48,7 +47,7 @@ public class RestaurantDetails extends AppCompatActivity {
     private double restaurantLongitude;
     private List<Booking> allBookings;
     private Intent intent;
-    private final WorkmatesJoiningAdapter adapter = new WorkmatesJoiningAdapter(new WorkmatesAdapter.ListDiff(), this);
+    private final WorkmatesJoiningAdapter adapter = new WorkmatesJoiningAdapter(new WorkmatesJoiningAdapter.ListDiff(), this);
     private User user;
 
     @Override

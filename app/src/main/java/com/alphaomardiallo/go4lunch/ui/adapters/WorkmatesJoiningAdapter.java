@@ -22,11 +22,12 @@ import com.bumptech.glide.Glide;
 public class WorkmatesJoiningAdapter extends ListAdapter<User, WorkmatesJoiningAdapter.WorkmatesJoiningViewHolder> {
 
 
+    @SuppressLint("StaticFieldLeak")
     private static Context context;
 
     public WorkmatesJoiningAdapter(@NonNull DiffUtil.ItemCallback<User> diffCallback, Context context) {
         super(diffCallback);
-        this.context = context;
+        WorkmatesJoiningAdapter.context = context;
     }
 
 

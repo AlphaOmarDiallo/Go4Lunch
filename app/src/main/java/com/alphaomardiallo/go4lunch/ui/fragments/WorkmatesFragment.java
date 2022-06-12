@@ -19,8 +19,8 @@ import com.alphaomardiallo.go4lunch.R;
 import com.alphaomardiallo.go4lunch.data.dataSources.Model.Booking;
 import com.alphaomardiallo.go4lunch.data.viewModels.MainSharedViewModel;
 import com.alphaomardiallo.go4lunch.databinding.FragmentWorkmatesBinding;
-import com.alphaomardiallo.go4lunch.domain.OnClickWormkmateListener;
-import com.alphaomardiallo.go4lunch.ui.RestaurantDetails;
+import com.alphaomardiallo.go4lunch.domain.OnClickWorkmateListener;
+import com.alphaomardiallo.go4lunch.ui.Activities.RestaurantDetails;
 import com.alphaomardiallo.go4lunch.ui.adapters.WorkmatesAdapter;
 
 import java.util.ArrayList;
@@ -29,7 +29,7 @@ import java.util.List;
 import dagger.hilt.android.AndroidEntryPoint;
 
 @AndroidEntryPoint
-public class WorkmatesFragment extends Fragment implements OnClickWormkmateListener {
+public class WorkmatesFragment extends Fragment implements OnClickWorkmateListener {
 
     private static final String KEY_RESTAURANT_ID = "id";
     private FragmentWorkmatesBinding binding;
@@ -103,7 +103,7 @@ public class WorkmatesFragment extends Fragment implements OnClickWormkmateListe
      */
 
     @Override
-    public void onClickItem(String restaurantID) {
+    public void onClickWorkmate(String restaurantID) {
         openDetailActivity(restaurantID);
     }
 

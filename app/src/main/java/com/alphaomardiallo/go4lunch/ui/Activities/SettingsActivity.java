@@ -1,4 +1,4 @@
-package com.alphaomardiallo.go4lunch.ui;
+package com.alphaomardiallo.go4lunch.ui.Activities;
 
 import android.app.AlertDialog;
 import android.content.Intent;

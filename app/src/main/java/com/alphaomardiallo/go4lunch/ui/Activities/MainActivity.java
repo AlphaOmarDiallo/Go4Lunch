@@ -1,4 +1,4 @@
-package com.alphaomardiallo.go4lunch.ui;
+package com.alphaomardiallo.go4lunch.ui.Activities;
 
 import static android.Manifest.permission.ACCESS_FINE_LOCATION;
 

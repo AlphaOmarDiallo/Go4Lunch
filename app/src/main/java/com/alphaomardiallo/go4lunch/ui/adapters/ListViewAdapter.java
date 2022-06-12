@@ -22,7 +22,7 @@ import com.alphaomardiallo.go4lunch.R;
 import com.alphaomardiallo.go4lunch.data.dataSources.Model.Booking;
 import com.alphaomardiallo.go4lunch.data.dataSources.Model.nearBySearchPojo.ResultsItem;
 import com.alphaomardiallo.go4lunch.databinding.ItemRestaurantBinding;
-import com.alphaomardiallo.go4lunch.domain.OnClickItemListener;
+import com.alphaomardiallo.go4lunch.domain.OnClickRestaurantListener;
 import com.bumptech.glide.Glide;
 
 import java.util.List;
@@ -30,13 +30,13 @@ import java.util.Locale;
 
 public class ListViewAdapter extends ListAdapter<ResultsItem, ListViewAdapter.ListViewHolder> {
 
-    private final OnClickItemListener onClickItemListener;
+    private final OnClickRestaurantListener onClickRestaurantListener;
     private final Location location;
     private final List<Booking> bookingList;
 
-    public ListViewAdapter(@NonNull DiffUtil.ItemCallback<ResultsItem> diffCallback, OnClickItemListener onClickItemListener, Location location, List<Booking> bookingList) {
+    public ListViewAdapter(@NonNull DiffUtil.ItemCallback<ResultsItem> diffCallback, OnClickRestaurantListener onClickRestaurantListener, Location location, List<Booking> bookingList) {
         super(diffCallback);
-        this.onClickItemListener = onClickItemListener;
+        this.onClickRestaurantListener = onClickRestaurantListener;
         this.location = location;
         this.bookingList = bookingList;
     }
@@ -50,7 +50,7 @@ public class ListViewAdapter extends ListAdapter<ResultsItem, ListViewAdapter.Li
 
     @Override
     public void onBindViewHolder(@NonNull ListViewHolder holder, int position) {
-        holder.bind(getItem(position), onClickItemListener, location, bookingList);
+        holder.bind(getItem(position), onClickRestaurantListener, location, bookingList);
     }
 
     public static class ListDiff extends DiffUtil.ItemCallback<ResultsItem> {
@@ -96,7 +96,7 @@ public class ListViewAdapter extends ListAdapter<ResultsItem, ListViewAdapter.Li
             setupRatingBar();
         }
 
-        public void bind(ResultsItem restaurant, OnClickItemListener onClickItemListener, Location location, List<Booking> bookingList) {
+        public void bind(ResultsItem restaurant, OnClickRestaurantListener onClickRestaurantListener, Location location, List<Booking> bookingList) {
             restaurantName.setText(restaurant.getName());
             restaurantStyleAndAddress.setText(restaurant.getVicinity());
             restaurantOpeningTime.setText(getOpeningTime(restaurant.getOpeningHours().isOpenNow()));
@@ -118,7 +118,7 @@ public class ListViewAdapter extends ListAdapter<ResultsItem, ListViewAdapter.Li
                 restaurantPhoto.setImageResource(R.drawable.hungry_droid);
             }
 
-            card.setOnClickListener(view -> onClickItemListener.onClickItem(getAbsoluteAdapterPosition()));
+            card.setOnClickListener(view -> onClickRestaurantListener.onClickRestaurant(getAbsoluteAdapterPosition()));
         }
 
         private String getOpeningTime(Boolean isOpenNow) {

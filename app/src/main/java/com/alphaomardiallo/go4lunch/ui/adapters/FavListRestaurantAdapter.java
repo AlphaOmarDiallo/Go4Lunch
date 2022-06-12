@@ -20,16 +20,18 @@ import com.alphaomardiallo.go4lunch.BuildConfig;
 import com.alphaomardiallo.go4lunch.R;
 import com.alphaomardiallo.go4lunch.data.dataSources.Model.detailsPojo.Result;
 import com.alphaomardiallo.go4lunch.databinding.ItemRestaurantBinding;
-import com.alphaomardiallo.go4lunch.domain.OnClickItemListener;
+import com.alphaomardiallo.go4lunch.domain.OnClickRestaurantListener;
 import com.bumptech.glide.Glide;
 
 public class FavListRestaurantAdapter extends ListAdapter<Result, FavListRestaurantAdapter.ListViewHolder> {
 
-    private final OnClickItemListener onClickItemListener;
+    private final OnClickRestaurantListener onClickRestaurantListener;
+    private static final String OPEN = "Open now";
+    public static final String CLOSED = "Closed";
 
-    public FavListRestaurantAdapter(@NonNull DiffUtil.ItemCallback<Result> diffCallback, OnClickItemListener onClickItemListener) {
+    public FavListRestaurantAdapter(@NonNull DiffUtil.ItemCallback<Result> diffCallback, OnClickRestaurantListener onClickRestaurantListener) {
         super(diffCallback);
-        this.onClickItemListener = onClickItemListener;
+        this.onClickRestaurantListener = onClickRestaurantListener;
     }
 
     @NonNull
@@ -41,7 +43,7 @@ public class FavListRestaurantAdapter extends ListAdapter<Result, FavListRestaur
 
     @Override
     public void onBindViewHolder(@NonNull ListViewHolder holder, int position) {
-        holder.bind(getItem(position), onClickItemListener);
+        holder.bind(getItem(position), onClickRestaurantListener);
     }
 
     public static class ListDiff extends DiffUtil.ItemCallback<Result> {
@@ -87,7 +89,7 @@ public class FavListRestaurantAdapter extends ListAdapter<Result, FavListRestaur
             setupRatingBar();
         }
 
-        public void bind(Result restaurant, OnClickItemListener onClickItemListener) {
+        public void bind(Result restaurant, OnClickRestaurantListener onClickRestaurantListener) {
             restaurantName.setText(restaurant.getName());
             restaurantStyleAndAddress.setText(restaurant.getVicinity());
             restaurantOpeningTime.setText(getOpeningTime(restaurant.getOpeningHours().isOpenNow()));
@@ -103,16 +105,16 @@ public class FavListRestaurantAdapter extends ListAdapter<Result, FavListRestaur
                 restaurantPhoto.setImageResource(R.drawable.hungry_droid);
             }
 
-            card.setOnClickListener(view -> onClickItemListener.onClickItem(getAbsoluteAdapterPosition()));
+            card.setOnClickListener(view -> onClickRestaurantListener.onClickRestaurant(getAbsoluteAdapterPosition()));
         }
 
         private String getOpeningTime(Boolean isOpenNow) {
             if (!isOpenNow) {
                 restaurantOpeningTime.setTextColor(Color.RED);
-                return "Closed";
+                return CLOSED;
             } else {
                 restaurantOpeningTime.setTextColor(Color.BLUE);
-                return "Open now";
+                return OPEN;
             }
         }
 

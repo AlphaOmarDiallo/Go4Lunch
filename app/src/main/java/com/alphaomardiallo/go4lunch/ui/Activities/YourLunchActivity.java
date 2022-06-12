@@ -1,4 +1,4 @@
-package com.alphaomardiallo.go4lunch.ui;
+package com.alphaomardiallo.go4lunch.ui.Activities;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -14,7 +14,7 @@ import com.alphaomardiallo.go4lunch.data.dataSources.Model.Booking;
 import com.alphaomardiallo.go4lunch.data.dataSources.Model.User;
 import com.alphaomardiallo.go4lunch.data.viewModels.YourLunchViewModel;
 import com.alphaomardiallo.go4lunch.databinding.ActivityYourLunchBinding;
-import com.alphaomardiallo.go4lunch.domain.OnClickItemListener;
+import com.alphaomardiallo.go4lunch.domain.OnClickRestaurantListener;
 import com.alphaomardiallo.go4lunch.ui.adapters.FavListRestaurantAdapter;
 
 import java.util.List;
@@ -23,7 +23,7 @@ import java.util.Objects;
 import dagger.hilt.android.AndroidEntryPoint;
 
 @AndroidEntryPoint
-public class YourLunchActivity extends AppCompatActivity implements OnClickItemListener {
+public class YourLunchActivity extends AppCompatActivity implements OnClickRestaurantListener {
 
     private static final String USER_ID = "userID";
     private static final String ID = "id";
@@ -142,7 +142,7 @@ public class YourLunchActivity extends AppCompatActivity implements OnClickItemL
      */
 
     @Override
-    public void onClickItem(int position) {
+    public void onClickRestaurant(int position) {
         openDetailActivity(Objects.requireNonNull(currentUser.getFavouriteRestaurants()).get(position));
     }
 

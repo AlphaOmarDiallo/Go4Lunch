@@ -19,8 +19,8 @@ import com.alphaomardiallo.go4lunch.data.dataSources.Model.Booking;
 import com.alphaomardiallo.go4lunch.data.dataSources.Model.nearBySearchPojo.ResultsItem;
 import com.alphaomardiallo.go4lunch.data.viewModels.MainSharedViewModel;
 import com.alphaomardiallo.go4lunch.databinding.FragmentListViewBinding;
-import com.alphaomardiallo.go4lunch.domain.OnClickItemListener;
-import com.alphaomardiallo.go4lunch.ui.RestaurantDetails;
+import com.alphaomardiallo.go4lunch.domain.OnClickRestaurantListener;
+import com.alphaomardiallo.go4lunch.ui.Activities.RestaurantDetails;
 import com.alphaomardiallo.go4lunch.ui.adapters.ListViewAdapter;
 import com.bumptech.glide.Glide;
 import com.google.android.material.snackbar.Snackbar;
@@ -32,7 +32,7 @@ import java.util.Objects;
 import dagger.hilt.android.AndroidEntryPoint;
 
 @AndroidEntryPoint
-public class ListViewFragment extends Fragment implements OnClickItemListener {
+public class ListViewFragment extends Fragment implements OnClickRestaurantListener {
 
     private static final String KEY_RESTAURANT_ID = "id";
     private static final int SNACK_BAR_LENGTH_LONG = 10000;
@@ -148,7 +148,7 @@ public class ListViewFragment extends Fragment implements OnClickItemListener {
      * Method overriding onCLickItemListener interface to manage clicks on recyclerView
      */
     @Override
-    public void onClickItem(int position) {
+    public void onClickRestaurant(int position) {
         ResultsItem restaurant = Objects.requireNonNull(viewModel.getRestaurants().getValue()).get(position);
         openDetailActivity(restaurant.getPlaceId());
     }

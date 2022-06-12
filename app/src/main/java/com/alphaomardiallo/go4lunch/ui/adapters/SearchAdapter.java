@@ -14,16 +14,16 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.alphaomardiallo.go4lunch.R;
 import com.alphaomardiallo.go4lunch.data.dataSources.Model.autocompletePojo.PredictionsItem;
 import com.alphaomardiallo.go4lunch.databinding.ItemSearchBinding;
-import com.alphaomardiallo.go4lunch.domain.OnClickItemListener;
+import com.alphaomardiallo.go4lunch.domain.OnClickRestaurantListener;
 
 public class SearchAdapter extends ListAdapter<PredictionsItem, SearchAdapter.SearchViewHolder> {
 
     public ItemSearchBinding binding;
-    OnClickItemListener onClickItemListener;
+    OnClickRestaurantListener onClickRestaurantListener;
 
-    public SearchAdapter(@NonNull DiffUtil.ItemCallback<PredictionsItem> diffCallback, OnClickItemListener onClickItemListener) {
+    public SearchAdapter(@NonNull DiffUtil.ItemCallback<PredictionsItem> diffCallback, OnClickRestaurantListener onClickRestaurantListener) {
         super(diffCallback);
-        this.onClickItemListener = onClickItemListener;
+        this.onClickRestaurantListener = onClickRestaurantListener;
     }
 
     @NonNull
@@ -35,7 +35,7 @@ public class SearchAdapter extends ListAdapter<PredictionsItem, SearchAdapter.Se
 
     @Override
     public void onBindViewHolder(@NonNull SearchViewHolder holder, int position) {
-        holder.bind(getItem(position), onClickItemListener);
+        holder.bind(getItem(position), onClickRestaurantListener);
     }
 
     public static class ListSearchDiff extends DiffUtil.ItemCallback<PredictionsItem> {
@@ -65,10 +65,10 @@ public class SearchAdapter extends ListAdapter<PredictionsItem, SearchAdapter.Se
             card = itemView.findViewById(R.id.search_item);
         }
 
-        public void bind(PredictionsItem restaurant, OnClickItemListener onClickItemListener) {
+        public void bind(PredictionsItem restaurant, OnClickRestaurantListener onClickRestaurantListener) {
             tvName.setText(restaurant.getStructuredFormatting().getMainText());
             tvAddress.setText(restaurant.getStructuredFormatting().getSecondaryText());
-            card.setOnClickListener(view -> onClickItemListener.onClickItem(getAbsoluteAdapterPosition()));
+            card.setOnClickListener(view -> onClickRestaurantListener.onClickRestaurant(getAbsoluteAdapterPosition()));
         }
     }
 }

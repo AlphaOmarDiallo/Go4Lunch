@@ -3,7 +3,6 @@ package com.alphaomardiallo.go4lunch.ui.adapters;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Color;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,24 +19,25 @@ import com.alphaomardiallo.go4lunch.R;
 import com.alphaomardiallo.go4lunch.data.dataSources.Model.Booking;
 import com.alphaomardiallo.go4lunch.data.dataSources.Model.User;
 import com.alphaomardiallo.go4lunch.databinding.ItemWorkmatesBinding;
-import com.alphaomardiallo.go4lunch.domain.OnClickWormkmateListener;
+import com.alphaomardiallo.go4lunch.domain.OnClickWorkmateListener;
 import com.bumptech.glide.Glide;
 
 import java.util.List;
 
 public class WorkmatesAdapter extends ListAdapter<User, WorkmatesAdapter.WorkmatesViewHolder> {
 
-    private final OnClickWormkmateListener onClickItemListener;
+    private final OnClickWorkmateListener onClickItemListener;
+
+    @SuppressLint("StaticFieldLeak")
     private static Context context;
     private final List<Booking> bookingList;
 
-    public WorkmatesAdapter(@NonNull DiffUtil.ItemCallback<User> diffCallback, OnClickWormkmateListener onClickItemListener, List<Booking> bookingList, Context context) {
+    public WorkmatesAdapter(@NonNull DiffUtil.ItemCallback<User> diffCallback, OnClickWorkmateListener onClickItemListener, List<Booking> bookingList, Context context) {
         super(diffCallback);
         this.onClickItemListener = onClickItemListener;
         this.bookingList = bookingList;
         WorkmatesAdapter.context = context;
     }
-
 
     @NonNull
     @Override
@@ -53,8 +53,6 @@ public class WorkmatesAdapter extends ListAdapter<User, WorkmatesAdapter.Workmat
 
     public static class ListDiff extends DiffUtil.ItemCallback<User> {
 
-        private static final String TAG = "LISTDIFF";
-
         @Override
         public boolean areItemsTheSame(@NonNull User oldItem, @NonNull User newItem) {
             return oldItem.getUid().equalsIgnoreCase(newItem.getUid());
@@ -62,7 +60,6 @@ public class WorkmatesAdapter extends ListAdapter<User, WorkmatesAdapter.Workmat
 
         @Override
         public boolean areContentsTheSame(@NonNull User oldItem, @NonNull User newItem) {
-            Log.e(TAG, "areContentsTheSame: " + oldItem + newItem, null);
             return oldItem.getUsername().equalsIgnoreCase(newItem.getUsername()) &&
                     oldItem.getUserEmail().equalsIgnoreCase(newItem.getUserEmail());
         }
@@ -84,7 +81,7 @@ public class WorkmatesAdapter extends ListAdapter<User, WorkmatesAdapter.Workmat
 
 
         @SuppressLint("StringFormatMatches")
-        public void bind(User user, OnClickWormkmateListener onClickItemListener, List<Booking> bookingList) {
+        public void bind(User user, OnClickWorkmateListener onClickItemListener, List<Booking> bookingList) {
             // Checking for a booking
 
             boolean hasABooking = false;
@@ -122,7 +119,7 @@ public class WorkmatesAdapter extends ListAdapter<User, WorkmatesAdapter.Workmat
 
             if (hasABooking) {
                 Booking finalUserBooking = userBooking;
-                item.setOnClickListener(view -> onClickItemListener.onClickItem(finalUserBooking.getBookedRestaurantID()));
+                item.setOnClickListener(view -> onClickItemListener.onClickWorkmate(finalUserBooking.getBookedRestaurantID()));
             }
         }
     }
