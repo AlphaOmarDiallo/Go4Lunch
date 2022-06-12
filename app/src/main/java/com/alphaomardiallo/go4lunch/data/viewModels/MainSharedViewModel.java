@@ -24,6 +24,7 @@ import com.alphaomardiallo.go4lunch.data.repositories.PermissionRepository;
 import com.alphaomardiallo.go4lunch.data.repositories.PlacesAPIRepository;
 import com.alphaomardiallo.go4lunch.data.repositories.UserRepository;
 import com.alphaomardiallo.go4lunch.data.repositories.UserRepositoryImp;
+import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseUser;
 
@@ -83,6 +84,15 @@ public class MainSharedViewModel extends ViewModel {
     /**
      * Location tracking
      */
+
+    public LatLng getOfficeLatLng(){
+        Location office = locationRepository.getOfficeLocation();
+        return new LatLng(office.getLatitude(), office.getLongitude());
+    }
+
+    public Location getOfficeLocation(){
+        return locationRepository.getOfficeLocation();
+    }
 
     public void startTrackingLocation(Context context, Activity activity) {
         locationRepository.startLocationRequest(context, activity);

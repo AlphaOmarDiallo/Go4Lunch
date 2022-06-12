@@ -1,12 +1,9 @@
 package com.alphaomardiallo.go4lunch.ui.fragments;
 
-import static android.content.ContentValues.TAG;
-
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.location.Location;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,7 +20,6 @@ import com.alphaomardiallo.go4lunch.data.dataSources.Model.nearBySearchPojo.Resu
 import com.alphaomardiallo.go4lunch.data.viewModels.MainSharedViewModel;
 import com.alphaomardiallo.go4lunch.databinding.FragmentListViewBinding;
 import com.alphaomardiallo.go4lunch.domain.OnClickItemListener;
-import com.alphaomardiallo.go4lunch.domain.PositionUtils;
 import com.alphaomardiallo.go4lunch.ui.RestaurantDetails;
 import com.alphaomardiallo.go4lunch.ui.adapters.ListViewAdapter;
 import com.bumptech.glide.Glide;
@@ -40,13 +36,12 @@ public class ListViewFragment extends Fragment implements OnClickItemListener {
 
     private static final String KEY_RESTAURANT_ID = "id";
     private static final int SNACK_BAR_LENGTH_LONG = 10000;
-    private final PositionUtils positionUtils = new PositionUtils();
-    private final Location location = positionUtils.getOfficeLocationFormat();
+    private Location location = null;
     private FragmentListViewBinding binding;
     private MainSharedViewModel viewModel;
     private List<ResultsItem> restaurantList = new ArrayList<>();
     private List<Booking> bookingList = new ArrayList<>();
-    private ListViewAdapter adapter = new ListViewAdapter(new ListViewAdapter.ListDiff(), this, location, bookingList);
+    private ListViewAdapter adapter;
 
     @Nullable
     @Override
@@ -67,7 +62,10 @@ public class ListViewFragment extends Fragment implements OnClickItemListener {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        setLoaders();
+
+        getLocationDefaultLocation();
+
+        setLoaders(restaurantList);
 
         observePermission();
     }
@@ -75,6 +73,11 @@ public class ListViewFragment extends Fragment implements OnClickItemListener {
     /**
      * Methods getting API's to populate recyclerView
      */
+
+    private void getLocationDefaultLocation() {
+        location = viewModel.getOfficeLocation();
+        setAdapter(location);
+    }
 
     private void observePermission() {
         viewModel.observePermissionState().observe(requireActivity(), this::observeData);
@@ -88,27 +91,31 @@ public class ListViewFragment extends Fragment implements OnClickItemListener {
         }
     }
 
-    private void updateViewsWithParametersLocation(Location location) {
-        if (this.isAdded()) {
-            Log.e(TAG, "updateViewsWithParametersLocation: ", null);
-            viewModel.getRestaurants().observe(requireActivity(), this::setLoadersAfterAPICalls);
-            viewModel.getRestaurants().observe(requireActivity(), adapter::submitList);
-        }
+    private void updateBookingList(List<Booking> bookingList) {
+        this.bookingList = bookingList;
+        viewModel.getCurrentLocation().observe(requireActivity(), this::updateLocation);
+        viewModel.getRestaurantToFocusOn().observe(requireActivity(), this::getSearchResult);
     }
 
     private void updateLocation(Location location) {
-        setAdapter(location);
+        this.location = location;
+        setAdapter(this.location);
         if (this.isAdded()) {
             viewModel.getCurrentLocation().observe(requireActivity(), this::updateViewsWithParametersLocation);
         }
     }
 
-    private void updateBookingList(List<Booking> bookingList) {
-        this.bookingList = bookingList;
-        setAdapter(location);
-        viewModel.getCurrentLocation().observe(requireActivity(), this::updateLocation);
-        viewModel.getRestaurantToFocusOn().observe(requireActivity(), this::getSearchResult);
+    private void updateViewsWithParametersLocation(Location location) {
+        if (this.isAdded()) {
+            viewModel.getRestaurants().observe(requireActivity(), this::setLoaders);
+            setAdapter(location);
+            viewModel.getRestaurants().observe(requireActivity(), adapter::submitList);
+        }
     }
+
+    /**
+     * Using search result
+     */
 
     private void getSearchResult(String restaurantID) {
         boolean isInList = false;
@@ -149,7 +156,8 @@ public class ListViewFragment extends Fragment implements OnClickItemListener {
     /**
      * Managing the idling time with a gif
      */
-    private void setLoaders() {
+    private void setLoaders(List<ResultsItem> list) {
+        restaurantList = list;
 
         if (!viewModel.hasPermission(requireContext())) {
             binding.tvLoadingMessage.setText(R.string.location_missing);
@@ -168,19 +176,6 @@ public class ListViewFragment extends Fragment implements OnClickItemListener {
 
             binding.tvLoadingMessage.setVisibility(View.VISIBLE);
             binding.ivLoadingGIF.setVisibility(View.VISIBLE);
-        } else {
-            binding.tvLoadingMessage.setVisibility(View.INVISIBLE);
-            binding.ivLoadingGIF.setVisibility(View.INVISIBLE);
-        }
-    }
-
-    public void setLoadersAfterAPICalls(List<ResultsItem> list) {
-        restaurantList = list;
-        if (list.isEmpty()) {
-            Glide.with(binding.ivLoadingGIF)
-                    .asGif()
-                    .load(getString(R.string.fetching_list_gif))
-                    .into(binding.ivLoadingGIF);
         } else {
             binding.tvLoadingMessage.setVisibility(View.INVISIBLE);
             binding.ivLoadingGIF.setVisibility(View.INVISIBLE);

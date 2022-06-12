@@ -34,7 +34,6 @@ import com.alphaomardiallo.go4lunch.data.dataSources.Model.Booking;
 import com.alphaomardiallo.go4lunch.data.dataSources.Model.User;
 import com.alphaomardiallo.go4lunch.data.viewModels.MainSharedViewModel;
 import com.alphaomardiallo.go4lunch.databinding.ActivityMainBinding;
-import com.alphaomardiallo.go4lunch.domain.PermissionUtils;
 import com.alphaomardiallo.go4lunch.ui.fragments.ListViewFragment;
 import com.alphaomardiallo.go4lunch.ui.fragments.MapsFragment;
 import com.alphaomardiallo.go4lunch.ui.fragments.WorkmatesFragment;
@@ -65,7 +64,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private static final String KEY_SEARCH_QUERY = "Query";
     private static final String KEY_LOCATION_STRING = "Location";
     private static final String USER_ID = "userID";
-    private static final PermissionUtils permission = new PermissionUtils();
     private final Handler handler = new Handler(Looper.getMainLooper());
     private final MapsFragment mapsFragment = new MapsFragment();
     private final ListViewFragment listViewFragment = new ListViewFragment();
@@ -400,9 +398,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     public void requestPermission() {
-        if (permission.hasLocationPermissions(this)) {
-            return;
-        }
 
         EasyPermissions.requestPermissions(
                 this,

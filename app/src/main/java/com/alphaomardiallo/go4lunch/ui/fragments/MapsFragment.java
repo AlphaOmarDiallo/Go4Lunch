@@ -1,13 +1,10 @@
 package com.alphaomardiallo.go4lunch.ui.fragments;
 
-import static android.content.ContentValues.TAG;
-
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.location.Location;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,8 +21,6 @@ import com.alphaomardiallo.go4lunch.data.dataSources.Model.detailsPojo.Result;
 import com.alphaomardiallo.go4lunch.data.dataSources.Model.nearBySearchPojo.ResultsItem;
 import com.alphaomardiallo.go4lunch.data.viewModels.MainSharedViewModel;
 import com.alphaomardiallo.go4lunch.databinding.FragmentMapsBinding;
-import com.alphaomardiallo.go4lunch.domain.PermissionUtils;
-import com.alphaomardiallo.go4lunch.domain.PositionUtils;
 import com.alphaomardiallo.go4lunch.ui.RestaurantDetails;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -43,10 +38,11 @@ import java.util.Objects;
 import dagger.hilt.android.AndroidEntryPoint;
 
 @AndroidEntryPoint
-public class MapsFragment extends Fragment /*implements EasyPermissions.PermissionCallbacks*/ {
+public class MapsFragment extends Fragment {
 
     private static final int SNACK_BAR_LENGTH_LONG = 10000;
-    private static final PermissionUtils permission = new PermissionUtils();
+    private static final int ZERO = 0;
+    private static final String RESTAURANT_ID_KEY = "id";
     private final long defaultCameraZoomOverMap = 19;
     private FragmentMapsBinding binding;
     private MainSharedViewModel viewModel;
@@ -54,7 +50,6 @@ public class MapsFragment extends Fragment /*implements EasyPermissions.Permissi
     private List<Booking> bookingList;
     private GoogleMap map;
     private Location location;
-    private final PositionUtils positionUtils = new PositionUtils();
 
     private final OnMapReadyCallback callback = new OnMapReadyCallback() {
 
@@ -90,12 +85,6 @@ public class MapsFragment extends Fragment /*implements EasyPermissions.Permissi
             setMap(googleMap);
 
             addOfficeMarkerToMap(googleMap);
-
-            binding.fabMyLocation.setOnClickListener(view1 -> {
-                if (permission.hasLocationPermissions(requireContext())) {
-                    getCurrentLocation(googleMap);
-                }
-            });
 
             if (location != null) {
                 getCurrentLocation(googleMap);
@@ -142,9 +131,8 @@ public class MapsFragment extends Fragment /*implements EasyPermissions.Permissi
         viewModel.getAllBookings().observe(requireActivity(), this::setBookingList);
     }
 
-    private void setBookingList(List<Booking> list){
+    private void setBookingList(List<Booking> list) {
         bookingList = list;
-        Log.e(TAG, "setBookingList: " + bookingList,null );
     }
 
     private void observePermission() {
@@ -152,7 +140,6 @@ public class MapsFragment extends Fragment /*implements EasyPermissions.Permissi
     }
 
     private void observeData(Boolean hasPermission) {
-        Log.e(TAG, "observeData: here " + hasPermission, null);
         if (hasPermission) {
             if (this.isAdded()) {
                 observeBookings();
@@ -168,7 +155,6 @@ public class MapsFragment extends Fragment /*implements EasyPermissions.Permissi
     }
 
     private void updateLocation(Location location) {
-        Log.e(TAG, "updateLocation: here", null);
         if (this.isAdded()) {
             this.location = location;
             enableMyLocation(map);
@@ -220,17 +206,23 @@ public class MapsFragment extends Fragment /*implements EasyPermissions.Permissi
         googleMap.getUiSettings().setMyLocationButtonEnabled(false);
         googleMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
 
-        if (permission.hasLocationPermissions(requireContext())) {
-            enableMyLocation(googleMap);
+        viewModel.observePermissionState().observe(requireActivity(), this::setCamera);
+
+    }
+
+    private void setCamera(boolean hasPermission) {
+        if (hasPermission) {
+            enableMyLocation(map);
+            binding.fabMyLocation.setOnClickListener(view1 -> getCurrentLocation(map));
         } else {
-            googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(positionUtils.getOfficeLocation(), defaultCameraZoomOverMap));
+            map.moveCamera(CameraUpdateFactory.newLatLngZoom(viewModel.getOfficeLatLng(), defaultCameraZoomOverMap));
         }
     }
 
     private void addOfficeMarkerToMap(GoogleMap googleMap) {
         googleMap.addMarker(new MarkerOptions()
-                .position(positionUtils.getOfficeLocation())
-                .title("Office")
+                .position(viewModel.getOfficeLatLng())
+                .title(getString(R.string.office_name))
                 .icon(BitmapDescriptorFactory.fromBitmap(viewModel.resizeMarker(requireContext().getResources(), R.drawable.office_marker)))
         );
     }
@@ -242,7 +234,7 @@ public class MapsFragment extends Fragment /*implements EasyPermissions.Permissi
 
             LatLng coordinates = new LatLng(resultsItem.getGeometry().getLocation().getLat(), resultsItem.getGeometry().getLocation().getLng());
 
-            if (bookingList != null && bookingList.size() > 0) {
+            if (bookingList != null && bookingList.size() > ZERO) {
 
 
                 for (Booking booking : bookingList) {
@@ -281,7 +273,7 @@ public class MapsFragment extends Fragment /*implements EasyPermissions.Permissi
 
     private void openDetailActivity(String restaurantID) {
         Intent intent = new Intent(requireContext(), RestaurantDetails.class);
-        intent.putExtra("id", restaurantID);
+        intent.putExtra(RESTAURANT_ID_KEY, restaurantID);
         startActivity(intent);
     }
 
@@ -317,4 +309,3 @@ public class MapsFragment extends Fragment /*implements EasyPermissions.Permissi
     }
 
 }
-
