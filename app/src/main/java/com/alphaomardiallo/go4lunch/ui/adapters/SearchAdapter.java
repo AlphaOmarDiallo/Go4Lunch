@@ -19,7 +19,7 @@ import com.alphaomardiallo.go4lunch.domain.OnClickRestaurantListener;
 public class SearchAdapter extends ListAdapter<PredictionsItem, SearchAdapter.SearchViewHolder> {
 
     public ItemSearchBinding binding;
-    OnClickRestaurantListener onClickRestaurantListener;
+    final OnClickRestaurantListener onClickRestaurantListener;
 
     public SearchAdapter(@NonNull DiffUtil.ItemCallback<PredictionsItem> diffCallback, OnClickRestaurantListener onClickRestaurantListener) {
         super(diffCallback);

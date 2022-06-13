@@ -11,8 +11,8 @@ import javax.inject.Inject;
 
 public class AutocompleteRepositoryImp implements AutocompleteRepository {
 
-    MutableLiveData<List<PredictionsItem>> predictionsList = new MutableLiveData<>();
-    MutableLiveData<PredictionsItem> selectedRestaurant = new MutableLiveData<>();
+    final MutableLiveData<List<PredictionsItem>> predictionsList = new MutableLiveData<>();
+    final MutableLiveData<PredictionsItem> selectedRestaurant = new MutableLiveData<>();
 
     @Inject
     public AutocompleteRepositoryImp() {

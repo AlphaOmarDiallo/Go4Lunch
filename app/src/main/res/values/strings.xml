@@ -64,6 +64,8 @@
     <string name="user_joining_append">%s, %s</string>
     <string name="final_notification">"%s.\n%s"</string>
     <string name="default_notification_channel_id">com.google.firebase.messaging.default_notification_channel_id</string>
+    <string name="notification_you_are_going_with">You are going with%s</string>
+    <string name="notification_you_are_eating_alone">You are eating alone today</string>
 
     <string name="app_name">Go4Lunch</string>
     <string name="slogan">Find a nice restaurant and invite your co-workers for lunch!</string>
@@ -147,7 +149,5 @@
     <string name="your_favourite_restaurants">Your favourite restaurants</string>
     <string name="msg_token_fmt">%s</string>
     <string name="created_booking">Your booking has been created</string>
-    <string name="notification_you_are_going_with">You are going with%s</string>
-    <string name="notification_you_are_eating_alone">You are eating alone today</string>
 
 </resources>

@@ -17,7 +17,7 @@ public class MainApplication extends Application {
     public static final String LUNCHTIME_REMINDER = "Lunch time reminder";
     public static final String CHANNEL_BOOKING_REMINDER = "makeABookingReminder";
     public static final String BOOKING_REMINDER = "Book lunch reminder";
-    public List<NotificationChannel> notificationChannelList = new ArrayList<>();
+    public final List<NotificationChannel> notificationChannelList = new ArrayList<>();
 
     @Override
     public void onCreate() {

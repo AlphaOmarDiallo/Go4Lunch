@@ -14,7 +14,7 @@ import pub.devrel.easypermissions.EasyPermissions;
 
 public class PermissionRepositoryImp implements PermissionRepository {
 
-    MutableLiveData<Boolean> hasPermissions = new MutableLiveData<>();
+    final MutableLiveData<Boolean> hasPermissions = new MutableLiveData<>();
 
     @Inject
     public PermissionRepositoryImp() {

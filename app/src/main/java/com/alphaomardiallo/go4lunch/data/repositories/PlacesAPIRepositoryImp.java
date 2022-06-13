@@ -55,12 +55,12 @@ public class PlacesAPIRepositoryImp implements PlacesAPIRepository {
     public PlacesAPIRepositoryImp() {
     }
 
-    Retrofit retrofit = new Retrofit.Builder()
+    final Retrofit retrofit = new Retrofit.Builder()
             .baseUrl(BASE_URL)
             .addConverterFactory(GsonConverterFactory.create())
             .build();
 
-    RetrofitNearBySearchAPI retrofitNearBySearchAPI = retrofit.create(RetrofitNearBySearchAPI.class);
+    final RetrofitNearBySearchAPI retrofitNearBySearchAPI = retrofit.create(RetrofitNearBySearchAPI.class);
 
     /**
      * NearBySearch
@@ -202,7 +202,7 @@ public class PlacesAPIRepositoryImp implements PlacesAPIRepository {
      * Places Detail
      */
 
-    RetrofitDetailsAPI retrofitDetailsAPI = retrofit.create(RetrofitDetailsAPI.class);
+    final RetrofitDetailsAPI retrofitDetailsAPI = retrofit.create(RetrofitDetailsAPI.class);
 
     @Override
     public LiveData<Result> getDetails() {
@@ -296,7 +296,7 @@ public class PlacesAPIRepositoryImp implements PlacesAPIRepository {
      * Places AutoComplete
      */
 
-    RetrofitAutocompleteAPI retrofitAutocompleteAPI = retrofit.create(RetrofitAutocompleteAPI.class);
+    final RetrofitAutocompleteAPI retrofitAutocompleteAPI = retrofit.create(RetrofitAutocompleteAPI.class);
 
     public LiveData<List<PredictionsItem>> autoCompleteSearch(String Query, String location, int radius) {
 
