@@ -99,7 +99,6 @@ public class ListViewAdapter extends ListAdapter<ResultsItem, ListViewAdapter.Li
         public void bind(ResultsItem restaurant, OnClickRestaurantListener onClickRestaurantListener, Location location, List<Booking> bookingList) {
             restaurantName.setText(restaurant.getName());
             restaurantStyleAndAddress.setText(restaurant.getVicinity());
-            restaurantOpeningTime.setText(getOpeningTime(restaurant.getOpeningHours().isOpenNow()));
             restaurantDistance.setText(restaurant.getGeometry().getLocation().toString());
             restaurantNumberOfWorkmates.setText(getNumberOfWorkmates(bookingList, restaurant.getPlaceId()));
             restaurantRating.setRating(getRating(restaurant.getRating()));
@@ -107,6 +106,10 @@ public class ListViewAdapter extends ListAdapter<ResultsItem, ListViewAdapter.Li
             restaurantLocation.setLatitude(restaurant.getGeometry().getLocation().getLat());
             restaurantLocation.setLongitude(restaurant.getGeometry().getLocation().getLng());
             restaurantDistance.setText(String.format("%sm", Math.round(location.distanceTo(restaurantLocation))));
+
+            if (restaurant.getOpeningHours() != null){
+                restaurantOpeningTime.setText(getOpeningTime(restaurant.getOpeningHours().isOpenNow()));
+            }
 
             if (restaurantPhoto != null) {
                 Glide.with(restaurantPhoto)

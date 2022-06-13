@@ -200,9 +200,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     private void cleanBookingList(List<Booking> list) {
-        if (list != null && list.size() > 0) {
+        /*if (list != null && list.size() > 0) {
             viewModel.removeBookingsFromPreviousDay(this);
-        }
+        }*/
     }
 
     /**
