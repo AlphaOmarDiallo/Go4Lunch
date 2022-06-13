@@ -1,14 +1,11 @@
 package com.alphaomardiallo.go4lunch.data.viewModels;
 
-import static android.content.ContentValues.TAG;
-
 import android.app.Activity;
 import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.location.Location;
-import android.util.Log;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
@@ -39,6 +36,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel;
 @HiltViewModel
 public class MainSharedViewModel extends ViewModel {
 
+    private static final int DISTANCE_IN_METERS = 51;
     private final UserRepositoryImp userRepositoryImp;
     private final LocationRepository locationRepository;
     private final PlacesAPIRepository placesAPIRepository;
@@ -128,12 +126,11 @@ public class MainSharedViewModel extends ViewModel {
             placesAPIRepository.fetchNearBySearchPlaces(locationString, locationRepository.getRadius());
 
         } else {
-            if (savedLocation.distanceTo(location) > 51) {
+            if (savedLocation.distanceTo(location) > DISTANCE_IN_METERS) {
                 Location currentLocation = locationRepository.getCurrentLocation().getValue();
 
                 String locationString = Objects.requireNonNull(currentLocation).getLatitude() + "," + currentLocation.getLongitude();
                 placesAPIRepository.fetchNearBySearchPlaces(locationString, locationRepository.getRadius());
-                Log.e(TAG, "getAllRestaurantList: distance condition met", null);
             }
         }
     }

@@ -178,14 +178,12 @@ public class UserRepositoryImp implements UserRepository {
     public void addFavouriteRestaurant(String userID, String restaurantID) {
         database.collection(COLLECTION_NAME).document(userID)
                 .update(FIELD_FAVOURITE_RESTAURANT, FieldValue.arrayUnion(restaurantID))
-                .addOnSuccessListener(unused -> Log.i(TAG, "addFavouriteRestaurant: favourite restaurant added to list"))
                 .addOnFailureListener(e -> Log.e(TAG, "addFavouriteRestaurant: failed ", e));
     }
 
     public void removeFavouriteRestaurant(String userID, String restaurantID) {
         database.collection(COLLECTION_NAME).document(userID)
                 .update(FIELD_FAVOURITE_RESTAURANT, FieldValue.arrayRemove(restaurantID))
-                .addOnSuccessListener(unused -> Log.i(TAG, "removeFavouriteRestaurant: favourite restaurant removed from list"))
                 .addOnFailureListener(e -> Log.e(TAG, "removeFavouriteRestaurant: failed ", e));
     }
 }

@@ -1,10 +1,7 @@
 package com.alphaomardiallo.go4lunch.ui.fragments;
 
-import static android.content.ContentValues.TAG;
-
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -94,8 +91,6 @@ public class WorkmatesFragment extends Fragment implements OnClickWorkmateListen
         allBookings = list;
         setAdapter();
         observeUserList();
-        Log.i(TAG, "updateBookingList: " + list);
-
     }
 
     /**

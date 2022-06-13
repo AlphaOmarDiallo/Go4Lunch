@@ -159,5 +159,4 @@ public class AlarmReceiver extends BroadcastReceiver {
         // Show notification
         notificationManager.notify(NOTIFICATION_TAG, NOTIFICATION_ID, notificationBuilder.build());
     }
-
 }

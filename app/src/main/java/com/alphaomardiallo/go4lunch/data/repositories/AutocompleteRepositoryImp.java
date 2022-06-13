@@ -6,7 +6,6 @@ import androidx.lifecycle.MutableLiveData;
 import com.alphaomardiallo.go4lunch.data.dataSources.Model.autocompletePojo.PredictionsItem;
 
 import java.util.List;
-import java.util.Objects;
 
 import javax.inject.Inject;
 
@@ -31,7 +30,6 @@ public class AutocompleteRepositoryImp implements AutocompleteRepository {
 
     public void setPlaceToFocusOn(PredictionsItem restaurant) {
         selectedRestaurant.setValue(restaurant);
-        System.out.println(Objects.requireNonNull(selectedRestaurant.getValue()).getStructuredFormatting().getMainText());
     }
 
 }

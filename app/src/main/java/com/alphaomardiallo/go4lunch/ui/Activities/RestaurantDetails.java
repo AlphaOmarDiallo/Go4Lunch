@@ -1,5 +1,7 @@
 package com.alphaomardiallo.go4lunch.ui.Activities;
 
+import static android.content.ContentValues.TAG;
+
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
@@ -8,6 +10,7 @@ import android.content.res.ColorStateList;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
@@ -144,7 +147,6 @@ public class RestaurantDetails extends AppCompatActivity {
         binding.tvWebsiteDetails.setVisibility(View.INVISIBLE);
 
         if (restaurant != null) {
-            System.out.println(restaurantID);
             String restaurantPhoto = getString(R.string.restaurantPlaceHolder);
             restaurantName = restaurant.getName();
             double restaurantRating = restaurant.getRating();
@@ -156,7 +158,7 @@ public class RestaurantDetails extends AppCompatActivity {
             try {
                 restaurantPhoto = "https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference=" + restaurant.getPhotos().get(0).getPhotoReference() + "&key=" + BuildConfig.PLACES_API_KEY;
             } catch (Exception e) {
-                System.out.println(e.getMessage());
+                Log.e(TAG, "setupViews: Failed ", e);
             }
 
             Glide.with(binding.ivRestaurantPhotoDetail)
