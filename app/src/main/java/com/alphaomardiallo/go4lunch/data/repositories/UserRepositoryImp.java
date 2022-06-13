@@ -166,6 +166,7 @@ public class UserRepositoryImp implements UserRepository {
                 user.setValue(value.toObject(User.class));
             } else {
                 Log.i(TAG, "onEvent: data is null");
+                createUser();
             }
 
         });
