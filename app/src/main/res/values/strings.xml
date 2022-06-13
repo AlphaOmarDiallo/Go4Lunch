@@ -147,5 +147,7 @@
     <string name="your_favourite_restaurants">Your favourite restaurants</string>
     <string name="msg_token_fmt">%s</string>
     <string name="created_booking">Your booking has been created</string>
+    <string name="notification_you_are_going_with">You are going with%s</string>
+    <string name="notification_you_are_eating_alone">You are eating alone today</string>
 
 </resources>

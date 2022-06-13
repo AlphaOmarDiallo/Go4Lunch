@@ -35,11 +35,13 @@ import dagger.hilt.android.AndroidEntryPoint;
 public class AlarmReceiver extends BroadcastReceiver {
     private static final int NOTIFICATION_ID = 416;
     private static final String NOTIFICATION_TAG = "GO4LUNCH";
+    public static final String COLLECTION_USERS = "users";
+    public static final String COLLECTION_BOOKING = "booking";
     Context context;
     List<User> allUsers;
     List<Booking> allBookings;
     String notification1 = null;
-    String notification2 = "You are eating alone today.";
+    String notification2 = null;
     String userID = null;
     String restaurantID = null;
     String restaurantName = null;
@@ -55,7 +57,6 @@ public class AlarmReceiver extends BroadcastReceiver {
         getUserDataFromSharedPreferences();
         getUsersFromFireStore();
         setNotificationString();
-        sendVisualNotification();
     }
 
 
@@ -74,7 +75,7 @@ public class AlarmReceiver extends BroadcastReceiver {
     private void getUsersFromFireStore() {
 
         FirebaseFirestore.getInstance()
-                .collection("users")
+                .collection(COLLECTION_USERS)
                 .get()
                 .addOnSuccessListener(queryDocumentSnapshots -> {
                     allUsers = queryDocumentSnapshots.toObjects(User.class);
@@ -85,7 +86,7 @@ public class AlarmReceiver extends BroadcastReceiver {
 
     private void getBookingsFromFirestore() {
         FirebaseFirestore.getInstance()
-                .collection("booking")
+                .collection(COLLECTION_BOOKING)
                 .get()
                 .addOnSuccessListener(queryDocumentSnapshots -> {
                     allBookings = queryDocumentSnapshots.toObjects(Booking.class);
@@ -101,9 +102,7 @@ public class AlarmReceiver extends BroadcastReceiver {
 
         for (User user : allUsers) {
             for (Booking booking : allBookings) {
-                if (booking.getUserWhoBooked().equalsIgnoreCase(user.getUid())
-                        && booking.getBookedRestaurantID().equalsIgnoreCase(restaurantID)
-                        && !user.getUid().equalsIgnoreCase(userID)) {
+                if (!booking.getUserWhoBooked().equalsIgnoreCase(userID) && booking.getUserWhoBooked().equalsIgnoreCase(user.getUid())) {
                     userJoining.add(user);
                     break;
                 }
@@ -115,8 +114,12 @@ public class AlarmReceiver extends BroadcastReceiver {
                 userJoiningString = String.format(context.getString(R.string.user_joining_append), userJoiningString, user.getUsername());
             }
 
-            notification2 = String.format("You are going with%s", userJoiningString);
+            notification2 = String.format(context.getString(R.string.notification_you_are_going_with), userJoiningString);
+        } else {
+            notification2 = context.getString(R.string.notification_you_are_eating_alone);
         }
+
+        sendVisualNotification();
 
     }
 
