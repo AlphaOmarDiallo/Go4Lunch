@@ -148,20 +148,26 @@ public class BookingRepositoryImp implements BookingRepository {
 
     @SuppressLint("MissingPermission")
     private void setAlarmExactRTCWakeUp(Context context) {
-        Calendar c = Calendar.getInstance();
+        SharedPreferences sharedPreferences = context.getSharedPreferences(context.getString(R.string.preferences_main_file), Context.MODE_PRIVATE);
 
-        if (checkDateToSetNotification() < TO_COMPARE_TO) {
-            c.set(Calendar.HOUR_OF_DAY, ALARM_HOUR);
-            c.set(Calendar.MINUTE, ALARM_MIN_SEC);
-            c.set(Calendar.SECOND, ALARM_MIN_SEC);
+        if(sharedPreferences.getString(context.getString(R.string.shared_pref_notifications), "false").equalsIgnoreCase("true")) {
 
-            AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-            Intent alarmIntent = new Intent(context, AlarmReceiver.class);
-            @SuppressLint("UnspecifiedImmutableFlag") PendingIntent pendingAlarmIntent = PendingIntent.getBroadcast(context, 1, alarmIntent, PendingIntent.FLAG_ONE_SHOT);
-            alarmManager.setExact(AlarmManager.RTC_WAKEUP, c.getTimeInMillis(), pendingAlarmIntent);
-        } else {
-            Log.i(TAG, "setAlarmExactRTCWakeUp: Alarm is not set because booking is made after the notification time");
+            Calendar c = Calendar.getInstance();
+
+            if (checkDateToSetNotification() < TO_COMPARE_TO) {
+                c.set(Calendar.HOUR_OF_DAY, ALARM_HOUR);
+                c.set(Calendar.MINUTE, ALARM_MIN_SEC);
+                c.set(Calendar.SECOND, ALARM_MIN_SEC);
+
+                AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+                Intent alarmIntent = new Intent(context, AlarmReceiver.class);
+                @SuppressLint("UnspecifiedImmutableFlag") PendingIntent pendingAlarmIntent = PendingIntent.getBroadcast(context, 1, alarmIntent, PendingIntent.FLAG_ONE_SHOT);
+                alarmManager.setExact(AlarmManager.RTC_WAKEUP, c.getTimeInMillis(), pendingAlarmIntent);
+            } else {
+                Log.i(TAG, "setAlarmExactRTCWakeUp: Alarm is not set because booking is made after the notification time");
+            }
         }
+
     }
 
     private void cancelAlarm(Context context) {

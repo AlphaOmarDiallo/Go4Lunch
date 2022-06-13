@@ -17,7 +17,7 @@ import com.alphaomardiallo.go4lunch.data.dataSources.Model.Booking;
 import com.alphaomardiallo.go4lunch.data.viewModels.MainSharedViewModel;
 import com.alphaomardiallo.go4lunch.databinding.FragmentWorkmatesBinding;
 import com.alphaomardiallo.go4lunch.domain.OnClickWorkmateListener;
-import com.alphaomardiallo.go4lunch.ui.Activities.RestaurantDetails;
+import com.alphaomardiallo.go4lunch.ui.activities.RestaurantDetails;
 import com.alphaomardiallo.go4lunch.ui.adapters.WorkmatesAdapter;
 
 import java.util.ArrayList;

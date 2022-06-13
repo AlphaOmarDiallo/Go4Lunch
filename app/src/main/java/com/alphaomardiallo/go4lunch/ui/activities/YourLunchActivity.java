@@ -1,4 +1,4 @@
-package com.alphaomardiallo.go4lunch.ui.Activities;
+package com.alphaomardiallo.go4lunch.ui.activities;
 
 import android.content.Intent;
 import android.os.Bundle;

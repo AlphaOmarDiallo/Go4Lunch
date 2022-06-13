@@ -31,7 +31,7 @@
     <string name="restaurantPlaceHolder" translatable="false">https://images.pexels.com/photos/3184192/pexels-photo-3184192.jpeg?cs=srgb&amp;dl=pexels-fauxels-3184192.jpg&amp;fm=jpg"</string>
     <string name="restaurant_photo" translatable="false">https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&amp;photo_reference=%s&amp;key=%s;</string>
     <string name="gif_eating_alone" translatable="false">https://media.giphy.com/media/p1NqIBmDgA2P8Kwz8E/giphy.gif</string>
-    <string name="we_need_your_location_gif" tools:ignore="Typos" translatable="false">https://media.giphy.com/media/Vh8zf1nIfQRRXksAm1/giphy.gif</string>
+    <string name="we_need_your_location_gif" translatable="false" tools:ignore="Typos">https://media.giphy.com/media/Vh8zf1nIfQRRXksAm1/giphy.gif</string>
     <string name="fetching_list_gif" translatable="false">https://media.giphy.com/media/0KiLnOipDAnfk5Jgsf/giphy.gif</string>
     <string name="no_results_gif" translatable="false">https://media.giphy.com/media/MdeHHwPzLpzbEkzl70/giphy.gif</string>
     <string name="user_does_not_have_picture" translatable="false">https://images.pexels.com/photos/3179911/pexels-photo-3179911.jpeg?auto=compress&amp;cs=tinysrgb&amp;w=1260&amp;h=750&amp;dpr=2</string>
@@ -49,6 +49,7 @@
     <string name="shared_pref_restaurant_ID" translatable="false">bookedRestaurantID</string>
     <string name="shared_pref_restaurant_Name" translatable="false">bookedRestaurantName</string>
     <string name="shared_pref_restaurant_Address" translatable="false">bookedRestaurantAddress</string>
+    <string name="shared_pref_notifications" translatable="false">notificationPref</string>
 
     <!-- location -->
     <string name="office_location" translatable="false">48.86501071160738,2.3467211059168793</string>
@@ -149,4 +150,9 @@
     <string name="your_favourite_restaurants">Your favourite restaurants</string>
     <string name="msg_token_fmt" translatable="false">%s</string>
     <string name="created_booking">Your booking has been created</string>
+    <!-- Preference Titles -->
+    <string name="messages_header" translatable="false">Messages</string>
+    <string name="no_notification">You will receive lunch notification</string>
+    <string name="yes_notification">You will not receive notifications</string>
+    <string name="Notification" translatable="false">Notification</string>
 </resources>

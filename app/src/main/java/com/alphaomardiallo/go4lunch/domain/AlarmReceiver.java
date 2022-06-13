@@ -21,7 +21,7 @@ import androidx.core.app.NotificationCompat;
 import com.alphaomardiallo.go4lunch.R;
 import com.alphaomardiallo.go4lunch.data.dataSources.Model.Booking;
 import com.alphaomardiallo.go4lunch.data.dataSources.Model.User;
-import com.alphaomardiallo.go4lunch.ui.Activities.MainActivity;
+import com.alphaomardiallo.go4lunch.ui.activities.MainActivity;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;

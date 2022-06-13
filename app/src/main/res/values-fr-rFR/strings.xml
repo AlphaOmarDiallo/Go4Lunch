@@ -3,7 +3,7 @@
     <string name="app_name">Go4Lunch</string>
     <string name="signature_title">Votre signature</string>
     <string name="reply_title">Réponse par défault</string>
-    <string name="delete_account">Supprimer compte</string>
+    <string name="delete_account">Supprimer mon compte</string>
     <string name="cancel">Annuler</string>
     <string name="dialog_account_delete">Etes-vous certains de vouloir supprimer votre compte pour toujours? Toutes les données seront perdues.</string>
     <string name="dialog_account_title">Supprimer mon compte</string>
@@ -70,4 +70,6 @@
     <string name="yes_booking">Vous avez selectionné %s pour le déjeuner</string>
     <string name="your_favourite_restaurants">Vos restaurants favoris</string>
     <string name="created_booking">Votre réservation a été créée</string>
+    <string name="no_notification">Vous recevrez les notifications du déjeuner</string>
+    <string name="yes_notification">Vous ne recevrez aucunes notifications</string>
 </resources>

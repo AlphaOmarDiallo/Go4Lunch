@@ -20,7 +20,7 @@ import com.alphaomardiallo.go4lunch.data.dataSources.Model.nearBySearchPojo.Resu
 import com.alphaomardiallo.go4lunch.data.viewModels.MainSharedViewModel;
 import com.alphaomardiallo.go4lunch.databinding.FragmentListViewBinding;
 import com.alphaomardiallo.go4lunch.domain.OnClickRestaurantListener;
-import com.alphaomardiallo.go4lunch.ui.Activities.RestaurantDetails;
+import com.alphaomardiallo.go4lunch.ui.activities.RestaurantDetails;
 import com.alphaomardiallo.go4lunch.ui.adapters.ListViewAdapter;
 import com.bumptech.glide.Glide;
 import com.google.android.material.snackbar.Snackbar;
