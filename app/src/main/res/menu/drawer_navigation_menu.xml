@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/yourLunchNavDrawer"
+        android:icon="@drawable/ic_baseline_spoon_knife_24"
+        android:title="@string/your_lunch" />
+
+    <item
+        android:id="@+id/settingsNavDrawer"
+        android:icon="@drawable/ic_baseline_settings_24"
+        android:title="@string/settings" />
+
+    <item
+        android:id="@+id/logoutNavDrawer"
+        android:icon="@drawable/ic_baseline_logout_24"
+        android:title="@string/logout" />
+
+</menu>

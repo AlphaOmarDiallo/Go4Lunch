@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/menuItemMapView"
+        android:enabled="true"
+        android:icon="@drawable/ic_baseline_map_24"
+        android:label="@string/i_m_hungry"
+        android:title="@string/map_view" />
+    <item
+        android:id="@+id/menuItemListView"
+        android:enabled="true"
+        android:icon="@drawable/ic_baseline_view_list_24"
+        android:label="@string/i_m_hungry"
+        android:title="@string/list_view" />
+    <item
+        android:id="@+id/menuItemWorkmates"
+        android:enabled="true"
+        android:icon="@drawable/ic_baseline_workmates_24"
+        android:label="@string/available_workmates"
+        android:title="@string/workmates" />
+</menu>

@@ -20,38 +20,38 @@
     <string name="cancel">Cancel</string>
     <string name="dialog_account_delete">Are you sure you want to delete your account? All data will be lost forever.</string>
     <string name="dialog_account_title">Delete my account</string>
-    <string name="OK">OK</string>
+    <string name="OK" translatable="false">OK</string>
     <string name="location_permission_denied">Location permission denied</string>
     <string name="permission_required_toast">Permission required</string>
     <string name="permission_rationale_location">This app needs location permission to function properly</string>
 
     <!-- links -->
-    <string name="login_and_menu_background">https://images.pexels.com/photos/3184188/pexels-photo-3184188.jpeg?cs=srgb&amp;dl=pexels-fauxels-3184188.jpg&amp;fm=jpg</string>
-    <string name="nav_drawer_background">https://images.pexels.com/photos/3184183/pexels-photo-3184183.jpeg?cs=srgb&amp;dl=pexels-fauxels-3184183.jpg&amp;fm=jpg</string>
-    <string name="restaurantPlaceHolder">https://images.pexels.com/photos/3184192/pexels-photo-3184192.jpeg?cs=srgb&amp;dl=pexels-fauxels-3184192.jpg&amp;fm=jpg"</string>
-    <string name="restaurant_photo">https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&amp;photo_reference=%s&amp;key=%s;</string>
-    <string name="gif_eating_alone">https://media.giphy.com/media/p1NqIBmDgA2P8Kwz8E/giphy.gif</string>
-    <string name="we_need_your_location_gif" tools:ignore="Typos">https://media.giphy.com/media/Vh8zf1nIfQRRXksAm1/giphy.gif</string>
-    <string name="fetching_list_gif">https://media.giphy.com/media/0KiLnOipDAnfk5Jgsf/giphy.gif</string>
-    <string name="no_results_gif">https://media.giphy.com/media/MdeHHwPzLpzbEkzl70/giphy.gif</string>
-    <string name="user_does_not_have_picture">https://images.pexels.com/photos/3179911/pexels-photo-3179911.jpeg?auto=compress&amp;cs=tinysrgb&amp;w=1260&amp;h=750&amp;dpr=2</string>
-    <string name="fake_avatar">https://cdn.pixabay.com/photo/2016/08/08/09/17/avatar-1577909_1280.png</string>
+    <string name="login_and_menu_background" translatable="false">https://images.pexels.com/photos/3184188/pexels-photo-3184188.jpeg?cs=srgb&amp;dl=pexels-fauxels-3184188.jpg&amp;fm=jpg</string>
+    <string name="nav_drawer_background" translatable="false">https://images.pexels.com/photos/3184183/pexels-photo-3184183.jpeg?cs=srgb&amp;dl=pexels-fauxels-3184183.jpg&amp;fm=jpg</string>
+    <string name="restaurantPlaceHolder" translatable="false">https://images.pexels.com/photos/3184192/pexels-photo-3184192.jpeg?cs=srgb&amp;dl=pexels-fauxels-3184192.jpg&amp;fm=jpg"</string>
+    <string name="restaurant_photo" translatable="false">https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&amp;photo_reference=%s&amp;key=%s;</string>
+    <string name="gif_eating_alone" translatable="false">https://media.giphy.com/media/p1NqIBmDgA2P8Kwz8E/giphy.gif</string>
+    <string name="we_need_your_location_gif" tools:ignore="Typos" translatable="false">https://media.giphy.com/media/Vh8zf1nIfQRRXksAm1/giphy.gif</string>
+    <string name="fetching_list_gif" translatable="false">https://media.giphy.com/media/0KiLnOipDAnfk5Jgsf/giphy.gif</string>
+    <string name="no_results_gif" translatable="false">https://media.giphy.com/media/MdeHHwPzLpzbEkzl70/giphy.gif</string>
+    <string name="user_does_not_have_picture" translatable="false">https://images.pexels.com/photos/3179911/pexels-photo-3179911.jpeg?auto=compress&amp;cs=tinysrgb&amp;w=1260&amp;h=750&amp;dpr=2</string>
+    <string name="fake_avatar" translatable="false">https://cdn.pixabay.com/photo/2016/08/08/09/17/avatar-1577909_1280.png</string>
 
     <!--  Keys -->
-    <string name="default_web_client_id_google">407532419271-qimb705lnldgpbks9mb0bhoveskv8po6.apps.googleusercontent.com</string>
-    <string name="facebook_app_id">275016551500747</string>
-    <string name="facebook_application_id">fb275016551500747</string>
+    <string name="default_web_client_id_google" translatable="false">407532419271-qimb705lnldgpbks9mb0bhoveskv8po6.apps.googleusercontent.com</string>
+    <string name="facebook_app_id" translatable="false">275016551500747</string>
+    <string name="facebook_application_id" translatable="false">fb275016551500747</string>
 
     <!--  SharedPreferences -->
-    <string name="preferences_main_file">preferencesMainFile</string>
-    <string name="shared_pref_current_User_ID">currentUserID</string>
-    <string name="shared_pref_current_User_Username">currentUserUsername</string>
-    <string name="shared_pref_restaurant_ID">bookedRestaurantID</string>
-    <string name="shared_pref_restaurant_Name">bookedRestaurantName</string>
-    <string name="shared_pref_restaurant_Address">bookedRestaurantAddress</string>
+    <string name="preferences_main_file" translatable="false">preferencesMainFile</string>
+    <string name="shared_pref_current_User_ID" translatable="false">currentUserID</string>
+    <string name="shared_pref_current_User_Username" translatable="false">currentUserUsername</string>
+    <string name="shared_pref_restaurant_ID" translatable="false">bookedRestaurantID</string>
+    <string name="shared_pref_restaurant_Name" translatable="false">bookedRestaurantName</string>
+    <string name="shared_pref_restaurant_Address" translatable="false">bookedRestaurantAddress</string>
 
     <!-- location -->
-    <string name="office_location">48.86501071160738,2.3467211059168793</string>
+    <string name="office_location" translatable="false">48.86501071160738,2.3467211059168793</string>
     <string name="office_name">Office</string>
 
     <!-- notification -->
@@ -63,7 +63,7 @@
     <string name="notification_line_2">You are going with%s</string>
     <string name="user_joining_append">%s, %s</string>
     <string name="final_notification">"%s.\n%s"</string>
-    <string name="default_notification_channel_id">com.google.firebase.messaging.default_notification_channel_id</string>
+    <string name="default_notification_channel_id" translatable="false">com.google.firebase.messaging.default_notification_channel_id</string>
     <string name="notification_you_are_going_with">You are going with%s</string>
     <string name="notification_you_are_eating_alone">You are eating alone today</string>
 
@@ -149,5 +149,4 @@
     <string name="your_favourite_restaurants">Your favourite restaurants</string>
     <string name="msg_token_fmt">%s</string>
     <string name="created_booking">Your booking has been created</string>
-
 </resources>
