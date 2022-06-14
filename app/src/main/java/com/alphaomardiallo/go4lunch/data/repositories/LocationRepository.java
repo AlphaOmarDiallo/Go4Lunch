@@ -16,6 +16,9 @@ public interface LocationRepository {
 
     Location getOfficeLocation();
 
+    String getOfficeLocationString();
+
     void stopLocationUpdates();
+
 
 }

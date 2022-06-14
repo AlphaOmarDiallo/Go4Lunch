@@ -55,6 +55,12 @@ public class LocationRepositoryImp implements LocationRepository {
         return officeLocation;
     }
 
+    @Override
+    public String getOfficeLocationString() {
+        return "48.86501071160738,2.3467211059168793";
+    }
+
+
     @SuppressLint("MissingPermission")
     public void startLocationRequest(Context context, Activity activity) {
 
