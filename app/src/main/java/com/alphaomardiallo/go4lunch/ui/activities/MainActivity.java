@@ -362,7 +362,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private void onSignInResult(FirebaseAuthUIAuthenticationResult result) {
         IdpResponse response = result.getIdpResponse();
         if (result.getResultCode() == RESULT_OK) {
-            //viewModel.createUserInDataBase();
             observeUsers();
             showSnackBarMessage(getString(R.string.connection_succeed));
         } else {
