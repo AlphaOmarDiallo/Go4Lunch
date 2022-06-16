@@ -4,6 +4,14 @@ apply plugin: 'com.google.gms.google-services'
 apply plugin: 'com.google.android.libraries.mapsplatform.secrets-gradle-plugin'
 
 android {
+    signingConfigs {
+        debug {
+            storeFile file('C:\\Users\\Diallo\\Keystore\\go4lunch.jks')
+            storePassword 'noixdecoco'
+            keyAlias 'upload'
+            keyPassword 'noixdecoco'
+        }
+    }
     compileSdk 31
 
     testOptions {
