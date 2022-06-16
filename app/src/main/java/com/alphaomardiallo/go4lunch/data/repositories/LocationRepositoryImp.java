@@ -29,7 +29,7 @@ public class LocationRepositoryImp implements LocationRepository {
     private static final String OFFICE = "Office";
 
     private FusedLocationProviderClient fusedLocationProviderClient;
-    private final MutableLiveData<Location> locationMutableLiveData = new MutableLiveData<>();
+    public final MutableLiveData<Location> locationMutableLiveData = new MutableLiveData<>();
 
     private LocationCallback locationCallback;
     private LocationRequest locationRequest;
