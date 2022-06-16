@@ -94,7 +94,7 @@ public class LocationRepositoryImp implements LocationRepository {
         locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
     }
 
-    private void createLocationCallback() {
+    public void createLocationCallback() {
         locationCallback = new LocationCallback() {
             @Override
             public void onLocationResult(LocationResult locationResult) {

@@ -60,8 +60,14 @@ public class WorkmatesAdapter extends ListAdapter<User, WorkmatesAdapter.Workmat
 
         @Override
         public boolean areContentsTheSame(@NonNull User oldItem, @NonNull User newItem) {
-            return oldItem.getUsername().equalsIgnoreCase(newItem.getUsername()) &&
-                    oldItem.getUserEmail().equalsIgnoreCase(newItem.getUserEmail());
+
+            if(oldItem.getUserEmail() != null && newItem.getUserEmail() != null) {
+                return oldItem.getUsername().equalsIgnoreCase(newItem.getUsername()) &&
+                        oldItem.getUserEmail().equalsIgnoreCase(newItem.getUserEmail());
+            } else {
+                return oldItem.getUsername().equalsIgnoreCase(newItem.getUsername());
+            }
+
         }
     }
 

@@ -26,6 +26,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 
@@ -33,8 +34,8 @@ import javax.inject.Inject;
 
 public class BookingRepositoryImp implements BookingRepository {
 
-    private static final int ALARM_HOUR = 12;
-    private static final int ALARM_MIN_SEC = 0;
+    private static final int ALARM_HOUR = 0;
+    private static final int ALARM_MIN_SEC = 1;
     private static final int TO_COMPARE_TO = 0;
     private static final String NOTIFICATION_TIME = "12:00";
     private static final String DATE_FORMAT = "dd MMM yyyy";
@@ -133,7 +134,7 @@ public class BookingRepositoryImp implements BookingRepository {
     public void deleteBookingsFromPreviousDays(Context context) {
         for (Booking booking : Objects.requireNonNull(allBookings.getValue())) {
             long dateMilli = booking.getBookingDate().getTime();
-            @SuppressLint("SimpleDateFormat") DateFormat simple = new SimpleDateFormat(DATE_FORMAT);
+            DateFormat simple = new SimpleDateFormat(DATE_FORMAT, Locale.FRANCE);
             Date result = new Date(dateMilli);
             Date today = new Date(Calendar.getInstance().getTimeInMillis());
             if (simple.format(result).compareTo(simple.format(today)) != TO_COMPARE_TO) {
@@ -150,7 +151,7 @@ public class BookingRepositoryImp implements BookingRepository {
     private void setAlarmExactRTCWakeUp(Context context) {
         SharedPreferences sharedPreferences = context.getSharedPreferences(context.getString(R.string.preferences_main_file), Context.MODE_PRIVATE);
 
-        if(sharedPreferences.getString(context.getString(R.string.shared_pref_notifications), "false").equalsIgnoreCase("true")) {
+        if (sharedPreferences.getString(context.getString(R.string.shared_pref_notifications), "false").equalsIgnoreCase("true")) {
 
             Calendar c = Calendar.getInstance();
 

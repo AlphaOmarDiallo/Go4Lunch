@@ -13,6 +13,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
+import org.mockito.Mock;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,6 +24,7 @@ public class AutocompleteRepositoryImpTest {
     @Rule
     public InstantTaskExecutorRule instantTaskExecutorRule = new InstantTaskExecutorRule();
 
+    @Mock
     public AutocompleteRepositoryImp autocompleteRepositoryImp = new AutocompleteRepositoryImp();
 
     public List<PredictionsItem> list = new ArrayList<>();
