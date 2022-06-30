@@ -28,11 +28,11 @@ public class LocationRepositoryImp implements LocationRepository {
     private static final float SMALLEST_DISPLACEMENT_THRESHOLD_METER = 50;
     private static final String OFFICE = "Office";
 
-    private FusedLocationProviderClient fusedLocationProviderClient;
+    public FusedLocationProviderClient fusedLocationProviderClient;
     public final MutableLiveData<Location> locationMutableLiveData = new MutableLiveData<>();
 
-    private LocationCallback locationCallback;
-    private LocationRequest locationRequest;
+    public LocationCallback locationCallback;
+    public LocationRequest locationRequest;
 
     @Inject
     public LocationRepositoryImp() {
@@ -73,12 +73,12 @@ public class LocationRepositoryImp implements LocationRepository {
         fusedLocationProviderClient.removeLocationUpdates(locationCallback);
     }
 
-    private void instantiateFusedLocationProviderClient(Context context) {
+    public void instantiateFusedLocationProviderClient(Context context) {
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(context);
     }
 
     @SuppressLint("MissingPermission")
-    private void getLastKnownLocation(Activity activity) {
+    public void getLastKnownLocation(Activity activity) {
         fusedLocationProviderClient.getLastLocation()
                 .addOnSuccessListener(activity, location -> {
                     if (location != null) {
@@ -87,7 +87,7 @@ public class LocationRepositoryImp implements LocationRepository {
                 });
     }
 
-    private void setupLocationRequest() {
+    public void setupLocationRequest() {
         locationRequest = LocationRequest.create();
         locationRequest.setInterval(LOCATION_REQUEST_PROVIDER_IN_MS);
         locationRequest.setSmallestDisplacement(SMALLEST_DISPLACEMENT_THRESHOLD_METER);
@@ -112,7 +112,7 @@ public class LocationRepositoryImp implements LocationRepository {
     }
 
     @SuppressLint("MissingPermission")
-    private void startLocationUpdates() {
+    public void startLocationUpdates() {
         fusedLocationProviderClient.requestLocationUpdates(locationRequest,
                 locationCallback,
                 Looper.getMainLooper());

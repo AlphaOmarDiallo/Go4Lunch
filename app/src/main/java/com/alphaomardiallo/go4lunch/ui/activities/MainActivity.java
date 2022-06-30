@@ -205,9 +205,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
     }
 
-    /**
-     * Observing current location
-     */
+
+     // Observing current location
+
 
     private void observeLocation() {
         viewModel.startTrackingLocation(this, this);

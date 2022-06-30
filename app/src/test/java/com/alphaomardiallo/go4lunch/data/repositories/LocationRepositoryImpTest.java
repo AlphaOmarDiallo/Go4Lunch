@@ -1,8 +1,6 @@
 package com.alphaomardiallo.go4lunch.data.repositories;
 
 import static com.google.common.truth.Truth.assertThat;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 
@@ -12,17 +10,17 @@ import android.location.Location;
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.Observer;
 
 import com.alphaomardiallo.go4lunch.ui.activities.MainActivity;
+import com.google.android.gms.location.FusedLocationProviderClient;
 
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.junit.runners.JUnit4;
+import org.mockito.junit.MockitoJUnitRunner;
 
-@RunWith(JUnit4.class)
+@RunWith(MockitoJUnitRunner.class)
 public class LocationRepositoryImpTest {
 
     public LocationRepositoryImp locationRepositoryImp = new LocationRepositoryImp();
@@ -31,18 +29,14 @@ public class LocationRepositoryImpTest {
     public MutableLiveData<Location> locationLiveData = spy(new MutableLiveData<>());
     public Location locationMirror = mock(Location.class);
     public Location location1 = mock(Location.class);
+    public FusedLocationProviderClient fusedLocationProviderClient = mock(FusedLocationProviderClient.class);
 
     @Rule
     public InstantTaskExecutorRule instantTaskExecutorRule = new InstantTaskExecutorRule();
 
     @Before
     public void init() {
-        locationRepositoryImp.locationMutableLiveData.observeForever(new Observer<Location>() {
-            @Override
-            public void onChanged(Location location) {
-                locationMirror = location;
-            }
-        });
+        locationRepositoryImp.locationMutableLiveData.observeForever(location -> locationMirror = location);
     }
 
     @Test
@@ -57,7 +51,14 @@ public class LocationRepositoryImpTest {
     }
     @Test
     public void createLocationCallBack() {
-        doNothing().when(mockLocationRepositoryImp).createLocationCallback();
+        locationRepositoryImp.createLocationCallback();
+        assertThat(locationRepositoryImp.locationCallback).isNotNull();
+    }
+
+    @Test
+    public void create_a_location_request() {
+        locationRepositoryImp.setupLocationRequest();
+        assertThat(locationRepositoryImp.locationRequest).isNotNull();
     }
 
     @Test
@@ -65,15 +66,23 @@ public class LocationRepositoryImpTest {
         Context context = mock(Context.class);
         MainActivity mainActivity = mock(MainActivity.class);
         LiveData<Location> currentLocation = locationLiveData;
-        doNothing().when(mockLocationRepositoryImp).startLocationRequest(context,mainActivity);
+        mockLocationRepositoryImp.startLocationRequest(context,mainActivity);
 
-        doReturn(currentLocation).when(mockLocationRepositoryImp).getCurrentLocation();
+        locationRepositoryImp.getCurrentLocation();
         locationLiveData.postValue(locationMirror);
 
         assertThat(locationLiveData.getValue()).isEqualTo(currentLocation.getValue());
     }
 
+    @Test
+    public void get_last_known_location() {
+        mockLocationRepositoryImp.instantiateFusedLocationProviderClient(mock(Context.class));
+        assertThat(fusedLocationProviderClient).isNotNull();
+    }
 
-
-
+    @Test
+    public void start_location_updates() {
+        mockLocationRepositoryImp.startLocationUpdates();
+        assertThat(locationRepositoryImp.fusedLocationProviderClient).isNull();
+    }
 }

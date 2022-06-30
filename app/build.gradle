@@ -4,14 +4,7 @@ apply plugin: 'com.google.gms.google-services'
 apply plugin: 'com.google.android.libraries.mapsplatform.secrets-gradle-plugin'
 
 android {
-    signingConfigs {
-        debug {
-            storeFile file('C:\\Users\\Diallo\\Keystore\\go4lunch.jks')
-            storePassword 'noixdecoco'
-            keyAlias 'upload'
-            keyPassword 'noixdecoco'
-        }
-    }
+
     compileSdk 31
 
     testOptions {
@@ -84,7 +77,6 @@ dependencies {
     // Saved state module for ViewModel
     implementation "androidx.lifecycle:lifecycle-viewmodel-savedstate:$lifecycle_version"
     // Annotation processor
-    //kapt "androidx.lifecycle:lifecycle-compiler:$lifecycle_version"
     // alternately - if using Java8, use the following instead of lifecycle-compiler
     implementation "androidx.lifecycle:lifecycle-common-java8:$lifecycle_version"
     // optional - Test helpers for LiveData
@@ -110,9 +102,6 @@ dependencies {
     // For instrumentation tests
     androidTestImplementation 'com.google.dagger:hilt-android-testing:2.42'
     androidTestAnnotationProcessor 'com.google.dagger:hilt-compiler:2.42'
-    // For local unit tests
-    testImplementation 'com.google.dagger:hilt-android-testing:2.42'
-    testAnnotationProcessor 'com.google.dagger:hilt-compiler:2.42'
 
     //Firebase
     implementation platform('com.google.firebase:firebase-bom:30.0.2')

@@ -34,8 +34,8 @@ import javax.inject.Inject;
 
 public class BookingRepositoryImp implements BookingRepository {
 
-    private static final int ALARM_HOUR = 0;
-    private static final int ALARM_MIN_SEC = 1;
+    private static final int ALARM_HOUR = 12;
+    private static final int ALARM_MIN_SEC = 0;
     private static final int TO_COMPARE_TO = 0;
     private static final String NOTIFICATION_TIME = "12:00";
     private static final String DATE_FORMAT = "dd MMM yyyy";
@@ -148,7 +148,7 @@ public class BookingRepositoryImp implements BookingRepository {
      */
 
     @SuppressLint("MissingPermission")
-    private void setAlarmExactRTCWakeUp(Context context) {
+    public void setAlarmExactRTCWakeUp(Context context) {
         SharedPreferences sharedPreferences = context.getSharedPreferences(context.getString(R.string.preferences_main_file), Context.MODE_PRIVATE);
 
         if (sharedPreferences.getString(context.getString(R.string.shared_pref_notifications), "false").equalsIgnoreCase("true")) {
@@ -171,7 +171,7 @@ public class BookingRepositoryImp implements BookingRepository {
 
     }
 
-    private void cancelAlarm(Context context) {
+    public void cancelAlarm(Context context) {
         @SuppressLint("ServiceCast")
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         Intent alarmIntent = new Intent(context, AlarmReceiver.class);
@@ -179,7 +179,7 @@ public class BookingRepositoryImp implements BookingRepository {
         alarmManager.cancel(pendingAlarmIntent);
     }
 
-    private int checkDateToSetNotification() {
+    public int checkDateToSetNotification() {
         @SuppressLint("SimpleDateFormat") SimpleDateFormat formatter = new SimpleDateFormat(TIME_FORMAT);
         Date date = new Date();
         return formatter.format(date).compareTo(NOTIFICATION_TIME);

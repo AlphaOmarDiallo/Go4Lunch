@@ -11,8 +11,8 @@ import javax.inject.Inject;
 
 public class AutocompleteRepositoryImp implements AutocompleteRepository {
 
-    final MutableLiveData<List<PredictionsItem>> predictionsList = new MutableLiveData<>();
-    final MutableLiveData<PredictionsItem> selectedRestaurant = new MutableLiveData<>();
+    public final MutableLiveData<List<PredictionsItem>> predictionsList = new MutableLiveData<>();
+    public final MutableLiveData<PredictionsItem> selectedRestaurant = new MutableLiveData<>();
 
     @Inject
     public AutocompleteRepositoryImp() {
@@ -20,7 +20,7 @@ public class AutocompleteRepositoryImp implements AutocompleteRepository {
 
     @Override
     public void updatePredictionList(List<PredictionsItem> list) {
-        predictionsList.setValue(list);
+        predictionsList.postValue(list);
     }
 
     @Override
@@ -29,7 +29,8 @@ public class AutocompleteRepositoryImp implements AutocompleteRepository {
     }
 
     public void setPlaceToFocusOn(PredictionsItem restaurant) {
-        selectedRestaurant.setValue(restaurant);
+        selectedRestaurant.postValue(restaurant);
+
     }
 
 }

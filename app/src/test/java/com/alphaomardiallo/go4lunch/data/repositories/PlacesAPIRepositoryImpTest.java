@@ -1,5 +1,7 @@
 package com.alphaomardiallo.go4lunch.data.repositories;
 
+import static org.mockito.Mockito.mock;
+
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule;
 
 import com.alphaomardiallo.go4lunch.BuildConfig;
@@ -10,9 +12,7 @@ import com.alphaomardiallo.go4lunch.data.dataSources.remoteData.RetrofitNearBySe
 
 import org.junit.Before;
 import org.junit.Rule;
-import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import retrofit2.Call;
@@ -29,19 +29,10 @@ public class PlacesAPIRepositoryImpTest {
     @Rule
     public InstantTaskExecutorRule instantTaskExecutorRule = new InstantTaskExecutorRule();
 
-    @Mock
-    private RetrofitAutocompleteAPI retrofitAutocompleteAPI;
-
-    @Mock
-    private RetrofitNearBySearchAPI retrofitNearBySearchAPI;
-
-    @Mock
-    private RetrofitDetailsAPI retrofitDetailsAPI;
-
-    @Mock
-    private PlacesAPIRepositoryImp placesAPIRepositoryImp;
-
-    @Mock
+    private RetrofitAutocompleteAPI retrofitAutocompleteAPI = mock(RetrofitAutocompleteAPI.class);
+    private RetrofitNearBySearchAPI retrofitNearBySearchAPI = mock(RetrofitNearBySearchAPI.class);
+    private RetrofitDetailsAPI retrofitDetailsAPI = mock(RetrofitDetailsAPI.class);
+    private PlacesAPIRepositoryImp mockPlacesAPIRepositoryImp = mock(PlacesAPIRepositoryImp.class);
     Call<PlaceNearBy> mockedNearBySearchCall;
 
     @Before
@@ -49,45 +40,6 @@ public class PlacesAPIRepositoryImpTest {
         retrofitNearBySearchAPI.getNearByPlacesRadiusMethod(location, radius, maxPrice, RESTAURANT, key, null);
     }
 
-    @Test
-    public void getNearBySearchRestaurantList() {
 
-    }
-
-    @Test
-    public void fetchNearBySearchPlaces() {
-    }
-
-    @Test
-    public void getNextResultsRadiusMethod() {
-    }
-
-    @Test
-    public void getDetails() {
-    }
-
-    @Test
-    public void getSelectedRestaurantDetails() {
-    }
-
-    @Test
-    public void fetchOneNearByRestaurantDetail() {
-    }
-
-    @Test
-    public void fetchAllDetails() {
-    }
-
-    @Test
-    public void fetchDetailsForFavourite() {
-    }
-
-    @Test
-    public void autoCompleteSearch() {
-    }
-
-    @Test
-    public void observeListFavouriteRestaurant() {
-    }
 
 }
