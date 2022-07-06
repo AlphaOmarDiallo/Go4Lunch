@@ -1,7 +1,6 @@
 # Go4Lunch
 
 This repository contains an application for project 7 of the path **Grande École du Numérique**. 
-This application is the property of the startup Lamzone. It helps collaborators book meetingrooms quickly. 
 
 ## Identification of the project and the mission
 
