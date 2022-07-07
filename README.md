@@ -2,6 +2,8 @@
 
 This repository contains an application for project 7 of the path **Grande École du Numérique**. 
 
+[All the visuals of the application are available here](https://drive.google.com/drive/folders/1eUBItIa_JBYWvaDgNL6zQIVwZqVn8T4c?usp=sharing)
+
 ## Identification of the project and the mission
 
 Name and nature: 
